@@ -16,3 +16,13 @@ export interface RegisterCredentials {
 export interface AuthResponseData {
   user: User;
 }
+
+export interface ForgotPasswordCredentials {
+  email: string;
+}
+
+export interface ResetPasswordCredentials {
+  resetPasswordToken: string;
+  password: string;
+  passwordConfirmation: string;
+}

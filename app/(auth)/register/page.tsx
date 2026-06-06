@@ -1,5 +1,5 @@
 import { AuthCard } from '@/features/auth/components/AuthCard';
-import { RegisterForm } from '@/features/auth/components/RegisterForm';
+import { RegisterForm } from '@/features/auth/components/register/RegisterForm';
 
 export default function RegisterPage() {
   return (
