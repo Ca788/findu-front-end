@@ -6,8 +6,10 @@ import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import { AppStorageKeys } from '@/constants/AppStorageKeys';
 import type {
   AuthResponseData,
+  ForgotPasswordCredentials,
   LoginCredentials,
   RegisterCredentials,
+  ResetPasswordCredentials,
 } from '@/features/auth/models/auth.model';
 import type { User } from '@/models/user.model';
 
@@ -75,4 +77,23 @@ export async function getCurrentUser(): Promise<User> {
     '/user',
   );
   return response.data.data.user;
+}
+
+export async function requestPasswordReset(
+  credentials: ForgotPasswordCredentials,
+): Promise<void> {
+  await publicApiClient.post('/password', { user: credentials });
+}
+
+export async function resetPassword(
+  credentials: ResetPasswordCredentials,
+): Promise<void> {
+  const { resetPasswordToken, password, passwordConfirmation } = credentials;
+  await publicApiClient.patch('/password', {
+    user: {
+      reset_password_token: resetPasswordToken,
+      password,
+      password_confirmation: passwordConfirmation,
+    },
+  });
 }

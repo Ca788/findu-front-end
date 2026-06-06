@@ -79,6 +79,11 @@ export function LoginForm() {
           {isLoading ? 'Entrando...' : 'Entrar'}
         </Button>
         <Typography variant="body2" color="text.secondary" align="center">
+          <Link component={NextLink} href={AppRoutePaths.FORGOT_PASSWORD}>
+            Esqueci minha senha
+          </Link>
+        </Typography>
+        <Typography variant="body2" color="text.secondary" align="center">
           Não tem conta?{' '}
           <Link component={NextLink} href={AppRoutePaths.REGISTER}>
             Criar agora
