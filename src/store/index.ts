@@ -1,11 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-const readyReducer = (state: { ready: true } = { ready: true }) => state;
+import { authReducer } from '@/store/slices/auth.slice';
 
 export const makeStore = () =>
   configureStore({
     reducer: {
-      _ready: readyReducer,
+      auth: authReducer,
     },
   });
 
