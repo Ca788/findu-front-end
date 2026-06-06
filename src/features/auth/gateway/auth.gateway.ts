@@ -1,4 +1,4 @@
-import type { AxiosResponse } from 'axios';
+import { AxiosHeaders, type AxiosResponse } from 'axios';
 import publicApiClient from '@/infrastructure/public-api.client';
 import authorizedApiClient from '@/infrastructure/authorized-api.client';
 import type { SuccessResponse } from '@/infrastructure/AppResponse';
@@ -11,12 +11,30 @@ import type {
 } from '@/features/auth/models/auth.model';
 import type { User } from '@/models/user.model';
 
-function extractAndPersistToken(response: AxiosResponse): void {
-  const headerValue =
-    (response.headers['authorization'] as string | undefined) ??
-    (response.headers['Authorization'] as string | undefined);
+function readAuthorizationHeader(response: AxiosResponse): string | undefined {
+  const headers = response.headers;
 
-  if (!headerValue) return;
+  if (headers instanceof AxiosHeaders) {
+    const value = headers.get('authorization');
+    return typeof value === 'string' ? value : undefined;
+  }
+
+  const plain = headers as Record<string, unknown>;
+  const value = plain['authorization'] ?? plain['Authorization'];
+  return typeof value === 'string' ? value : undefined;
+}
+
+function extractAndPersistToken(response: AxiosResponse): void {
+  const headerValue = readAuthorizationHeader(response);
+
+  if (!headerValue) {
+    console.warn(
+      '[auth] Authorization header not found in response. ' +
+        'The backend must expose it via CORS ' +
+        '(Rails rack-cors: `expose: ["Authorization"]`).',
+    );
+    return;
+  }
 
   const token = headerValue.startsWith('Bearer ')
     ? headerValue.slice('Bearer '.length)
