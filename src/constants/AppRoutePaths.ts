@@ -8,4 +8,7 @@ export class AppRoutePaths {
   static readonly DASHBOARD = '/dashboard';
   static readonly CATEGORIES = '/categories';
   static readonly TRANSACTIONS = '/transactions';
+  static readonly BUDGETS = '/budgets';
+  static readonly SUMMARY = '/summary';
+  static readonly CHAT = '/chat';
 }

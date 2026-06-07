@@ -33,20 +33,17 @@ export const navItems: NavItem[] = [
   },
   {
     label: 'Orçamentos',
-    href: '/budgets',
+    href: AppRoutePaths.BUDGETS,
     icon: SavingsIcon,
-    comingSoon: true,
   },
   {
     label: 'Resumo',
-    href: '/summary',
+    href: AppRoutePaths.SUMMARY,
     icon: PieChartIcon,
-    comingSoon: true,
   },
   {
     label: 'Chat',
-    href: '/chat',
+    href: AppRoutePaths.CHAT,
     icon: ChatIcon,
-    comingSoon: true,
   },
 ];
