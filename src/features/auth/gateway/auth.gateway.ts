@@ -11,6 +11,7 @@ import type {
   LoginCredentials,
   RegisterCredentials,
   ResetPasswordCredentials,
+  UpdateProfileInput,
 } from '@/features/auth/models/auth.model';
 import type { User } from '@/models/user.model';
 
@@ -70,6 +71,37 @@ export async function logout(): Promise<void> {
 export async function getCurrentUser(): Promise<User> {
   const response = await authorizedApiClient.get<SuccessResponse<AuthResponseData>>(
     '/user',
+  );
+  return response.data.data.user;
+}
+
+export async function updateProfile(input: UpdateProfileInput): Promise<User> {
+  const hasAvatar = input.avatar instanceof File;
+  const isRemovingAvatar = input.removeAvatar === true;
+
+  if (!hasAvatar) {
+    const payload: Record<string, unknown> = {};
+    if (typeof input.name !== 'undefined') payload.name = input.name;
+    if (typeof input.phone !== 'undefined') payload.phone = input.phone;
+    if (isRemovingAvatar) payload.remove_avatar = true;
+
+    const response = await authorizedApiClient.patch<SuccessResponse<AuthResponseData>>(
+      '/user',
+      { user: payload },
+    );
+    return response.data.data.user;
+  }
+
+  const formData = new FormData();
+  if (typeof input.name !== 'undefined') formData.append('user[name]', input.name ?? '');
+  if (typeof input.phone !== 'undefined') formData.append('user[phone]', input.phone ?? '');
+  if (input.avatar) formData.append('user[avatar]', input.avatar);
+  if (isRemovingAvatar) formData.append('user[remove_avatar]', 'true');
+
+  const response = await authorizedApiClient.patch<SuccessResponse<AuthResponseData>>(
+    '/user',
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
   );
   return response.data.data.user;
 }

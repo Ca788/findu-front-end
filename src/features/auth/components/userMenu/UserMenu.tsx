@@ -22,7 +22,7 @@ export function UserMenu() {
   const router = useRouter();
   const { user } = useCurrentUser();
   const { logout, isLoading } = useLogout();
-  const { showSuccess, showError, showInfo } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const isOpen = Boolean(anchorEl);
 
@@ -31,7 +31,7 @@ export function UserMenu() {
 
   const handleProfile = () => {
     close();
-    showInfo('Perfil — em breve');
+    router.push(AppRoutePaths.PROFILE);
   };
 
   const handleLogout = async () => {
@@ -50,6 +50,7 @@ export function UserMenu() {
     <>
       <UserAvatarButton
         initials={getInitials(user?.name, user?.email)}
+        avatarUrl={user?.avatar_url}
         onClick={open}
         expanded={isOpen}
         controls={MENU_ID}

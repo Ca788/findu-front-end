@@ -26,3 +26,10 @@ export interface ResetPasswordCredentials {
   password: string;
   passwordConfirmation: string;
 }
+
+export interface UpdateProfileInput {
+  name?: string;
+  phone?: string | null;
+  avatar?: File | null;
+  removeAvatar?: boolean;
+}

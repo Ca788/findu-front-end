@@ -5,8 +5,13 @@ import {
   login as loginGateway,
   logout as logoutGateway,
   register as registerGateway,
+  updateProfile as updateProfileGateway,
 } from '@/features/auth/gateway/auth.gateway';
-import type {LoginCredentials, RegisterCredentials,} from '@/features/auth/models/auth.model';
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+  UpdateProfileInput,
+} from '@/features/auth/models/auth.model';
 import {type AppErrorResult, AppErrorResultMapper, type ErrorResponse,} from '@/infrastructure/AppResponse';
 import {appStorage} from '@/infrastructure/storage/StorageBuilder';
 import {AppStorageKeys} from '@/constants/AppStorageKeys';
@@ -79,6 +84,17 @@ export const getUserFromToken = createAsyncThunk<User, void, ThunkConfig>(
     }
     try {
       return await getCurrentUserGateway();
+    } catch (error) {
+      return rejectWithValue(toAppError(error));
+    }
+  },
+);
+
+export const updateProfile = createAsyncThunk<User, UpdateProfileInput, ThunkConfig>(
+  'auth/updateProfile',
+  async (input, { rejectWithValue }) => {
+    try {
+      return await updateProfileGateway(input);
     } catch (error) {
       return rejectWithValue(toAppError(error));
     }
@@ -160,6 +176,19 @@ const authSlice = createSlice({
         state.user = undefined;
         state.status = 'unauthorized';
         state.isLoggedIn = false;
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = undefined;
+      })
+      .addCase(updateProfile.fulfilled, (state, action: PayloadAction<User>) => {
+        state.user = action.payload;
+        state.loading = false;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -11,4 +11,5 @@ export class AppRoutePaths {
   static readonly BUDGETS = '/budgets';
   static readonly SUMMARY = '/summary';
   static readonly CHAT = '/chat';
+  static readonly PROFILE = '/profile';
 }
