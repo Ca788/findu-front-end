@@ -23,9 +23,8 @@ export const navItems: NavItem[] = [
   },
   {
     label: 'Transações',
-    href: '/transactions',
+    href: AppRoutePaths.TRANSACTIONS,
     icon: ReceiptLongIcon,
-    comingSoon: true,
   },
   {
     label: 'Categorias',

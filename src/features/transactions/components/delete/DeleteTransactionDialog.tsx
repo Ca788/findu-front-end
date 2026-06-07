@@ -1,51 +1,52 @@
 'use client';
 
 import { AxiosError } from 'axios';
-import { useDeleteCategory } from '@/features/categories/hooks/useDeleteCategory';
+import { useDeleteTransaction } from '@/features/transactions/hooks/useDeleteTransaction';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
   AppErrorResultMapper,
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
-import type { Category } from '@/features/categories/models/category.model';
+import { formatBRL } from '@/utils/currency';
+import type { Transaction } from '@/features/transactions/models/transaction.model';
 
-interface DeleteCategoryDialogProps {
+interface DeleteTransactionDialogProps {
   open: boolean;
-  category?: Category;
+  transaction?: Transaction;
   onClose: () => void;
 }
 
-export function DeleteCategoryDialog({
+export function DeleteTransactionDialog({
   open,
-  category,
+  transaction,
   onClose,
-}: DeleteCategoryDialogProps) {
+}: DeleteTransactionDialogProps) {
   const { showSuccess, showError } = useSnackbar();
-  const { mutateAsync, isPending } = useDeleteCategory();
+  const { mutateAsync, isPending } = useDeleteTransaction();
 
   const handleConfirm = async () => {
-    if (!category) return;
+    if (!transaction) return;
     try {
-      await mutateAsync(category.id);
-      showSuccess('Categoria removida');
+      await mutateAsync(transaction.id);
+      showSuccess('Transação removida');
       onClose();
     } catch (err) {
       const mapped = AppErrorResultMapper.fromAxiosError(
         err as AxiosError<ErrorResponse>,
       );
-      showError(mapped.data.message ?? 'Erro ao remover categoria');
+      showError(mapped.data.message ?? 'Erro ao remover transação');
     }
   };
 
   return (
     <ConfirmDialog
       open={open}
-      title="Remover categoria"
+      title="Remover transação"
       description={
         <>
-          Tem certeza que deseja remover{' '}
-          <strong>{category?.name ?? 'esta categoria'}</strong>?
+          Tem certeza que deseja remover a transação de{' '}
+          <strong>{formatBRL(transaction?.amount)}</strong>?
         </>
       }
       confirmLabel="Remover"

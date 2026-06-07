@@ -4,15 +4,10 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import { useCreateCategory } from '@/features/categories/hooks/useCreateCategory';
 import { useUpdateCategory } from '@/features/categories/hooks/useUpdateCategory';
 import { useSnackbar } from '@/providers/SnackbarProvider';
-import { useDevice } from '@/hooks/useDevice';
+import { FormDialog } from '@/components/common/FormDialog';
 import {
   AppErrorResultMapper,
   type ErrorResponse,
@@ -37,7 +32,6 @@ export function CategoryFormDialog({
 }: CategoryFormDialogProps) {
   const isEdit = !!category;
   const { showSuccess, showError } = useSnackbar();
-  const { isMobile } = useDevice();
   const createMutation = useCreateCategory();
   const updateMutation = useUpdateCategory();
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
@@ -75,27 +69,15 @@ export function CategoryFormDialog({
   };
 
   return (
-    <Dialog
+    <FormDialog
       open={open}
+      title={isEdit ? 'Editar categoria' : 'Nova categoria'}
       onClose={onClose}
-      fullWidth
+      onSubmit={handleSubmit(onSubmit)}
+      isSubmitting={isSubmitting}
       maxWidth="xs"
-      fullScreen={isMobile}
     >
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <DialogTitle>{isEdit ? 'Editar categoria' : 'Nova categoria'}</DialogTitle>
-        <DialogContent className="pt-2">
-          <CategoryFormFields register={register} errors={errors} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} disabled={isSubmitting}>
-            Cancelar
-          </Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? 'Salvando...' : 'Salvar'}
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+      <CategoryFormFields register={register} errors={errors} />
+    </FormDialog>
   );
 }

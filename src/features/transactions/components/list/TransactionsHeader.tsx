@@ -4,15 +4,15 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { PageHeader } from '@/components/common/PageHeader';
 
-interface CategoriesHeaderProps {
+interface TransactionsHeaderProps {
   onCreate: () => void;
 }
 
-export function CategoriesHeader({ onCreate }: CategoriesHeaderProps) {
+export function TransactionsHeader({ onCreate }: TransactionsHeaderProps) {
   return (
     <PageHeader
       eyebrow="Financeiro"
-      title="Categorias"
+      title="Transações"
       actions={
         <Button
           variant="contained"
@@ -20,7 +20,7 @@ export function CategoriesHeader({ onCreate }: CategoriesHeaderProps) {
           onClick={onCreate}
           className="w-full sm:w-auto"
         >
-          Nova categoria
+          Nova transação
         </Button>
       }
     />

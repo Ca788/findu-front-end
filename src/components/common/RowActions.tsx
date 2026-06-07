@@ -5,21 +5,28 @@ import Tooltip from '@mui/material/Tooltip';
 import EditIcon from '@mui/icons-material/EditOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 
-interface CategoryRowActionsProps {
+interface RowActionsProps {
   onEdit: () => void;
   onDelete: () => void;
+  editLabel?: string;
+  deleteLabel?: string;
 }
 
-export function CategoryRowActions({ onEdit, onDelete }: CategoryRowActionsProps) {
+export function RowActions({
+  onEdit,
+  onDelete,
+  editLabel = 'Editar',
+  deleteLabel = 'Remover',
+}: RowActionsProps) {
   return (
     <div className="flex justify-end gap-1">
-      <Tooltip title="Editar">
-        <IconButton size="small" onClick={onEdit} aria-label="Editar categoria">
+      <Tooltip title={editLabel}>
+        <IconButton size="small" onClick={onEdit} aria-label={editLabel}>
           <EditIcon fontSize="small" />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Remover">
-        <IconButton size="small" onClick={onDelete} aria-label="Remover categoria">
+      <Tooltip title={deleteLabel}>
+        <IconButton size="small" onClick={onDelete} aria-label={deleteLabel}>
           <DeleteIcon fontSize="small" />
         </IconButton>
       </Tooltip>
