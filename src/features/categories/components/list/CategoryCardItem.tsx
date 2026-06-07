@@ -1,0 +1,30 @@
+'use client';
+
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import type { Category } from '@/features/categories/models/category.model';
+import { CategoryRowActions } from '@/features/categories/components/list/CategoryRowActions';
+
+interface CategoryCardItemProps {
+  category: Category;
+  onEdit: (category: Category) => void;
+  onDelete: (category: Category) => void;
+}
+
+export function CategoryCardItem({
+  category,
+  onEdit,
+  onDelete,
+}: CategoryCardItemProps) {
+  return (
+    <Paper className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
+      <Typography variant="body1" className="min-w-0 flex-1 truncate font-medium">
+        {category.name}
+      </Typography>
+      <CategoryRowActions
+        onEdit={() => onEdit(category)}
+        onDelete={() => onDelete(category)}
+      />
+    </Paper>
+  );
+}

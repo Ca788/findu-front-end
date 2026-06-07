@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import { useCreateCategory } from '@/features/categories/hooks/useCreateCategory';
 import { useUpdateCategory } from '@/features/categories/hooks/useUpdateCategory';
 import { useSnackbar } from '@/providers/SnackbarProvider';
+import { useDevice } from '@/hooks/useDevice';
 import {
   AppErrorResultMapper,
   type ErrorResponse,
@@ -36,6 +37,7 @@ export function CategoryFormDialog({
 }: CategoryFormDialogProps) {
   const isEdit = !!category;
   const { showSuccess, showError } = useSnackbar();
+  const { isMobile } = useDevice();
   const createMutation = useCreateCategory();
   const updateMutation = useUpdateCategory();
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
@@ -73,7 +75,13 @@ export function CategoryFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="xs"
+      fullScreen={isMobile}
+    >
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <DialogTitle>{isEdit ? 'Editar categoria' : 'Nova categoria'}</DialogTitle>
         <DialogContent className="pt-2">

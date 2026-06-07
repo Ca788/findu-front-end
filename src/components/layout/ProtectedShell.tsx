@@ -19,7 +19,6 @@ export function ProtectedShell({ children }: ProtectedShellProps) {
       <Sidebar mobileOpen={mobileOpen} onMobileClose={handleClose} />
       <div
         className="flex min-h-screen flex-1 flex-col"
-        style={{ width: `calc(100% - ${SIDEBAR_WIDTH}px)` }}
       >
         <Topbar onMenuClick={handleToggle} />
         <main className="flex-1 px-4 py-6 md:px-8 md:py-10">{children}</main>

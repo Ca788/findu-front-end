@@ -1,6 +1,7 @@
 'use client';
 
 import TablePagination from '@mui/material/TablePagination';
+import { useDevice } from '@/hooks/useDevice';
 
 interface CategoriesPaginationProps {
   page: number;
@@ -17,6 +18,8 @@ export function CategoriesPagination({
   onPageChange,
   onPerPageChange,
 }: CategoriesPaginationProps) {
+  const { isMobile } = useDevice();
+
   return (
     <TablePagination
       component="div"
@@ -27,11 +30,18 @@ export function CategoriesPagination({
       onRowsPerPageChange={(event) =>
         onPerPageChange(Number(event.target.value))
       }
-      rowsPerPageOptions={[10, 25, 50]}
-      labelRowsPerPage="Por página"
+      rowsPerPageOptions={isMobile ? [] : [10, 25, 50]}
+      labelRowsPerPage={isMobile ? '' : 'Por página'}
       labelDisplayedRows={({ from, to, count }) =>
-        `${from}–${to} de ${count}`
+        isMobile ? `${from}–${to}/${count}` : `${from}–${to} de ${count}`
       }
+      sx={{
+        '.MuiTablePagination-toolbar': {
+          paddingLeft: { xs: 0, sm: 2 },
+          paddingRight: { xs: 0, sm: 2 },
+          minHeight: { xs: 48, sm: 52 },
+        },
+      }}
     />
   );
 }

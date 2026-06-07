@@ -8,6 +8,7 @@ import { useCategories } from '@/features/categories/hooks/useCategories';
 import { useCategoryDialogs } from '@/features/categories/hooks/useCategoryDialogs';
 import { CategoriesHeader } from '@/features/categories/components/list/CategoriesHeader';
 import { CategoriesTable } from '@/features/categories/components/list/CategoriesTable';
+import { CategoriesCardList } from '@/features/categories/components/list/CategoriesCardList';
 import { CategoriesPagination } from '@/features/categories/components/list/CategoriesPagination';
 import { CategoryFormDialog } from '@/features/categories/components/form/CategoryFormDialog';
 import { DeleteCategoryDialog } from '@/features/categories/components/delete/DeleteCategoryDialog';
@@ -34,12 +35,22 @@ export function CategoriesPage() {
       {isError && <Alert severity="error">Erro ao carregar categorias.</Alert>}
       {isFetching && <LinearProgress />}
 
-      <CategoriesTable
-        categories={categories}
-        isLoading={isLoading}
-        onEdit={dialogs.openEdit}
-        onDelete={dialogs.openDelete}
-      />
+      <div className="hidden md:block">
+        <CategoriesTable
+          categories={categories}
+          isLoading={isLoading}
+          onEdit={dialogs.openEdit}
+          onDelete={dialogs.openDelete}
+        />
+      </div>
+      <div className="md:hidden">
+        <CategoriesCardList
+          categories={categories}
+          isLoading={isLoading}
+          onEdit={dialogs.openEdit}
+          onDelete={dialogs.openDelete}
+        />
+      </div>
 
       {totalCount > 0 && (
         <CategoriesPagination

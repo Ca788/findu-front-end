@@ -10,7 +10,7 @@ interface CategoriesHeaderProps {
 
 export function CategoriesHeader({ onCreate }: CategoriesHeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <Typography variant="overline" color="text.secondary">
           Financeiro
@@ -23,7 +23,7 @@ export function CategoriesHeader({ onCreate }: CategoriesHeaderProps) {
         variant="contained"
         startIcon={<AddIcon />}
         onClick={onCreate}
-        className="shrink-0"
+        className="w-full shrink-0 sm:w-auto"
       >
         Nova categoria
       </Button>

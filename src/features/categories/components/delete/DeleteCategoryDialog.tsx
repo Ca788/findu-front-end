@@ -9,6 +9,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { useDeleteCategory } from '@/features/categories/hooks/useDeleteCategory';
 import { useSnackbar } from '@/providers/SnackbarProvider';
+import { useDevice } from '@/hooks/useDevice';
 import {
   AppErrorResultMapper,
   type ErrorResponse,
@@ -27,6 +28,7 @@ export function DeleteCategoryDialog({
   onClose,
 }: DeleteCategoryDialogProps) {
   const { showSuccess, showError } = useSnackbar();
+  const { isMobile } = useDevice();
   const { mutateAsync, isPending } = useDeleteCategory();
 
   const handleConfirm = async () => {
@@ -44,7 +46,13 @@ export function DeleteCategoryDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="xs"
+      fullScreen={isMobile}
+    >
       <DialogTitle>Remover categoria</DialogTitle>
       <DialogContent>
         <DialogContentText>
