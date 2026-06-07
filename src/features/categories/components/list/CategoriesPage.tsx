@@ -9,7 +9,7 @@ import { useCategoryDialogs } from '@/features/categories/hooks/useCategoryDialo
 import { CategoriesHeader } from '@/features/categories/components/list/CategoriesHeader';
 import { CategoriesTable } from '@/features/categories/components/list/CategoriesTable';
 import { CategoriesCardList } from '@/features/categories/components/list/CategoriesCardList';
-import { CategoriesPagination } from '@/features/categories/components/list/CategoriesPagination';
+import { DataPagination } from '@/components/common/DataPagination';
 import { CategoryFormDialog } from '@/features/categories/components/form/CategoryFormDialog';
 import { DeleteCategoryDialog } from '@/features/categories/components/delete/DeleteCategoryDialog';
 
@@ -53,7 +53,7 @@ export function CategoriesPage() {
       </div>
 
       {totalCount > 0 && (
-        <CategoriesPagination
+        <DataPagination
           page={page}
           perPage={perPage}
           totalCount={totalCount}

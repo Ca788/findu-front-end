@@ -3,21 +3,23 @@
 import TablePagination from '@mui/material/TablePagination';
 import { useDevice } from '@/hooks/useDevice';
 
-interface CategoriesPaginationProps {
+interface DataPaginationProps {
   page: number;
   perPage: number;
   totalCount: number;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+  perPageOptions?: number[];
 }
 
-export function CategoriesPagination({
+export function DataPagination({
   page,
   perPage,
   totalCount,
   onPageChange,
   onPerPageChange,
-}: CategoriesPaginationProps) {
+  perPageOptions = [10, 25, 50],
+}: DataPaginationProps) {
   const { isMobile } = useDevice();
 
   return (
@@ -30,7 +32,7 @@ export function CategoriesPagination({
       onRowsPerPageChange={(event) =>
         onPerPageChange(Number(event.target.value))
       }
-      rowsPerPageOptions={isMobile ? [] : [10, 25, 50]}
+      rowsPerPageOptions={isMobile ? [] : perPageOptions}
       labelRowsPerPage={isMobile ? '' : 'Por página'}
       labelDisplayedRows={({ from, to, count }) =>
         isMobile ? `${from}–${to}/${count}` : `${from}–${to} de ${count}`

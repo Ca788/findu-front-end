@@ -3,7 +3,7 @@
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import type { Category } from '@/features/categories/models/category.model';
-import { CategoryRowActions } from '@/features/categories/components/list/CategoryRowActions';
+import { RowActions } from '@/components/common/RowActions';
 
 interface CategoryCardItemProps {
   category: Category;
@@ -21,7 +21,7 @@ export function CategoryCardItem({
       <Typography variant="body1" className="min-w-0 flex-1 truncate font-medium">
         {category.name}
       </Typography>
-      <CategoryRowActions
+      <RowActions
         onEdit={() => onEdit(category)}
         onDelete={() => onDelete(category)}
       />
