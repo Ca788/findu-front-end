@@ -30,14 +30,7 @@ function readAuthorizationHeader(response: AxiosResponse): string | undefined {
 function extractAndPersistToken(response: AxiosResponse): void {
   const headerValue = readAuthorizationHeader(response);
 
-  if (!headerValue) {
-    console.warn(
-      '[auth] Authorization header not found in response. ' +
-        'The backend must expose it via CORS ' +
-        '(Rails rack-cors: `expose: ["Authorization"]`).',
-    );
-    return;
-  }
+  if (!headerValue) return;
 
   const token = headerValue.startsWith('Bearer ')
     ? headerValue.slice('Bearer '.length)
