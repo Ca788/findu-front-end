@@ -14,14 +14,13 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   const title = usePageTitle();
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center gap-2 border-b border-[color:var(--mui-palette-divider)] bg-[color:var(--mui-palette-background-default)]/80 px-4 backdrop-blur md:px-6">
+    <header className="sticky top-0 z-10 flex h-16 items-center gap-2 border-b border-(--mui-palette-divider) bg-(--mui-palette-background-default)/80 px-4 backdrop-blur md:px-6">
       <IconButton
         onClick={onMenuClick}
         aria-label="Abrir menu"
         edge="start"
         className="md:hidden"
       >
-        <MenuIcon />
       </IconButton>
       <Typography
         variant="subtitle1"
