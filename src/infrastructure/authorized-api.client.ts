@@ -2,6 +2,7 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import { AppStorageKeys } from '@/constants/AppStorageKeys';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
+import { disconnectCable } from '@/infrastructure/cable.client';
 
 const authorizedApiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -27,6 +28,7 @@ authorizedApiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       appStorage.remove(AppStorageKeys.TOKEN);
+      disconnectCable();
       if (typeof window !== 'undefined') {
         window.location.replace(AppRoutePaths.LOGIN);
       }

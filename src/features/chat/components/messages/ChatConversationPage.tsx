@@ -4,6 +4,7 @@ import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useMessages } from '@/features/chat/hooks/useMessages';
 import { useConversation } from '@/features/chat/hooks/useConversation';
+import { useConversationChannel } from '@/features/chat/hooks/useConversationChannel';
 import { ChatConversationHeader } from '@/features/chat/components/messages/ChatConversationHeader';
 import { MessagesList } from '@/features/chat/components/messages/MessagesList';
 import { MessageComposer } from '@/features/chat/components/messages/MessageComposer';
@@ -19,6 +20,7 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
     isLoading: isMessagesLoading,
     isError: isMessagesError,
   } = useMessages(conversationId);
+  useConversationChannel(conversationId);
 
   const messages = messagesData?.data ?? [];
   const title = conversation?.title?.trim() || 'Conversa';

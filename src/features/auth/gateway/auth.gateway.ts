@@ -4,6 +4,7 @@ import authorizedApiClient from '@/infrastructure/authorized-api.client';
 import type { SuccessResponse } from '@/infrastructure/AppResponse';
 import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import { AppStorageKeys } from '@/constants/AppStorageKeys';
+import { disconnectCable } from '@/infrastructure/cable.client';
 import type {
   AuthResponseData,
   ForgotPasswordCredentials,
@@ -69,6 +70,7 @@ export async function logout(): Promise<void> {
     await authorizedApiClient.delete('/logout');
   } finally {
     appStorage.remove(AppStorageKeys.TOKEN);
+    disconnectCable();
   }
 }
 
