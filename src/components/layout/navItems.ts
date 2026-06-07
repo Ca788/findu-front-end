@@ -29,9 +29,8 @@ export const navItems: NavItem[] = [
   },
   {
     label: 'Categorias',
-    href: '/categories',
+    href: AppRoutePaths.CATEGORIES,
     icon: CategoryIcon,
-    comingSoon: true,
   },
   {
     label: 'Orçamentos',
