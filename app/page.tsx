@@ -1,16 +1,10 @@
 import { PageContainer } from '@/components/layout/PageContainer';
-import { HeroCard } from '@/components/marketing/HeroCard';
-import { HeroActions } from '@/components/marketing/HeroActions';
+import { LoginScreen } from '@/features/auth/components/login/LoginScreen';
 
 export default function Home() {
   return (
-    <PageContainer>
-      <HeroCard
-        eyebrow="FindU"
-        title="Seu assistente financeiro."
-        description="Acompanhe transações, comprovantes e orçamentos com uma interface limpa e direta."
-        actions={<HeroActions />}
-      />
+    <PageContainer contentClassName="w-full max-w-md">
+      <LoginScreen />
     </PageContainer>
   );
 }

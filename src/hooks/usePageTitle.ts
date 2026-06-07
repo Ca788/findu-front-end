@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
-import { navItems } from '@/components/layout/navItems';
+import { navItems } from '@/components/layout/sidebar/navItems';
 
 const FALLBACK_TITLE = 'FindU';
 
