@@ -2,8 +2,8 @@
 
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import { TypingDots } from '@/features/chat/components/messages/TypingDots';
 import { formatTimeBR } from '@/utils/date';
 import { AttachmentChip } from '@/features/chat/components/messages/AttachmentChip';
 import type { ChatMessage } from '@/features/chat/models/message.model';
@@ -41,20 +41,17 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         }}
       >
         {hasBody ? (
-          <Typography variant="body2" component="div" className="whitespace-pre-wrap break-words">
+          <Typography variant="body2" component="div" className="whitespace-pre-wrap wrap-break-word">
             {message.body}
             {isStreaming && (
               <span
                 aria-hidden="true"
-                className="ml-0.5 inline-block w-[2px] h-[1em] align-[-2px] bg-current animate-pulse"
+                className="ml-0.5 inline-block w-0.5 h-[1em] align-[-2px] bg-current animate-pulse"
               />
             )}
           </Typography>
         ) : pending ? (
-          <div className="flex items-center gap-2">
-            <CircularProgress size={14} thickness={5} color="inherit" />
-            <Typography variant="body2">Pensando…</Typography>
-          </div>
+          <TypingDots />
         ) : (
           <Typography variant="body2" color="text.secondary">
             (sem conteúdo)

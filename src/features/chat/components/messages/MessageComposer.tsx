@@ -36,20 +36,17 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { showError } = useSnackbar();
-  const { mutateAsync, isPending } = useSendMessage();
+  const { send, isSending } = useSendMessage(conversationId);
 
   const hasContent = body.trim().length > 0 || files.length > 0;
 
   const submit = async () => {
-    if (!hasContent || isPending) return;
+    if (!hasContent || isSending) return;
     try {
-      await mutateAsync({
-        conversationId,
-        input: {
-          body: body.trim() || undefined,
-          attachments: files.length > 0 ? files : undefined,
-          client_message_id: createClientId(),
-        },
+      await send({
+        body: body.trim() || undefined,
+        attachments: files.length > 0 ? files : undefined,
+        client_message_id: createClientId(),
       });
       setBody('');
       setFiles([]);
@@ -107,7 +104,7 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
             <IconButton
               size="small"
               onClick={() => fileInputRef.current?.click()}
-              disabled={isPending || files.length >= MAX_FILES}
+              disabled={isSending || files.length >= MAX_FILES}
               aria-label="Anexar arquivo"
             >
               <AttachFileIcon fontSize="small" />
@@ -136,7 +133,7 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
         <IconButton
           color="primary"
           onClick={submit}
-          disabled={isPending || !hasContent}
+          disabled={isSending || !hasContent}
           aria-label="Enviar mensagem"
         >
           <SendIcon />

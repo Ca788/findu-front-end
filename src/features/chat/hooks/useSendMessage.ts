@@ -1,22 +1,23 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+'use client';
+
+import { useCallback, useState } from 'react';
 import { sendMessage } from '@/features/chat/gateway/messages.gateway';
-import { MESSAGES_KEY } from '@/features/chat/hooks/useMessages';
-import type { SendMessageInput } from '@/features/chat/models/message.model';
+import type { ChatMessage, SendMessageInput } from '@/features/chat/models/message.model';
 
-interface SendArgs {
-  conversationId: string;
-  input: SendMessageInput;
-}
+export function useSendMessage(conversationId: string) {
+  const [isSending, setIsSending] = useState(false);
 
-export function useSendMessage() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ conversationId, input }: SendArgs) =>
-      sendMessage(conversationId, input),
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: [MESSAGES_KEY, variables.conversationId],
-      });
+  const send = useCallback(
+    async (input: SendMessageInput): Promise<ChatMessage> => {
+      setIsSending(true);
+      try {
+        return await sendMessage(conversationId, input);
+      } finally {
+        setIsSending(false);
+      }
     },
-  });
+    [conversationId],
+  );
+
+  return { send, isSending };
 }
