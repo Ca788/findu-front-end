@@ -4,25 +4,15 @@ import Image from 'next/image';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import { absoluteApiUrl } from '@/utils/url';
 import type { MessageAttachment } from '@/features/chat/models/message.model';
-
-function absoluteUrl(url: string): string {
-  if (/^https?:\/\//.test(url)) return url;
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
-  try {
-    const apiBase = new URL(base, 'http://localhost');
-    return new URL(url, `${apiBase.protocol}//${apiBase.host}`).toString();
-  } catch {
-    return url;
-  }
-}
 
 interface AttachmentChipProps {
   attachment: MessageAttachment;
 }
 
 export function AttachmentChip({ attachment }: AttachmentChipProps) {
-  const href = absoluteUrl(attachment.url);
+  const href = absoluteApiUrl(attachment.url);
   const isImage = attachment.content_type.startsWith('image/');
 
   if (isImage) {

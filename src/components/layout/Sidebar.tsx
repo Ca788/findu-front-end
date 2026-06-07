@@ -6,33 +6,32 @@ import { SidebarContent } from '@/components/layout/SidebarContent';
 export const SIDEBAR_WIDTH = 256;
 
 interface SidebarProps {
-  mobileOpen: boolean;
-  onMobileClose: () => void;
+  open: boolean;
+  onClose: () => void;
+  onToggle: () => void;
 }
 
-export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
+export function Sidebar({ open, onClose, onToggle }: SidebarProps) {
   return (
     <>
       <Drawer
         variant="temporary"
-        open={mobileOpen}
-        onClose={onMobileClose}
+        open={open}
+        onClose={onClose}
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': { width: SIDEBAR_WIDTH },
         }}
       >
-        <SidebarContent onSelect={onMobileClose} />
+        <SidebarContent onSelect={onClose} onToggle={onClose} />
       </Drawer>
 
       <Drawer
-        variant="permanent"
-        open
+        variant="persistent"
+        open={open}
         sx={{
           display: { xs: 'none', md: 'block' },
-          width: SIDEBAR_WIDTH,
-          flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: SIDEBAR_WIDTH,
             boxSizing: 'border-box',
@@ -41,7 +40,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           },
         }}
       >
-        <SidebarContent onSelect={() => undefined} />
+        <SidebarContent onSelect={() => undefined} onToggle={onToggle} />
       </Drawer>
     </>
   );

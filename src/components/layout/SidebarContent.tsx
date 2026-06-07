@@ -10,6 +10,7 @@ import { SidebarItem } from '@/components/layout/SidebarItem';
 
 interface SidebarContentProps {
   onSelect: () => void;
+  onToggle?: () => void;
 }
 
 function isActive(pathname: string, item: NavItem): boolean {
@@ -17,7 +18,7 @@ function isActive(pathname: string, item: NavItem): boolean {
   return pathname === item.href || pathname.startsWith(`${item.href}/`);
 }
 
-export function SidebarContent({ onSelect }: SidebarContentProps) {
+export function SidebarContent({ onSelect, onToggle }: SidebarContentProps) {
   const pathname = usePathname();
   const { showInfo } = useSnackbar();
 
@@ -25,7 +26,7 @@ export function SidebarContent({ onSelect }: SidebarContentProps) {
 
   return (
     <div className="flex h-full flex-col">
-      <SidebarBrand />
+      <SidebarBrand onToggle={onToggle} />
       <Divider />
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <List disablePadding>

@@ -6,6 +6,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { TypingDots } from '@/features/chat/components/messages/TypingDots';
 import { formatTimeBR } from '@/utils/date';
 import { AttachmentChip } from '@/features/chat/components/messages/AttachmentChip';
+import { AudioMessagePlayer } from '@/features/chat/components/messages/AudioMessagePlayer';
 import type { ChatMessage } from '@/features/chat/models/message.model';
 
 interface MessageBubbleProps {
@@ -22,6 +23,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const pending = isPending(message.status);
   const hasBody = !!message.body && message.body.length > 0;
   const isStreaming = pending && hasBody;
+  const hasAudio = message.kind === 'audio' && !!message.audio_url;
 
   const bubbleClasses = [
     'max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2',
@@ -40,6 +42,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           borderColor: 'divider',
         }}
       >
+        {hasAudio && (
+          <div className={hasBody ? 'mb-2' : ''}>
+            <AudioMessagePlayer
+              url={message.audio_url as string}
+              tone={isUser ? 'user' : 'assistant'}
+            />
+          </div>
+        )}
         {hasBody ? (
           <Typography variant="body2" component="div" className="whitespace-pre-wrap wrap-break-word">
             {message.body}
@@ -52,7 +62,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           </Typography>
         ) : pending ? (
           <TypingDots />
-        ) : (
+        ) : hasAudio ? null : (
           <Typography variant="body2" color="text.secondary">
             (sem conteúdo)
           </Typography>

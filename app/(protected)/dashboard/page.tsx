@@ -1,10 +1,10 @@
 import { PageContainer } from '@/components/layout/PageContainer';
-import { DashboardWelcome } from '@/features/dashboard/components/DashboardWelcome';
+import { DashboardPage } from '@/features/dashboard/components/DashboardPage';
 
-export default function DashboardPage() {
+export default function Page() {
   return (
     <PageContainer>
-      <DashboardWelcome />
+      <DashboardPage />
     </PageContainer>
   );
 }

@@ -30,5 +30,7 @@ export interface ChatMessage {
 export interface SendMessageInput {
   body?: string;
   attachments?: File[];
+  audio?: Blob;
+  audioFilename?: string;
   client_message_id?: string;
 }
