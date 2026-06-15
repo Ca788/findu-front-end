@@ -46,6 +46,17 @@ export async function createConversation(
   return response.data.data;
 }
 
+export async function updateConversation(
+  id: string,
+  input: ConversationInput,
+): Promise<Conversation> {
+  const response = await authorizedApiClient.patch<SuccessResponse<Conversation>>(
+    `${BASE_PATH}/${id}`,
+    input,
+  );
+  return response.data.data;
+}
+
 export async function archiveConversation(id: string): Promise<void> {
   await authorizedApiClient.delete(`${BASE_PATH}/${id}`);
 }

@@ -20,7 +20,7 @@ interface TransactionsFiltersProps {
   hasFilters: boolean;
 }
 
-const FIELD_CLASS = 'min-w-[140px]';
+const FIELD_CLASS = 'w-[150px]';
 
 export function TransactionsFilters({
   filters,

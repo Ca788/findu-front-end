@@ -2,35 +2,50 @@
 
 import { createTheme } from '@mui/material/styles';
 
+const PALETTE = {
+  bgDefault: '#000000',
+  bgPaper:   '#0A0A0A',
+  bgRaised:  '#121212',
+  border:    'rgba(255, 255, 255, 0.06)',
+  borderHi:  'rgba(255, 255, 255, 0.10)',
+  textHi:    '#F5F5F5',
+  textMid:   '#A3A3A3',
+  textLow:   '#525252',
+};
+
 const theme = createTheme({
   cssVariables: true,
   palette: {
     mode: 'dark',
     primary: {
-      main: '#3B82F6',
-      dark: '#2563EB',
-      light: '#60A5FA',
-      contrastText: '#FFFFFF',
+      main: '#A3E635',
+      dark: '#84CC16',
+      light: '#BEF264',
+      contrastText: '#0A0A0A',
     },
     secondary: {
-      main: '#94A3B8',
-      dark: '#64748B',
-      light: '#CBD5E1',
+      main: '#A3A3A3',
+      dark: '#737373',
+      light: '#D4D4D4',
     },
     background: {
-      default: '#0A0F1C',
-      paper: '#111827',
+      default: PALETTE.bgDefault,
+      paper:   PALETTE.bgPaper,
     },
     text: {
-      primary: '#F1F5F9',
-      secondary: '#94A3B8',
-      disabled: '#475569',
+      primary:  PALETTE.textHi,
+      secondary: PALETTE.textMid,
+      disabled:  PALETTE.textLow,
     },
-    divider: 'rgba(148, 163, 184, 0.12)',
-    error: { main: '#EF4444' },
-    warning: { main: '#F59E0B' },
-    info: { main: '#38BDF8' },
-    success: { main: '#22C55E' },
+    divider: PALETTE.border,
+    error:   { main: '#F87171' },
+    warning: { main: '#FBBF24' },
+    info:    { main: '#60A5FA' },
+    success: { main: '#A3E635' },
+    action: {
+      hover:    'rgba(255, 255, 255, 0.04)',
+      selected: 'rgba(255, 255, 255, 0.06)',
+    },
   },
   shape: {
     borderRadius: 8,
@@ -55,6 +70,14 @@ const theme = createTheme({
     button: { textTransform: 'none', fontWeight: 500 },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: PALETTE.bgDefault,
+          color: PALETTE.textHi,
+        },
+      },
+    },
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
@@ -66,7 +89,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          border: '1px solid rgba(148, 163, 184, 0.08)',
+          backgroundColor: PALETTE.bgPaper,
+          border: `1px solid ${PALETTE.border}`,
         },
       },
     },
@@ -74,9 +98,64 @@ const theme = createTheme({
       defaultProps: { elevation: 0, color: 'transparent' },
       styleOverrides: {
         root: {
-          backgroundColor: '#0A0F1C',
-          borderBottom: '1px solid rgba(148, 163, 184, 0.08)',
+          backgroundColor: PALETTE.bgDefault,
+          borderBottom: `1px solid ${PALETTE.border}`,
         },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: PALETTE.bgDefault,
+          backgroundImage: 'none',
+          borderColor: PALETTE.border,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: PALETTE.bgPaper,
+          border: `1px solid ${PALETTE.border}`,
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: PALETTE.bgPaper,
+          backgroundImage: 'none',
+          border: `1px solid ${PALETTE.border}`,
+        },
+      },
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: PALETTE.bgRaised,
+          backgroundImage: 'none',
+          border: `1px solid ${PALETTE.border}`,
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: PALETTE.bgRaised,
+          backgroundImage: 'none',
+          border: `1px solid ${PALETTE.border}`,
+        },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: PALETTE.bgRaised,
+          border: `1px solid ${PALETTE.border}`,
+          color: PALETTE.textHi,
+          fontSize: 12,
+        },
+        arrow: { color: PALETTE.bgRaised },
       },
     },
     MuiTextField: {
@@ -86,7 +165,32 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
+          backgroundColor: 'transparent',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: PALETTE.border,
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: PALETTE.borderHi,
+          },
         },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: { borderColor: PALETTE.border },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'transparent',
+          border: `1px solid ${PALETTE.border}`,
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: { borderBottomColor: PALETTE.border },
       },
     },
   },

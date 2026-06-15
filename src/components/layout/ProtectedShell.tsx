@@ -9,6 +9,9 @@ import {
 } from '@/components/layout/sidebar/constants';
 import { Topbar } from '@/components/layout/Topbar';
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
+import { FloatingAgentProvider } from '@/contexts/FloatingAgentContext';
+import { FloatingAgentLauncher } from '@/features/chat/floating/FloatingAgentLauncher';
+import { FloatingAgentPanel } from '@/features/chat/floating/FloatingAgentPanel';
 
 interface ProtectedShellProps {
   children: ReactNode;
@@ -42,6 +45,8 @@ function ProtectedShellLayout({ children }: ProtectedShellProps) {
         <Topbar />
         <main className="flex-1 px-4 py-6 md:px-8 md:py-10">{children}</main>
       </Box>
+      <FloatingAgentPanel />
+      <FloatingAgentLauncher />
     </Box>
   );
 }
@@ -49,7 +54,9 @@ function ProtectedShellLayout({ children }: ProtectedShellProps) {
 export function ProtectedShell({ children }: ProtectedShellProps) {
   return (
     <SidebarProvider>
-      <ProtectedShellLayout>{children}</ProtectedShellLayout>
+      <FloatingAgentProvider>
+        <ProtectedShellLayout>{children}</ProtectedShellLayout>
+      </FloatingAgentProvider>
     </SidebarProvider>
   );
 }

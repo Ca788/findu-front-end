@@ -1,12 +1,12 @@
 'use client';
 
-import { FormEvent, ReactNode } from 'react';
+import {FormEvent, ReactNode} from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { useDevice } from '@/hooks/useDevice';
+import {useDevice} from '@/hooks/useDevice';
 
 interface FormDialogProps {
   open: boolean;
@@ -42,8 +42,10 @@ export function FormDialog({
       fullScreen={isMobile}
     >
       <form onSubmit={onSubmit} noValidate>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogContent className="pt-2">{children}</DialogContent>
+        <DialogTitle sx={{ paddingTop: '8px' }}>{title}</DialogTitle>
+        <DialogContent sx={{ '&.MuiDialogContent-root': { paddingTop: 2 } }}>
+          {children}
+        </DialogContent>
         <DialogActions>
           <Button onClick={onClose} disabled={isSubmitting}>
             {cancelLabel}
