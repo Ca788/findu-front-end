@@ -5,6 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/MenuOutlined';
 import { UserMenu } from '@/features/auth/components/userMenu/UserMenu';
+import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useSidebar } from '@/contexts/SidebarContext';
 
@@ -32,6 +33,7 @@ export function Topbar() {
       >
         {title}
       </Typography>
+      <ThemeToggleButton />
       <UserMenu />
     </header>
   );
