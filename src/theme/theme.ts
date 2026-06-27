@@ -5,36 +5,36 @@ import { createTheme, Theme } from '@mui/material/styles';
 export type ThemeMode = 'light' | 'dark';
 
 const DARK_PALETTE = {
-  bgDefault: '#000000',
-  bgPaper:   '#0A0A0A',
-  bgRaised:  '#121212',
-  border:    'rgba(255, 255, 255, 0.06)',
-  borderHi:  'rgba(255, 255, 255, 0.10)',
-  textHi:    '#F5F5F5',
-  textMid:   '#A3A3A3',
-  textLow:   '#525252',
-  actionHover:    'rgba(255, 255, 255, 0.04)',
-  actionSelected: 'rgba(255, 255, 255, 0.06)',
-  primaryMain:    '#A3E635',
-  primaryDark:    '#84CC16',
-  primaryLight:   '#BEF264',
-  primaryContrast:'#0A0A0A',
+  bgDefault: '#131314',
+  bgPaper:   '#1B1C1D',
+  bgRaised:  '#1F2022',
+  border:    'rgba(255, 255, 255, 0.08)',
+  borderHi:  'rgba(255, 255, 255, 0.14)',
+  textHi:    '#E3E3E3',
+  textMid:   '#9AA0A6',
+  textLow:   '#5F6368',
+  actionHover:    'rgba(255, 255, 255, 0.06)',
+  actionSelected: 'rgba(138, 180, 248, 0.16)',
+  primaryMain:    '#8AB4F8',
+  primaryDark:    '#669DF6',
+  primaryLight:   '#A8C7FA',
+  primaryContrast:'#0B1424',
 };
 
 const LIGHT_PALETTE = {
   bgDefault: '#FFFFFF',
-  bgPaper:   '#FAFAFA',
-  bgRaised:  '#F5F5F5',
-  border:    'rgba(0, 0, 0, 0.08)',
-  borderHi:  'rgba(0, 0, 0, 0.14)',
-  textHi:    '#0A0A0A',
-  textMid:   '#525252',
-  textLow:   '#A3A3A3',
-  actionHover:    'rgba(0, 0, 0, 0.04)',
-  actionSelected: 'rgba(0, 0, 0, 0.06)',
-  primaryMain:    '#65A30D',
-  primaryDark:    '#4D7C0F',
-  primaryLight:   '#84CC16',
+  bgPaper:   '#F8F9FA',
+  bgRaised:  '#F1F3F4',
+  border:    'rgba(60, 64, 67, 0.10)',
+  borderHi:  'rgba(60, 64, 67, 0.18)',
+  textHi:    '#1F1F1F',
+  textMid:   '#5F6368',
+  textLow:   '#9AA0A6',
+  actionHover:    'rgba(60, 64, 67, 0.06)',
+  actionSelected: 'rgba(26, 115, 232, 0.10)',
+  primaryMain:    '#1A73E8',
+  primaryDark:    '#1557B0',
+  primaryLight:   '#4285F4',
   primaryContrast:'#FFFFFF',
 };
 
@@ -66,17 +66,17 @@ export function getTheme(mode: ThemeMode): Theme {
         disabled:  p.textLow,
       },
       divider: p.border,
-      error:   { main: mode === 'dark' ? '#F87171' : '#DC2626' },
-      warning: { main: mode === 'dark' ? '#FBBF24' : '#D97706' },
-      info:    { main: mode === 'dark' ? '#60A5FA' : '#2563EB' },
-      success: { main: p.primaryMain },
+      error:   { main: mode === 'dark' ? '#F28B82' : '#D93025' },
+      warning: { main: mode === 'dark' ? '#FDD663' : '#F29900' },
+      info:    { main: mode === 'dark' ? '#8AB4F8' : '#1A73E8' },
+      success: { main: mode === 'dark' ? '#81C995' : '#1E8E3E' },
       action: {
         hover:    p.actionHover,
         selected: p.actionSelected,
       },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 12,
     },
     typography: {
       fontFamily: [
@@ -109,7 +109,12 @@ export function getTheme(mode: ThemeMode): Theme {
       MuiButton: {
         defaultProps: { disableElevation: true },
         styleOverrides: {
-          root: { borderRadius: 8 },
+          root: { borderRadius: 999, paddingInline: 18 },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: { borderRadius: 12 },
         },
       },
       MuiPaper: {
@@ -192,7 +197,7 @@ export function getTheme(mode: ThemeMode): Theme {
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
+            borderRadius: 12,
             backgroundColor: 'transparent',
             '& .MuiOutlinedInput-notchedOutline': {
               borderColor: p.border,
@@ -213,12 +218,24 @@ export function getTheme(mode: ThemeMode): Theme {
           root: {
             backgroundColor: 'transparent',
             border: `1px solid ${p.border}`,
+            borderRadius: 999,
           },
         },
       },
       MuiTableCell: {
         styleOverrides: {
           root: { borderBottomColor: p.border },
+        },
+      },
+      MuiListItemButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 999,
+            '&.Mui-selected': {
+              backgroundColor: p.actionSelected,
+              '&:hover': { backgroundColor: p.actionSelected },
+            },
+          },
         },
       },
     },

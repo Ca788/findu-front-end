@@ -2,17 +2,15 @@
 
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
-import { navItems } from '@/components/layout/sidebar/navItems';
+import { findActiveNavItem } from '@/components/layout/app-shell/appNavItems';
 
-const FALLBACK_TITLE = 'FindU';
+const FALLBACK_TITLE = 'Findu';
 
 export function usePageTitle(): string {
   const pathname = usePathname();
 
   return useMemo(() => {
-    const match = navItems.find(
-      (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
-    );
+    const match = findActiveNavItem(pathname);
     return match?.label ?? FALLBACK_TITLE;
   }, [pathname]);
 }

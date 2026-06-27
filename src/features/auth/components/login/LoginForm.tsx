@@ -40,7 +40,7 @@ export function LoginForm() {
     try {
       await login(data).unwrap();
       showSuccess('Login realizado com sucesso');
-      router.replace(AppRoutePaths.DASHBOARD);
+      router.replace(AppRoutePaths.CHAT);
     } catch (err) {
       const message =
         (err as AppErrorResult)?.data?.message ?? 'Erro ao fazer login';

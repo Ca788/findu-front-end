@@ -1,3 +1,0 @@
-export const SIDEBAR_EXPANDED_WIDTH = 256;
-export const SIDEBAR_COLLAPSED_WIDTH = 72;
-export const SIDEBAR_MOBILE_WIDTH = '80%';

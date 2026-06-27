@@ -2,10 +2,150 @@
 
 :root {
   color-scheme: dark;
+  --app-safe-top: env(safe-area-inset-top, 0px);
+  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --app-safe-left: env(safe-area-inset-left, 0px);
+  --app-safe-right: env(safe-area-inset-right, 0px);
+  --app-header-height: 56px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --app-header-height: 64px;
+  }
 }
 
 html,
 body {
   height: 100%;
-  background-color: #000000;
+  min-height: 100dvh;
+  background-color: var(--mui-palette-background-default, #131314);
+}
+
+body {
+  overscroll-behavior-y: contain;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes findu-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes findu-fade-in-soft {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.findu-anim-fade-in {
+  animation: findu-fade-in 220ms ease-out both;
+}
+
+.findu-anim-fade-in-soft {
+  animation: findu-fade-in-soft 320ms ease-out both;
+}
+
+.findu-scroll-smooth {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+.findu-aurora-glow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.findu-aurora-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60% 55% at 50% 78%,
+      rgba(138, 180, 248, 0.18) 0%,
+      rgba(138, 180, 248, 0.06) 35%,
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 30% 60%,
+      rgba(167, 139, 250, 0.14) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 75% 50%,
+      rgba(99, 102, 241, 0.12) 0%,
+      transparent 70%
+    );
+  opacity: 0.85;
+  animation: findu-aurora-drift 14s ease-in-out infinite alternate;
+}
+
+[data-mui-color-scheme="light"] .findu-aurora-glow::before {
+  background:
+    radial-gradient(
+      60% 55% at 50% 78%,
+      rgba(66, 133, 244, 0.10) 0%,
+      rgba(66, 133, 244, 0.03) 35%,
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 30% 60%,
+      rgba(167, 139, 250, 0.08) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 75% 50%,
+      rgba(99, 102, 241, 0.07) 0%,
+      transparent 70%
+    );
+  opacity: 0.9;
+}
+
+.findu-aurora-glow > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes findu-aurora-drift {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .findu-aurora-glow::before {
+    animation: none;
+  }
+}
+
+.findu-scroll-smooth::-webkit-scrollbar {
+  width: 6px;
+}
+
+.findu-scroll-smooth::-webkit-scrollbar-thumb {
+  background-color: var(--mui-palette-divider, rgba(255, 255, 255, 0.12));
+  border-radius: 999px;
+}
+
+.findu-scroll-smooth::-webkit-scrollbar-track {
+  background: transparent;
 }

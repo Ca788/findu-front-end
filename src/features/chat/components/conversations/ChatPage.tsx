@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { AxiosError } from 'axios';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/AddOutlined';
+import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { useSnackbar } from '@/providers/SnackbarProvider';
@@ -17,11 +19,9 @@ import {
 import { useConversations } from '@/features/chat/hooks/useConversations';
 import { useArchiveConversation } from '@/features/chat/hooks/useArchiveConversation';
 import { ChatList } from '@/features/chat/components/conversations/ChatList';
-import { NewConversationDialog } from '@/features/chat/components/conversations/NewConversationDialog';
 import type { Conversation } from '@/features/chat/models/conversation.model';
 
 export function ChatPage() {
-  const [isCreateOpen, setCreateOpen] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<Conversation | undefined>();
   const { showSuccess, showError } = useSnackbar();
 
@@ -48,12 +48,13 @@ export function ChatPage() {
     <Stack spacing={3}>
       <PageHeader
         eyebrow="Assistente"
-        title="Conversas"
+        title="Histórico de conversas"
         actions={
           <Button
+            component={Link}
+            href={AppRoutePaths.CHAT}
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => setCreateOpen(true)}
             className="w-full sm:w-auto"
           >
             Nova conversa
@@ -70,10 +71,6 @@ export function ChatPage() {
         onArchive={setArchiveTarget}
       />
 
-      <NewConversationDialog
-        open={isCreateOpen}
-        onClose={() => setCreateOpen(false)}
-      />
       <ConfirmDialog
         open={!!archiveTarget}
         title="Arquivar conversa"

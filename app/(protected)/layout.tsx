@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
 import { AuthGuard } from '@/guards/AuthGuard';
-import { ProtectedShell } from '@/components/layout/ProtectedShell';
+import { AppShell } from '@/components/layout/app-shell/AppShell';
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   return (
     <AuthGuard>
-      <ProtectedShell>{children}</ProtectedShell>
+      <AppShell>{children}</AppShell>
     </AuthGuard>
   );
 }

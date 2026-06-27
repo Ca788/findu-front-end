@@ -10,7 +10,6 @@ import { useDashboardMonth } from '@/features/dashboard/hooks/useDashboardMonth'
 import { DashboardWelcome } from '@/features/dashboard/components/DashboardWelcome';
 import { DashboardBudgets } from '@/features/dashboard/components/DashboardBudgets';
 import { DashboardRecentTransactions } from '@/features/dashboard/components/DashboardRecentTransactions';
-import { DashboardChatCta } from '@/features/dashboard/components/DashboardChatCta';
 
 export function DashboardPage() {
   const { from, to, referenceDate, monthLabel } = useDashboardMonth();
@@ -33,8 +32,6 @@ export function DashboardPage() {
       </div>
 
       <CategoryBreakdown summary={summaryQuery.data} />
-
-      <DashboardChatCta />
     </Stack>
   );
 }

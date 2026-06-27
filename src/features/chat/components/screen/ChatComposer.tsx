@@ -2,29 +2,27 @@
 
 import { useRef, useState, type KeyboardEvent } from 'react';
 import { AxiosError } from 'axios';
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import SendIcon from '@mui/icons-material/SendOutlined';
+import SendIcon from '@mui/icons-material/SendRounded';
 import AttachFileIcon from '@mui/icons-material/AttachFileOutlined';
 import MicIcon from '@mui/icons-material/MicNoneOutlined';
 import StopIcon from '@mui/icons-material/StopCircleOutlined';
 import CloseIcon from '@mui/icons-material/CloseOutlined';
-import { useSendMessage } from '@/features/chat/hooks/useSendMessage';
 import { useAudioRecorder } from '@/features/chat/hooks/useAudioRecorder';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import {
   AppErrorResultMapper,
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
-
-interface MessageComposerProps {
-  conversationId: string;
-}
+import type {
+  ChatMessage,
+  SendMessageInput,
+} from '@/features/chat/models/message.model';
 
 const ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf';
 const MAX_FILES = 5;
@@ -44,12 +42,25 @@ function formatDuration(ms: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-export function MessageComposer({ conversationId }: MessageComposerProps) {
+export interface ChatComposerProps {
+  onSubmit: (input: SendMessageInput) => Promise<ChatMessage | void>;
+  isSending?: boolean;
+  disabled?: boolean;
+  placeholder?: string;
+  maxRows?: number;
+}
+
+export function ChatComposer({
+  onSubmit,
+  isSending = false,
+  disabled = false,
+  placeholder = 'Pergunte algo...',
+  maxRows = 6,
+}: ChatComposerProps) {
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { showError } = useSnackbar();
-  const { send, isSending } = useSendMessage(conversationId);
   const recorder = useAudioRecorder();
 
   const inAudioMode =
@@ -59,11 +70,12 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
     recorder.status === 'ready';
 
   const hasContent = body.trim().length > 0 || files.length > 0;
+  const isBusy = isSending || disabled;
 
   const submitText = async () => {
-    if (!hasContent || isSending) return;
+    if (!hasContent || isBusy) return;
     try {
-      await send({
+      await onSubmit({
         body: body.trim() || undefined,
         attachments: files.length > 0 ? files : undefined,
         client_message_id: createClientId(),
@@ -80,9 +92,9 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
   };
 
   const submitAudio = async () => {
-    if (!recorder.recorded || isSending) return;
+    if (!recorder.recorded || isBusy) return;
     try {
-      await send({
+      await onSubmit({
         audio: recorder.recorded.blob,
         client_message_id: createClientId(),
       });
@@ -104,9 +116,8 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
 
   const handleFiles = (selected: FileList | null) => {
     if (!selected) return;
-    const incoming = Array.from(selected);
     const allowed: File[] = [];
-    for (const file of incoming) {
+    for (const file of Array.from(selected)) {
       if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         showError(`"${file.name}" excede ${MAX_FILE_SIZE_MB}MB`);
         continue;
@@ -125,123 +136,181 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
     if (recorder.error) showError(recorder.error);
   };
 
+  const isRecording = recorder.status === 'recording' || recorder.status === 'requesting';
+  const isReady = recorder.status === 'ready';
+
   return (
-    <Paper className="flex flex-col gap-2 rounded-2xl px-3 py-2">
+    <Box
+      sx={{
+        px: { xs: 1.25, sm: 2, md: 3 },
+        pt: 1.25,
+        pb: 1.25,
+        mx: 'auto',
+        width: '100%',
+        maxWidth: 880,
+      }}
+    >
       {!inAudioMode && files.length > 0 && (
-        <div className="flex flex-wrap gap-1">
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1 }}>
           {files.map((file, idx) => (
             <Chip
               key={`${file.name}-${idx}`}
               label={file.name}
               size="small"
               onDelete={() => removeFile(idx)}
+              sx={{ maxWidth: 220 }}
             />
           ))}
-        </div>
+        </Box>
       )}
 
-      {inAudioMode ? (
-        <AudioModePanel
-          status={recorder.status}
-          elapsedMs={recorder.elapsedMs}
-          previewUrl={recorder.recorded?.url}
-          isSending={isSending}
-          onStop={() => recorder.stop()}
-          onCancel={() => recorder.cancel()}
-          onSend={submitAudio}
-        />
-      ) : (
-        <div className="flex items-end gap-2">
-          <Tooltip title="Anexar imagem ou PDF">
-            <span>
-              <IconButton
-                size="small"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isSending || files.length >= MAX_FILES}
-                aria-label="Anexar arquivo"
-              >
-                <AttachFileIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={ACCEPT}
-            multiple
-            hidden
-            onChange={(e) => handleFiles(e.target.files)}
+      <Box
+        sx={(theme) => ({
+          display: 'flex',
+          alignItems: inAudioMode ? 'center' : 'flex-end',
+          gap: 0.5,
+          px: 1,
+          py: 0.75,
+          borderRadius: 28,
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          transition: theme.transitions.create(['border-color', 'box-shadow'], {
+            duration: theme.transitions.duration.shorter,
+          }),
+          '&:focus-within': {
+            borderColor: 'primary.main',
+            boxShadow: `0 0 0 4px ${theme.palette.primary.main}1f`,
+          },
+        })}
+      >
+        {inAudioMode ? (
+          <AudioModeRow
+            status={recorder.status}
+            elapsedMs={recorder.elapsedMs}
+            previewUrl={recorder.recorded?.url}
+            isBusy={isBusy}
+            onStop={() => recorder.stop()}
+            onCancel={() => recorder.cancel()}
+            onSend={submitAudio}
+            isRecording={isRecording}
+            isReady={isReady}
           />
-          <TextField
-            multiline
-            maxRows={6}
-            fullWidth
-            variant="standard"
-            placeholder="Pergunte algo… (Enter envia, Shift+Enter quebra linha)"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            onKeyDown={handleKeyDown}
-            slotProps={{ input: { disableUnderline: true } }}
-          />
-          {hasContent ? (
-            <IconButton
-              color="primary"
-              onClick={submitText}
-              disabled={isSending}
-              aria-label="Enviar mensagem"
-            >
-              <SendIcon />
-            </IconButton>
-          ) : (
-            <Tooltip title="Gravar áudio">
+        ) : (
+          <>
+            <Tooltip title="Anexar imagem ou PDF">
               <span>
                 <IconButton
-                  color="primary"
-                  onClick={startRecording}
-                  disabled={isSending}
-                  aria-label="Gravar áudio"
+                  size="small"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isBusy || files.length >= MAX_FILES}
+                  aria-label="Anexar arquivo"
+                  sx={{ alignSelf: 'flex-end', mb: 0.25 }}
                 >
-                  <MicIcon />
+                  <AttachFileIcon fontSize="small" />
                 </IconButton>
               </span>
             </Tooltip>
-          )}
-        </div>
-      )}
-    </Paper>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={ACCEPT}
+              multiple
+              hidden
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+            <TextField
+              multiline
+              maxRows={maxRows}
+              fullWidth
+              variant="standard"
+              placeholder={placeholder}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isBusy}
+              slotProps={{ input: { disableUnderline: true } }}
+              sx={{
+                alignSelf: 'center',
+                '& .MuiInputBase-root': { px: 0.5, py: 0.75, fontSize: 15 },
+              }}
+            />
+            {hasContent ? (
+              <Tooltip title="Enviar">
+                <span>
+                  <IconButton
+                    color="primary"
+                    onClick={submitText}
+                    disabled={isBusy}
+                    aria-label="Enviar mensagem"
+                    sx={(theme) => ({
+                      alignSelf: 'flex-end',
+                      mb: 0.25,
+                      bgcolor: 'primary.main',
+                      color: 'primary.contrastText',
+                      '&:hover': { bgcolor: 'primary.dark' },
+                      transition: theme.transitions.create('transform', {
+                        duration: theme.transitions.duration.shorter,
+                      }),
+                      '&:active': { transform: 'scale(0.94)' },
+                    })}
+                  >
+                    <SendIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Gravar áudio">
+                <span>
+                  <IconButton
+                    onClick={startRecording}
+                    disabled={isBusy}
+                    aria-label="Gravar áudio"
+                    sx={{ alignSelf: 'flex-end', mb: 0.25 }}
+                  >
+                    <MicIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+          </>
+        )}
+      </Box>
+    </Box>
   );
 }
 
-interface AudioModePanelProps {
+interface AudioModeRowProps {
   status: ReturnType<typeof useAudioRecorder>['status'];
   elapsedMs: number;
   previewUrl?: string;
-  isSending: boolean;
+  isBusy: boolean;
   onStop: () => void;
   onCancel: () => void;
   onSend: () => void;
+  isRecording: boolean;
+  isReady: boolean;
 }
 
-function AudioModePanel({
+function AudioModeRow({
   status,
   elapsedMs,
   previewUrl,
-  isSending,
+  isBusy,
   onStop,
   onCancel,
   onSend,
-}: AudioModePanelProps) {
-  const isRecording = status === 'recording' || status === 'requesting';
-  const isReady = status === 'ready';
-
+  isRecording,
+  isReady,
+}: AudioModeRowProps) {
   return (
-    <div className="flex items-center gap-2">
+    <>
       <Tooltip title="Cancelar">
         <span>
           <IconButton
             size="small"
             onClick={onCancel}
-            disabled={isSending || status === 'stopping'}
+            disabled={isBusy || status === 'stopping'}
             aria-label="Cancelar gravação"
           >
             <CloseIcon fontSize="small" />
@@ -254,16 +323,14 @@ function AudioModePanel({
           flex: 1,
           display: 'flex',
           alignItems: 'center',
-          gap: 1.5,
-          px: 1.5,
-          py: 1,
-          borderRadius: 1.5,
-          bgcolor: 'action.hover',
+          gap: 1.25,
+          px: 1.25,
+          py: 0.75,
         }}
       >
         {isRecording && (
           <Box
-            aria-hidden="true"
+            aria-hidden
             sx={{
               width: 10,
               height: 10,
@@ -277,7 +344,6 @@ function AudioModePanel({
             }}
           />
         )}
-
         {isReady && previewUrl ? (
           <audio
             controls
@@ -307,10 +373,15 @@ function AudioModePanel({
             <IconButton
               color="primary"
               onClick={onSend}
-              disabled={isSending}
+              disabled={isBusy}
               aria-label="Enviar áudio"
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                '&:hover': { bgcolor: 'primary.dark' },
+              }}
             >
-              <SendIcon />
+              <SendIcon fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
@@ -328,6 +399,6 @@ function AudioModePanel({
           </span>
         </Tooltip>
       )}
-    </div>
+    </>
   );
 }

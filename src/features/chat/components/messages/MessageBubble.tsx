@@ -1,6 +1,6 @@
 'use client';
 
-import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { TypingDots } from '@/features/chat/components/messages/TypingDots';
@@ -25,33 +25,46 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isStreaming = pending && hasBody;
   const hasAudio = message.kind === 'audio' && !!message.audio_url;
 
-  const bubbleClasses = [
-    'max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2',
-    isUser ? 'self-end' : 'self-start',
-  ].join(' ');
-
   return (
-    <div className={`flex flex-col gap-1 ${isUser ? 'items-end' : 'items-start'}`}>
-      <Paper
-        elevation={0}
-        className={bubbleClasses}
-        sx={{
+    <Box
+      className="findu-anim-fade-in"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 0.5,
+        alignItems: isUser ? 'flex-end' : 'flex-start',
+      }}
+    >
+      <Box
+        sx={(theme) => ({
+          maxWidth: { xs: '88%', sm: '78%' },
+          px: 2,
+          py: 1.25,
+          borderRadius: 3,
           bgcolor: isUser ? 'primary.main' : 'background.paper',
           color: isUser ? 'primary.contrastText' : 'text.primary',
           border: isUser ? 'none' : '1px solid',
           borderColor: 'divider',
-        }}
+          boxShadow: isUser
+            ? `0 1px 2px ${theme.palette.primary.main}33`
+            : 'none',
+          wordBreak: 'break-word',
+        })}
       >
         {hasAudio && (
-          <div className={hasBody ? 'mb-2' : ''}>
+          <Box sx={{ mb: hasBody ? 1 : 0 }}>
             <AudioMessagePlayer
               url={message.audio_url as string}
               tone={isUser ? 'user' : 'assistant'}
             />
-          </div>
+          </Box>
         )}
         {hasBody ? (
-          <Typography variant="body2" component="div" className="whitespace-pre-wrap wrap-break-word">
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: 14.5, lineHeight: 1.55 }}
+          >
             {message.body}
             {isStreaming && (
               <span
@@ -68,21 +81,25 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           </Typography>
         )}
         {message.attachments && message.attachments.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
+          <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {message.attachments.map((att) => (
               <AttachmentChip key={att.id} attachment={att} />
             ))}
-          </div>
+          </Box>
         )}
-      </Paper>
+      </Box>
 
-      <div className="flex items-center gap-1 px-1">
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 0.5 }}>
         {failed && <ErrorOutlineIcon fontSize="small" color="error" />}
-        <Typography variant="caption" color={failed ? 'error.main' : 'text.secondary'}>
+        <Typography
+          variant="caption"
+          color={failed ? 'error.main' : 'text.secondary'}
+          sx={{ fontSize: 11 }}
+        >
           {failed ? 'Falha ao processar · ' : ''}
           {formatTimeBR(message.created_at)}
         </Typography>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

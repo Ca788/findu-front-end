@@ -63,7 +63,7 @@ export function RegisterForm() {
     try {
       await registerUser(payload).unwrap();
       showSuccess('Conta criada com sucesso');
-      router.replace(AppRoutePaths.DASHBOARD);
+      router.replace(AppRoutePaths.CHAT);
     } catch (err) {
       const message =
         (err as AppErrorResult)?.data?.message ?? 'Erro ao criar conta';
