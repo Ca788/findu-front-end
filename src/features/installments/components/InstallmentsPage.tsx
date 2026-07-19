@@ -8,6 +8,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/AddOutlined';
@@ -15,6 +16,7 @@ import EditIcon from '@mui/icons-material/EditOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { useDevice } from '@/hooks/useDevice';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import {
   AppErrorResultMapper,
@@ -56,6 +58,7 @@ function statusLabel(status: InstallmentPlan['status']): string {
 }
 
 export function InstallmentsPage() {
+  const { isMobile } = useDevice();
   const { showSuccess, showError } = useSnackbar();
   const query = useInstallmentPlans({ page: 1, perPage: 50 });
   const cancelMutation = useCancelInstallmentPlan();
@@ -64,6 +67,11 @@ export function InstallmentsPage() {
   const [canceling, setCanceling] = useState<InstallmentPlan | null>(null);
 
   const plans = query.data?.data ?? [];
+
+  const openCreate = () => {
+    setSelected(null);
+    setFormOpen(true);
+  };
 
   const handleCancel = async () => {
     if (!canceling) return;
@@ -80,21 +88,16 @@ export function InstallmentsPage() {
   };
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={{ xs: 2, sm: 3 }} className="pb-20 sm:pb-0">
       <PageHeader
         eyebrow="Financeiro"
         title="Parcelamentos"
         actions={
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setSelected(null);
-              setFormOpen(true);
-            }}
-          >
-            Novo parcelamento
-          </Button>
+          !isMobile ? (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+              Novo parcelamento
+            </Button>
+          ) : undefined
         }
       />
 
@@ -117,10 +120,10 @@ export function InstallmentsPage() {
               : 0;
 
           return (
-            <Paper key={plan.id} className="flex flex-col gap-2 rounded-2xl p-4">
+            <Paper key={plan.id} className="flex flex-col gap-2 rounded-2xl p-3.5 sm:p-4">
               <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <Typography variant="subtitle1" className="truncate">
+                <div className="min-w-0 flex-1">
+                  <Typography variant="subtitle1" className="break-words">
                     {plan.description || 'Parcelamento'}
                   </Typography>
                   <div className="mt-1 flex flex-wrap items-center gap-1">
@@ -204,6 +207,22 @@ export function InstallmentsPage() {
         onClose={() => setCanceling(null)}
         onConfirm={handleCancel}
       />
+
+      {isMobile && (
+        <Fab
+          color="primary"
+          aria-label="Novo parcelamento"
+          onClick={openCreate}
+          sx={{
+            position: 'fixed',
+            right: 16,
+            bottom: 'max(16px, env(safe-area-inset-bottom))',
+            zIndex: (theme) => theme.zIndex.speedDial,
+          }}
+        >
+          <AddIcon />
+        </Fab>
+      )}
     </Stack>
   );
 }

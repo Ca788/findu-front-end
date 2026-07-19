@@ -22,6 +22,14 @@ interface StatementEntriesFiltersProps {
   totalCount: number;
 }
 
+const toggleSx = {
+  flex: 1,
+  minWidth: 0,
+  px: { xs: 0.75, sm: 1.5 },
+  fontSize: { xs: '0.7rem', sm: '0.8125rem' },
+  whiteSpace: 'nowrap' as const,
+};
+
 export function StatementEntriesFilters({
   filters,
   onChange,
@@ -38,38 +46,46 @@ export function StatementEntriesFilters({
   ) => onChange({ ...filters, [key]: value });
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-black/5 bg-black/[0.02] p-3 dark:border-white/10 dark:bg-white/5">
-      <div className="flex flex-wrap items-center gap-2">
-        <ToggleButtonGroup
-          exclusive
-          size="small"
-          value={filters.status}
-          onChange={(_, next: EntryFilterStatus | null) => next && patch('status', next)}
-        >
-          <ToggleButton value="all">Todos</ToggleButton>
-          <ToggleButton value="pending">Pendentes</ToggleButton>
-          <ToggleButton value="paid">Pagos</ToggleButton>
-        </ToggleButtonGroup>
+    <div className="flex flex-col gap-2.5 rounded-2xl border border-black/5 bg-black/[0.02] p-3 dark:border-white/10 dark:bg-white/5">
+      <ToggleButtonGroup
+        exclusive
+        size="small"
+        fullWidth
+        value={filters.status}
+        onChange={(_, next: EntryFilterStatus | null) => next && patch('status', next)}
+      >
+        <ToggleButton value="all" sx={toggleSx}>
+          Todos
+        </ToggleButton>
+        <ToggleButton value="pending" sx={toggleSx}>
+          Pendentes
+        </ToggleButton>
+        <ToggleButton value="paid" sx={toggleSx}>
+          Pagos
+        </ToggleButton>
+      </ToggleButtonGroup>
 
-        <ToggleButtonGroup
-          exclusive
-          size="small"
-          value={filters.transaction_type}
-          onChange={(_, next: EntryFilterType | null) =>
-            next && patch('transaction_type', next)
-          }
-        >
-          <ToggleButton value="all">Tipo</ToggleButton>
-          <ToggleButton value="expense" color="error">
-            Despesa
-          </ToggleButton>
-          <ToggleButton value="income" color="success">
-            Receita
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </div>
+      <ToggleButtonGroup
+        exclusive
+        size="small"
+        fullWidth
+        value={filters.transaction_type}
+        onChange={(_, next: EntryFilterType | null) =>
+          next && patch('transaction_type', next)
+        }
+      >
+        <ToggleButton value="all" sx={toggleSx}>
+          Tipo
+        </ToggleButton>
+        <ToggleButton value="expense" color="error" sx={toggleSx}>
+          Despesa
+        </ToggleButton>
+        <ToggleButton value="income" color="success" sx={toggleSx}>
+          Receita
+        </ToggleButton>
+      </ToggleButtonGroup>
 
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <TextField
           select
           size="small"
@@ -107,6 +123,7 @@ export function StatementEntriesFilters({
           value={filters.search}
           onChange={(event) => patch('search', event.target.value)}
           fullWidth
+          slotProps={{ htmlInput: { enterKeyHint: 'search' } }}
         />
       </div>
 
@@ -117,11 +134,8 @@ export function StatementEntriesFilters({
             : `${totalCount} lançamento(s)`}
         </span>
         {active && (
-          <Button
-            size="small"
-            onClick={() => onChange(DEFAULT_ENTRY_FILTERS)}
-          >
-            Limpar filtros
+          <Button size="small" onClick={() => onChange(DEFAULT_ENTRY_FILTERS)}>
+            Limpar
           </Button>
         )}
       </div>

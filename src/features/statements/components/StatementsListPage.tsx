@@ -7,12 +7,13 @@ import Typography from '@mui/material/Typography';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useStatementsList } from '@/features/statements/hooks/useStatementsList';
 import { StatementCard } from '@/features/statements/components/StatementCard';
+import { currentMonthParam } from '@/features/statements/utils/month';
 
 export function StatementsListPage() {
   const query = useStatementsList();
   const rows = query.data ?? [];
 
-  const today = new Date().toISOString().slice(0, 7);
+  const today = currentMonthParam();
   const [past, current, future] = rows.reduce<
     [typeof rows, typeof rows, typeof rows]
   >(

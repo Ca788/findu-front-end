@@ -13,14 +13,28 @@ interface StatementMonthSwitcherProps {
 
 export function StatementMonthSwitcher({ month, onChange }: StatementMonthSwitcherProps) {
   return (
-    <div className="flex items-center gap-2">
-      <IconButton onClick={() => onChange(addMonths(month, -1))} aria-label="Mês anterior">
+    <div className="flex w-full items-center justify-between gap-1 rounded-2xl border border-black/5 bg-black/[0.02] px-1 py-0.5 dark:border-white/10 dark:bg-white/5 sm:w-auto sm:justify-center sm:border-0 sm:bg-transparent sm:px-0 dark:sm:bg-transparent">
+      <IconButton
+        onClick={() => onChange(addMonths(month, -1))}
+        aria-label="Mês anterior"
+        size="large"
+        sx={{ touchAction: 'manipulation' }}
+      >
         <ChevronLeftIcon />
       </IconButton>
-      <Typography variant="h6" className="min-w-[10rem] text-center capitalize">
+      <Typography
+        variant="subtitle1"
+        className="min-w-0 flex-1 text-center capitalize sm:min-w-[11rem] sm:flex-none"
+        sx={{ fontWeight: 700, fontSize: { xs: '1rem', sm: '1.15rem' } }}
+      >
         {formatMonthLabel(month)}
       </Typography>
-      <IconButton onClick={() => onChange(addMonths(month, 1))} aria-label="Próximo mês">
+      <IconButton
+        onClick={() => onChange(addMonths(month, 1))}
+        aria-label="Próximo mês"
+        size="large"
+        sx={{ touchAction: 'manipulation' }}
+      >
         <ChevronRightIcon />
       </IconButton>
     </div>

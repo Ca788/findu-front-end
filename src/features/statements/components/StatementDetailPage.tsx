@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
@@ -13,6 +14,7 @@ import AddIcon from '@mui/icons-material/AddOutlined';
 import { AxiosError } from 'axios';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { useDevice } from '@/hooks/useDevice';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import {
   AppErrorResultMapper,
@@ -44,6 +46,7 @@ interface StatementDetailPageProps {
 
 export function StatementDetailPage({ month }: StatementDetailPageProps) {
   const router = useRouter();
+  const { isMobile } = useDevice();
   const { showSuccess, showError } = useSnackbar();
   const query = useStatement(month);
   const markPaid = useMarkEntryPaid(month);
@@ -113,21 +116,23 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
   const paidEntries = filteredEntries.filter((entry) => entry.status === 'paid');
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={{ xs: 2, sm: 3 }} className="pb-20 sm:pb-0">
       <PageHeader
         eyebrow="Extrato"
         title="Planejamento do mês"
         actions={
-          <div className="flex items-center gap-2">
+          <>
             <StatementMonthSwitcher month={month} onChange={goToMonth} />
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={openCreate}
-            >
-              Novo lançamento
-            </Button>
-          </div>
+            {!isMobile && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={openCreate}
+              >
+                Novo lançamento
+              </Button>
+            )}
+          </>
         }
       />
 
@@ -137,16 +142,16 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
       <StatementKpis statement={statement} />
 
       <div className="grid gap-3 lg:grid-cols-3">
-        <Paper className="flex flex-col gap-2 rounded-2xl p-4 lg:col-span-2">
-          <div className="flex items-center justify-between">
+        <Paper className="flex flex-col gap-2 rounded-2xl p-3 sm:p-4 lg:col-span-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <Typography variant="subtitle1">Lançamentos</Typography>
-            <div className="flex items-center gap-2">
-              <Chip size="small" label={`Pendentes ${pendingEntries.length}`} />
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Chip size="small" label={`${pendingEntries.length} pend.`} />
               <Chip
                 size="small"
                 color="success"
                 variant="outlined"
-                label={`Pagos ${paidEntries.length}`}
+                label={`${paidEntries.length} pagos`}
               />
             </div>
           </div>
@@ -226,6 +231,22 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
         onClose={() => setDeleting(null)}
         onConfirm={confirmDelete}
       />
+
+      {isMobile && (
+        <Fab
+          color="primary"
+          aria-label="Novo lançamento"
+          onClick={openCreate}
+          sx={{
+            position: 'fixed',
+            right: 16,
+            bottom: 'max(16px, env(safe-area-inset-bottom))',
+            zIndex: (theme) => theme.zIndex.speedDial,
+          }}
+        >
+          <AddIcon />
+        </Fab>
+      )}
     </Stack>
   );
 }

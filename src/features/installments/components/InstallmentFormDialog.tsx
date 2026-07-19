@@ -20,6 +20,7 @@ import {
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
 import { formatBRL, parseAmountInput } from '@/utils/currency';
+import { localTodayInput, toLocalDateInput } from '@/utils/date';
 import type {
   InstallmentPlan,
   InstallmentPlanInput,
@@ -40,14 +41,16 @@ interface InstallmentFormDialogProps {
   onClose: () => void;
 }
 
-const DEFAULT_VALUES: InstallmentFormValues = {
-  description: '',
-  transaction_type: 'expense',
-  monthly_amount: '',
-  total_installments: '5',
-  first_competency: new Date().toISOString().slice(0, 10),
-  category_id: '',
-};
+function defaultValues(): InstallmentFormValues {
+  return {
+    description: '',
+    transaction_type: 'expense',
+    monthly_amount: '',
+    total_installments: '5',
+    first_competency: localTodayInput(),
+    category_id: '',
+  };
+}
 
 export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDialogProps) {
   const isEdit = !!plan;
@@ -68,7 +71,7 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
     formState: { errors },
   } = useForm<InstallmentFormValues>({
     resolver: zodResolver(installmentFormSchema),
-    defaultValues: DEFAULT_VALUES,
+    defaultValues: defaultValues(),
   });
 
   useEffect(() => {
@@ -82,7 +85,8 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
       total_installments: plan?.total_installments
         ? String(plan.total_installments)
         : '5',
-      first_competency: plan?.first_competency ?? new Date().toISOString().slice(0, 10),
+      first_competency:
+        toLocalDateInput(plan?.first_competency) || localTodayInput(),
       category_id: plan?.category_id ?? '',
     });
   }, [open, plan, reset]);
@@ -153,10 +157,14 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
                   value={field.value}
                   onChange={(_, next) => next && field.onChange(next)}
                   fullWidth
-                  size="small"
+                  size="medium"
                 >
-                  <ToggleButton value="expense" color="error">Despesa</ToggleButton>
-                  <ToggleButton value="income" color="success">Receita</ToggleButton>
+                  <ToggleButton value="expense" color="error" sx={{ flex: 1 }}>
+                    Despesa
+                  </ToggleButton>
+                  <ToggleButton value="income" color="success" sx={{ flex: 1 }}>
+                    Receita
+                  </ToggleButton>
                 </ToggleButtonGroup>
               </FormControl>
             )}

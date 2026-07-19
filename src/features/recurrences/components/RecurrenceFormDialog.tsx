@@ -19,6 +19,7 @@ import {
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
 import { parseAmountInput } from '@/utils/currency';
+import { localTodayInput, toLocalDateInput } from '@/utils/date';
 import type {
   RecurrenceRule,
   RecurrenceRuleInput,
@@ -38,15 +39,17 @@ interface RecurrenceFormDialogProps {
   onClose: () => void;
 }
 
-const DEFAULT_VALUES: RecurrenceFormValues = {
-  transaction_type: 'expense',
-  amount: '',
-  description: '',
-  day_of_month: '',
-  starts_on: new Date().toISOString().slice(0, 10),
-  ends_on: '',
-  category_id: '',
-};
+function defaultValues(): RecurrenceFormValues {
+  return {
+    transaction_type: 'expense',
+    amount: '',
+    description: '',
+    day_of_month: '',
+    starts_on: localTodayInput(),
+    ends_on: '',
+    category_id: '',
+  };
+}
 
 export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDialogProps) {
   const isEdit = !!rule;
@@ -66,7 +69,7 @@ export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDial
     formState: { errors },
   } = useForm<RecurrenceFormValues>({
     resolver: zodResolver(recurrenceFormSchema),
-    defaultValues: DEFAULT_VALUES,
+    defaultValues: defaultValues(),
   });
 
   useEffect(() => {
@@ -76,8 +79,8 @@ export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDial
       amount: rule?.amount ? String(rule.amount).replace('.', ',') : '',
       description: rule?.description ?? '',
       day_of_month: rule?.day_of_month ? String(rule.day_of_month) : '',
-      starts_on: rule?.starts_on ?? new Date().toISOString().slice(0, 10),
-      ends_on: rule?.ends_on ?? '',
+      starts_on: toLocalDateInput(rule?.starts_on) || localTodayInput(),
+      ends_on: toLocalDateInput(rule?.ends_on),
       category_id: rule?.category_id ?? '',
     });
   }, [open, rule, reset]);
@@ -130,10 +133,14 @@ export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDial
                 value={field.value}
                 onChange={(_, next) => next && field.onChange(next)}
                 fullWidth
-                size="small"
+                size="medium"
               >
-                <ToggleButton value="expense" color="error">Despesa</ToggleButton>
-                <ToggleButton value="income" color="success">Receita</ToggleButton>
+                <ToggleButton value="expense" color="error" sx={{ flex: 1 }}>
+                  Despesa
+                </ToggleButton>
+                <ToggleButton value="income" color="success" sx={{ flex: 1 }}>
+                  Receita
+                </ToggleButton>
               </ToggleButtonGroup>
             </FormControl>
           )}

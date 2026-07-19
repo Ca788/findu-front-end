@@ -22,7 +22,7 @@ export function PageContent({
   return (
     <div className={`flex-1 min-h-0 overflow-y-auto findu-scroll-smooth ${className}`}>
       <div
-        className={`mx-auto w-full ${MAX_WIDTH_CLASS[maxWidth]} px-4 py-5 md:px-8 md:py-8`}
+        className={`mx-auto w-full ${MAX_WIDTH_CLASS[maxWidth]} px-3 py-4 sm:px-4 sm:py-5 md:px-8 md:py-8`}
       >
         {children}
       </div>

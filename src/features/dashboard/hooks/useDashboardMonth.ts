@@ -1,26 +1,18 @@
+'use client';
+
 import { useMemo } from 'react';
 import {
   currentMonthParam,
   formatMonthLabel,
 } from '@/features/statements/utils/month';
+import { localTodayInput } from '@/utils/date';
 
-interface DashboardMonth {
-  monthParam: string; // "YYYY-MM"
-  monthLabel: string;
-  referenceDate: string; // "YYYY-MM-DD" (hoje)
-}
-
-function toIsoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-export function useDashboardMonth(): DashboardMonth {
+export function useDashboardMonth() {
   return useMemo(() => {
     const monthParam = currentMonthParam();
-    return {
-      monthParam,
-      monthLabel: formatMonthLabel(monthParam),
-      referenceDate: toIsoDate(new Date()),
-    };
+    const referenceDate = localTodayInput();
+    const monthLabel = formatMonthLabel(monthParam);
+
+    return { monthParam, referenceDate, monthLabel };
   }, []);
 }

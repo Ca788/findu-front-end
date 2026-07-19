@@ -1,12 +1,14 @@
 'use client';
 
-import {FormEvent, ReactNode} from 'react';
+import { FormEvent, ReactNode } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import {useDevice} from '@/hooks/useDevice';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/CloseRounded';
+import { useDevice } from '@/hooks/useDevice';
 
 interface FormDialogProps {
   open: boolean;
@@ -40,17 +42,92 @@ export function FormDialog({
       fullWidth
       maxWidth={maxWidth}
       fullScreen={isMobile}
+      scroll="paper"
+      slotProps={{
+        paper: {
+          sx: isMobile
+            ? {
+                m: 0,
+                borderRadius: 0,
+                maxHeight: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }
+            : { borderRadius: 3 },
+        },
+      }}
     >
-      <form onSubmit={onSubmit} noValidate>
-        <DialogTitle sx={{ paddingTop: '8px' }}>{title}</DialogTitle>
-        <DialogContent sx={{ '&.MuiDialogContent-root': { paddingTop: 2 } }}>
+      <form
+        onSubmit={onSubmit}
+        noValidate
+        className="flex min-h-0 flex-1 flex-col"
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1,
+            pt: isMobile ? 'max(12px, env(safe-area-inset-top))' : 2,
+            pb: 1.5,
+            px: 2,
+            fontWeight: 700,
+          }}
+        >
+          <span className="min-w-0 flex-1 truncate">{title}</span>
+          {isMobile && (
+            <IconButton
+              edge="end"
+              onClick={onClose}
+              disabled={isSubmitting}
+              aria-label="Fechar"
+              size="small"
+            >
+              <CloseIcon />
+            </IconButton>
+          )}
+        </DialogTitle>
+
+        <DialogContent
+          dividers={isMobile}
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            px: 2,
+            py: 2,
+            '&.MuiDialogContent-root': { paddingTop: 2 },
+          }}
+        >
           {children}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} disabled={isSubmitting}>
+
+        <DialogActions
+          sx={{
+            px: 2,
+            pt: 1.5,
+            pb: isMobile ? 'max(12px, env(safe-area-inset-bottom))' : 2,
+            gap: 1,
+            flexDirection: isMobile ? 'column-reverse' : 'row',
+            '& > :not(style)': isMobile ? { width: '100%', m: 0 } : undefined,
+          }}
+        >
+          <Button
+            onClick={onClose}
+            disabled={isSubmitting}
+            size={isMobile ? 'large' : 'medium'}
+            fullWidth={isMobile}
+          >
             {cancelLabel}
           </Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            size={isMobile ? 'large' : 'medium'}
+            fullWidth={isMobile}
+          >
             {isSubmitting ? 'Salvando...' : submitLabel}
           </Button>
         </DialogActions>

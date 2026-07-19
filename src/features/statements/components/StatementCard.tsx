@@ -7,7 +7,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Chip from '@mui/material/Chip';
 import { formatBRL } from '@/utils/currency';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
-import { formatMonthLabel } from '@/features/statements/utils/month';
+import { currentMonthParam, formatMonthLabel } from '@/features/statements/utils/month';
 import type { StatementSummary } from '@/features/statements/models/statement.model';
 
 interface StatementCardProps {
@@ -19,7 +19,7 @@ export function StatementCard({ summary }: StatementCardProps) {
   const balanceActual = Number(summary.balance_actual);
   const total = summary.pending_count + summary.paid_count;
   const percent = total > 0 ? Math.round((summary.paid_count / total) * 100) : 0;
-  const isCurrent = summary.month === new Date().toISOString().slice(0, 7);
+  const isCurrent = summary.month === currentMonthParam();
 
   return (
     <Paper

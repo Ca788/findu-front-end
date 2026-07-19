@@ -131,11 +131,15 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
                 value={field.value}
                 onChange={(_, next) => next && field.onChange(next)}
                 fullWidth
-                size="small"
+                size="medium"
                 disabled={isGenerated}
               >
-                <ToggleButton value="expense" color="error">Despesa</ToggleButton>
-                <ToggleButton value="income" color="success">Receita</ToggleButton>
+                <ToggleButton value="expense" color="error" sx={{ flex: 1 }}>
+                  Despesa
+                </ToggleButton>
+                <ToggleButton value="income" color="success" sx={{ flex: 1 }}>
+                  Receita
+                </ToggleButton>
               </ToggleButtonGroup>
               {fieldState.error?.message && (
                 <FormHelperText>{fieldState.error.message}</FormHelperText>
@@ -169,10 +173,14 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
                 value={field.value}
                 onChange={(_, next) => next && field.onChange(next)}
                 fullWidth
-                size="small"
+                size="medium"
               >
-                <ToggleButton value="pending">Pendente</ToggleButton>
-                <ToggleButton value="paid" color="success">Pago</ToggleButton>
+                <ToggleButton value="pending" sx={{ flex: 1 }}>
+                  Pendente
+                </ToggleButton>
+                <ToggleButton value="paid" color="success" sx={{ flex: 1 }}>
+                  Pago
+                </ToggleButton>
               </ToggleButtonGroup>
             </FormControl>
           )}
