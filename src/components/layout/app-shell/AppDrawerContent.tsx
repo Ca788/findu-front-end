@@ -33,7 +33,7 @@ function filterSection(section: AppNavItem['section']) {
 }
 
 export function AppDrawerContent({ collapsed, onNavigate, onClose }: AppDrawerContentProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '';
   const { isDesktop, toggleCollapsed } = useAppShell();
   const active = findActiveNavItem(pathname);
 

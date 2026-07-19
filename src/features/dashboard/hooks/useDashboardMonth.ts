@@ -1,10 +1,13 @@
 import { useMemo } from 'react';
+import {
+  currentMonthParam,
+  formatMonthLabel,
+} from '@/features/statements/utils/month';
 
 interface DashboardMonth {
-  from: string;
-  to: string;
+  monthParam: string; // "YYYY-MM"
   monthLabel: string;
-  referenceDate: string;
+  referenceDate: string; // "YYYY-MM-DD" (hoje)
 }
 
 function toIsoDate(date: Date): string {
@@ -13,17 +16,11 @@ function toIsoDate(date: Date): string {
 
 export function useDashboardMonth(): DashboardMonth {
   return useMemo(() => {
-    const today = new Date();
-    const start = new Date(today.getFullYear(), today.getMonth(), 1);
-    const monthLabel = new Intl.DateTimeFormat('pt-BR', {
-      month: 'long',
-      year: 'numeric',
-    }).format(today);
+    const monthParam = currentMonthParam();
     return {
-      from: toIsoDate(start),
-      to: toIsoDate(today),
-      referenceDate: toIsoDate(today),
-      monthLabel,
+      monthParam,
+      monthLabel: formatMonthLabel(monthParam),
+      referenceDate: toIsoDate(new Date()),
     };
   }, []);
 }

@@ -7,9 +7,10 @@ export class AppRoutePaths {
   static readonly RESET_PASSWORD = '/reset-password';
   static readonly DASHBOARD = '/dashboard';
   static readonly CATEGORIES = '/categories';
-  static readonly TRANSACTIONS = '/transactions';
+  static readonly STATEMENTS = '/statements';
+  static readonly RECURRENCES = '/recurrences';
+  static readonly INSTALLMENTS = '/installments';
   static readonly BUDGETS = '/budgets';
-  static readonly SUMMARY = '/summary';
   static readonly CHAT = '/chat';
   static readonly PROFILE = '/profile';
 }

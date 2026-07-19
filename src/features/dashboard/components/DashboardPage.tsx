@@ -3,35 +3,35 @@
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
-import { useSummary } from '@/features/summary/hooks/useSummary';
-import { SummaryKpis } from '@/features/summary/components/SummaryKpis';
-import { CategoryBreakdown } from '@/features/summary/components/CategoryBreakdown';
 import { useDashboardMonth } from '@/features/dashboard/hooks/useDashboardMonth';
 import { DashboardWelcome } from '@/features/dashboard/components/DashboardWelcome';
 import { DashboardBudgets } from '@/features/dashboard/components/DashboardBudgets';
-import { DashboardRecentTransactions } from '@/features/dashboard/components/DashboardRecentTransactions';
+import { DashboardRecentEntries } from '@/features/dashboard/components/DashboardRecentEntries';
+import { useStatement } from '@/features/statements/hooks/useStatement';
+import { StatementKpis } from '@/features/statements/components/StatementKpis';
+import { StatementSideLists } from '@/features/statements/components/StatementSideLists';
 
 export function DashboardPage() {
-  const { from, to, referenceDate, monthLabel } = useDashboardMonth();
-  const summaryQuery = useSummary({ from, to });
+  const { monthParam, referenceDate, monthLabel } = useDashboardMonth();
+  const statementQuery = useStatement(monthParam);
 
   return (
     <Stack spacing={3}>
       <DashboardWelcome monthLabel={monthLabel} />
 
-      {summaryQuery.isError && (
-        <Alert severity="error">Erro ao carregar resumo do mês.</Alert>
+      {statementQuery.isError && (
+        <Alert severity="error">Erro ao carregar extrato do mês.</Alert>
       )}
-      {summaryQuery.isFetching && <LinearProgress />}
+      {statementQuery.isFetching && <LinearProgress />}
 
-      <SummaryKpis summary={summaryQuery.data} />
+      <StatementKpis statement={statementQuery.data} />
 
       <div className="grid gap-3 lg:grid-cols-2">
         <DashboardBudgets referenceDate={referenceDate} />
-        <DashboardRecentTransactions />
+        <DashboardRecentEntries statement={statementQuery.data} monthParam={monthParam} />
       </div>
 
-      <CategoryBreakdown summary={summaryQuery.data} />
+      <StatementSideLists statement={statementQuery.data} />
     </Stack>
   );
 }

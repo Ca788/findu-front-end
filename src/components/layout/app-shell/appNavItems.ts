@@ -6,7 +6,8 @@ import DashboardIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLongOutlined';
 import CategoryIcon from '@mui/icons-material/CategoryOutlined';
 import SavingsIcon from '@mui/icons-material/SavingsOutlined';
-import PieChartIcon from '@mui/icons-material/PieChartOutlined';
+import ReplayIcon from '@mui/icons-material/ReplayOutlined';
+import CreditScoreIcon from '@mui/icons-material/CreditScoreOutlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
 export interface AppNavItem {
@@ -22,52 +23,65 @@ export const APP_CHAT_HISTORY_PATH = `${AppRoutePaths.CHAT}/history`;
 export const appNavItems: AppNavItem[] = [
   {
     label: 'Chat',
-    href: AppRoutePaths.CHAT,
+    href: '/chat',
     icon: ChatIcon,
     section: 'primary',
     exact: true,
   },
   {
     label: 'Histórico',
-    href: APP_CHAT_HISTORY_PATH,
+    href: '/chat/history',
     icon: HistoryIcon,
     section: 'primary',
   },
   {
     label: 'Dashboard',
-    href: AppRoutePaths.DASHBOARD,
+    href: '/dashboard',
     icon: DashboardIcon,
     section: 'secondary',
   },
   {
-    label: 'Transações',
-    href: AppRoutePaths.TRANSACTIONS,
+    label: 'Extratos',
+    href: '/statements',
     icon: ReceiptLongIcon,
     section: 'secondary',
   },
   {
+    label: 'Recorrências',
+    href: '/recurrences',
+    icon: ReplayIcon,
+    section: 'secondary',
+  },
+  {
+    label: 'Parcelamentos',
+    href: '/installments',
+    icon: CreditScoreIcon,
+    section: 'secondary',
+  },
+  {
     label: 'Categorias',
-    href: AppRoutePaths.CATEGORIES,
+    href: '/categories',
     icon: CategoryIcon,
     section: 'secondary',
   },
   {
     label: 'Orçamentos',
-    href: AppRoutePaths.BUDGETS,
+    href: '/budgets',
     icon: SavingsIcon,
-    section: 'secondary',
-  },
-  {
-    label: 'Resumo',
-    href: AppRoutePaths.SUMMARY,
-    icon: PieChartIcon,
     section: 'secondary',
   },
 ];
 
-export function findActiveNavItem(pathname: string): AppNavItem | undefined {
-  const ordered = [...appNavItems].sort((a, b) => b.href.length - a.href.length);
-  return ordered.find((item) => {
+export function findActiveNavItem(pathname: string | null | undefined): AppNavItem | undefined {
+  if (!pathname) return undefined;
+
+  const candidates = appNavItems.filter(
+    (item) => typeof item.href === 'string' && item.href.length > 0,
+  );
+
+  candidates.sort((a, b) => (b.href?.length ?? 0) - (a.href?.length ?? 0));
+
+  return candidates.find((item) => {
     if (item.exact) return pathname === item.href;
     return pathname === item.href || pathname.startsWith(`${item.href}/`);
   });
