@@ -76,7 +76,7 @@ export function getTheme(mode: ThemeMode): Theme {
       },
     },
     shape: {
-      borderRadius: 12,
+      borderRadius: 16,
     },
     typography: {
       fontFamily: [
@@ -124,6 +124,7 @@ export function getTheme(mode: ThemeMode): Theme {
             backgroundImage: 'none',
             backgroundColor: p.bgPaper,
             border: `1px solid ${p.border}`,
+            borderRadius: 16,
           },
         },
       },

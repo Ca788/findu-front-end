@@ -1,10 +1,10 @@
-import { PageContainer } from '@/components/layout/PageContainer';
+import { PageContent } from '@/components/layout/PageContent';
 import { DashboardPage } from '@/features/dashboard/components/DashboardPage';
 
 export default function Page() {
   return (
-    <PageContainer>
+    <PageContent maxWidth="md">
       <DashboardPage />
-    </PageContainer>
+    </PageContent>
   );
 }

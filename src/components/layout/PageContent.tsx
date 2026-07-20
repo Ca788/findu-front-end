@@ -22,7 +22,10 @@ export function PageContent({
   return (
     <div className={`flex-1 min-h-0 overflow-y-auto findu-scroll-smooth ${className}`}>
       <div
-        className={`mx-auto w-full ${MAX_WIDTH_CLASS[maxWidth]} px-3 py-4 sm:px-4 sm:py-5 md:px-8 md:py-8`}
+        className={`mx-auto w-full ${MAX_WIDTH_CLASS[maxWidth]} px-4 pt-4 sm:px-5 sm:pt-5 md:px-8 md:pt-8`}
+        style={{
+          paddingBottom: 'calc(1.5rem + var(--app-safe-bottom))',
+        }}
       >
         {children}
       </div>
