@@ -65,7 +65,7 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
   }, [month]);
 
   const goToMonth = (nextMonth: string) => {
-    router.push(`${AppRoutePaths.STATEMENTS}/${nextMonth}`);
+    router.push(AppRoutePaths.statementDetail(nextMonth));
   };
 
   const openCreate = () => {

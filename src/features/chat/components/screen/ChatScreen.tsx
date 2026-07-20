@@ -33,7 +33,7 @@ export function ChatScreen() {
         agent_id: selectedAgentId,
       });
       const message = await sendMessage(conversation.id, input);
-      router.replace(`${AppRoutePaths.CHAT}/${conversation.id}`);
+      router.replace(AppRoutePaths.chatConversation(conversation.id));
       return message;
     } catch (err) {
       const mapped = AppErrorResultMapper.fromAxiosError(
