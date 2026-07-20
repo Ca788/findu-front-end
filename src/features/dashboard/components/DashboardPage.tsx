@@ -38,7 +38,7 @@ export function DashboardPage() {
         />
       </div>
 
-      <StatementSideLists statement={statementQuery.data} />
+      <StatementSideLists statement={statementQuery.data} compact />
     </Stack>
   );
 }

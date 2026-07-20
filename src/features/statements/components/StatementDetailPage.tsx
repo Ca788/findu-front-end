@@ -7,12 +7,9 @@ import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { AxiosError } from 'axios';
-import { PageHeader } from '@/components/common/PageHeader';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { useDevice } from '@/hooks/useDevice';
 import { useSnackbar } from '@/providers/SnackbarProvider';
@@ -116,100 +113,81 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
   const paidEntries = filteredEntries.filter((entry) => entry.status === 'paid');
 
   return (
-    <Stack spacing={{ xs: 2, sm: 3 }} className="pb-20 sm:pb-0">
-      <PageHeader
-        eyebrow="Extrato"
-        title="Planejamento do mês"
-        actions={
-          <>
-            <StatementMonthSwitcher month={month} onChange={goToMonth} />
-            {!isMobile && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={openCreate}
-              >
-                Novo lançamento
-              </Button>
-            )}
-          </>
-        }
-      />
+    <Stack spacing={{ xs: 2.5, sm: 3 }} className="pb-24 sm:pb-0">
+      <Stack spacing={1.5}>
+        <StatementMonthSwitcher month={month} onChange={goToMonth} />
+        {!isMobile && (
+          <div className="flex justify-end">
+            <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+              Novo lançamento
+            </Button>
+          </div>
+        )}
+      </Stack>
 
       {query.isError && <Alert severity="error">Erro ao carregar o extrato.</Alert>}
-      {query.isFetching && <LinearProgress />}
+      {query.isFetching && <LinearProgress sx={{ height: 3, borderRadius: 999 }} />}
 
       <StatementKpis statement={statement} />
 
-      <div className="grid gap-3 lg:grid-cols-3">
-        <Paper className="flex flex-col gap-2 rounded-2xl p-3 sm:p-4 lg:col-span-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <Typography variant="subtitle1">Lançamentos</Typography>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Chip size="small" label={`${pendingEntries.length} pend.`} />
-              <Chip
-                size="small"
-                color="success"
-                variant="outlined"
-                label={`${paidEntries.length} pagos`}
+      <Stack spacing={2}>
+        <StatementEntriesFilters
+          filters={filters}
+          onChange={setFilters}
+          resultCount={filteredEntries.length}
+          totalCount={entries.length}
+        />
+
+        {entries.length === 0 && !query.isLoading && (
+          <Typography variant="body2" color="text.secondary">
+            Nenhum lançamento neste mês.
+          </Typography>
+        )}
+
+        {entries.length > 0 && filteredEntries.length === 0 && (
+          <Typography variant="body2" color="text.secondary">
+            Nada encontrado com esses filtros.
+          </Typography>
+        )}
+
+        {pendingEntries.length > 0 && (
+          <Stack spacing={1.25}>
+            <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 1 }}>
+              Pendentes · {pendingEntries.length}
+            </Typography>
+            {pendingEntries.map((entry) => (
+              <EntryRow
+                key={entry.id}
+                entry={entry}
+                onToggle={handleToggle}
+                onEdit={openEdit}
+                onDelete={setDeleting}
+                isToggling={markPaid.isPending || markPending.isPending}
               />
-            </div>
-          </div>
+            ))}
+          </Stack>
+        )}
 
-          <StatementEntriesFilters
-            filters={filters}
-            onChange={setFilters}
-            resultCount={filteredEntries.length}
-            totalCount={entries.length}
-          />
-
-          {entries.length === 0 && !query.isLoading && (
-            <Typography variant="body2" color="text.secondary">
-              Nenhum lançamento neste mês. Clique em "Novo lançamento" para começar.
+        {paidEntries.length > 0 && (
+          <Stack spacing={1.25}>
+            <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 1 }}>
+              Pagos · {paidEntries.length}
             </Typography>
-          )}
+            {paidEntries.map((entry) => (
+              <EntryRow
+                key={entry.id}
+                entry={entry}
+                onToggle={handleToggle}
+                onEdit={openEdit}
+                onDelete={setDeleting}
+                isToggling={markPaid.isPending || markPending.isPending}
+              />
+            ))}
+          </Stack>
+        )}
+      </Stack>
 
-          {entries.length > 0 && filteredEntries.length === 0 && (
-            <Typography variant="body2" color="text.secondary">
-              Nenhum lançamento corresponde aos filtros.
-            </Typography>
-          )}
-
-          {pendingEntries.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <Typography variant="overline" color="text.secondary">Pendentes</Typography>
-              {pendingEntries.map((entry) => (
-                <EntryRow
-                  key={entry.id}
-                  entry={entry}
-                  onToggle={handleToggle}
-                  onEdit={openEdit}
-                  onDelete={setDeleting}
-                  isToggling={markPaid.isPending || markPending.isPending}
-                />
-              ))}
-            </div>
-          )}
-
-          {paidEntries.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <Typography variant="overline" color="text.secondary">Pagos</Typography>
-              {paidEntries.map((entry) => (
-                <EntryRow
-                  key={entry.id}
-                  entry={entry}
-                  onToggle={handleToggle}
-                  onEdit={openEdit}
-                  onDelete={setDeleting}
-                  isToggling={markPaid.isPending || markPending.isPending}
-                />
-              ))}
-            </div>
-          )}
-        </Paper>
-
-        <StatementSideLists statement={statement} />
-      </div>
+      {!isMobile && <StatementSideLists statement={statement} />}
 
       <EntryFormDialog
         open={isFormOpen}

@@ -24,10 +24,14 @@
 .DS_Store
 *.pem
 
-# Capacitor / Android
-/android
+# Capacitor / Android secrets & local machine paths
+# (the android/ project itself may be versioned; android/.gitignore covers the rest)
 *.jks
 *.keystore
+android/local.properties
+android/app/google-services.json
+android/**/release/
+android/key.properties
 
 # debug
 npm-debug.log*
