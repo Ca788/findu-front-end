@@ -1,8 +1,11 @@
 'use client';
 
 import { Controller, type Control } from 'react-hook-form';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 import {
   BUDGET_PERIOD_LABELS,
   type BudgetPeriodType,
@@ -21,21 +24,39 @@ export function PeriodTypeField({ control }: PeriodTypeFieldProps) {
       name="period_type"
       control={control}
       render={({ field, fieldState }) => (
-        <TextField
-          select
-          label="Período"
-          fullWidth
-          value={field.value}
-          onChange={field.onChange}
-          error={!!fieldState.error}
-          helperText={fieldState.error?.message}
-        >
-          {ORDER.map((type) => (
-            <MenuItem key={type} value={type}>
-              {BUDGET_PERIOD_LABELS[type]}
-            </MenuItem>
-          ))}
-        </TextField>
+        <FormControl error={!!fieldState.error} fullWidth>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+            Período
+          </Typography>
+          <ToggleButtonGroup
+            exclusive
+            value={field.value}
+            onChange={(_, next) => next && field.onChange(next)}
+            fullWidth
+            size="small"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 1,
+              '& .MuiToggleButtonGroup-grouped': {
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '14px !important',
+                margin: 0,
+                py: 1.1,
+              },
+            }}
+          >
+            {ORDER.map((type) => (
+              <ToggleButton key={type} value={type}>
+                {BUDGET_PERIOD_LABELS[type]}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+          {fieldState.error?.message && (
+            <FormHelperText>{fieldState.error.message}</FormHelperText>
+          )}
+        </FormControl>
       )}
     />
   );

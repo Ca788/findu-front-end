@@ -2,6 +2,7 @@
 
 import { type ReactNode } from 'react';
 import Box from '@mui/material/Box';
+import { useDevice } from '@/hooks/useDevice';
 
 interface ChatLayoutProps {
   topbar?: ReactNode;
@@ -10,6 +11,8 @@ interface ChatLayoutProps {
 }
 
 export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
+  const { isMobile } = useDevice();
+
   return (
     <Box
       className="findu-aurora-glow"
@@ -50,7 +53,9 @@ export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
           bgcolor: 'background.default',
           borderTop: '1px solid',
           borderColor: 'divider',
-          paddingBottom: 'var(--app-safe-bottom)',
+          paddingBottom: isMobile
+            ? 'var(--app-bottom-nav-space)'
+            : 'var(--app-safe-bottom)',
         }}
       >
         {composer}

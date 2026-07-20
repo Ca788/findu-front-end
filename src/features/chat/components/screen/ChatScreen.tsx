@@ -87,7 +87,11 @@ export function ChatScreen() {
           justifyContent: 'center',
           gap: { xs: 2.5, md: 3.5 },
           px: { xs: 1.5, md: 3 },
-          py: 4,
+          pt: 4,
+          pb: {
+            xs: 'calc(1.5rem + var(--app-bottom-nav-space))',
+            sm: 4,
+          },
         }}
       >
         <ChatGreeting />

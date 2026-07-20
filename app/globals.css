@@ -7,11 +7,44 @@
   --app-safe-left: env(safe-area-inset-left, 0px);
   --app-safe-right: env(safe-area-inset-right, 0px);
   --app-header-height: 56px;
+  --app-bottom-nav-space: var(--app-safe-bottom);
+}
+
+@media (max-width: 599.95px) {
+  :root {
+    --app-bottom-nav-space: calc(64px + 10px + 12px + var(--app-safe-bottom));
+  }
 }
 
 @media (min-width: 768px) {
   :root {
     --app-header-height: 64px;
+  }
+}
+
+@keyframes findu-ai-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 4px var(--mui-palette-background-default, #131314),
+      0 8px 28px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 40%, transparent),
+      0 0 18px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 55%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px var(--mui-palette-background-default, #131314),
+      0 10px 34px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 55%, transparent),
+      0 0 28px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 75%, transparent);
+  }
+}
+
+.findu-ai-orb {
+  animation: findu-ai-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .findu-ai-orb {
+    animation: none;
   }
 }
 

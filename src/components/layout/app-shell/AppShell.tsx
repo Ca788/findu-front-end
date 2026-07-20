@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import { AppShellProvider } from '@/components/layout/app-shell/AppShellContext';
 import { AppDrawer } from '@/components/layout/app-shell/AppDrawer';
 import { AppHeader } from '@/components/layout/app-shell/AppHeader';
+import { AppBottomNav } from '@/components/layout/app-shell/AppBottomNav';
 
 interface AppShellProps {
   children: ReactNode;
@@ -24,6 +25,7 @@ function AppShellLayout({ children }: AppShellProps) {
       <Box
         component="div"
         sx={{
+          position: 'relative',
           flex: 1,
           minWidth: 0,
           display: 'flex',
@@ -45,6 +47,7 @@ function AppShellLayout({ children }: AppShellProps) {
         >
           {children}
         </Box>
+        <AppBottomNav />
       </Box>
     </Box>
   );

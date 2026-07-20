@@ -11,7 +11,7 @@ interface StatementKpisProps {
   statement?: Statement;
 }
 
-function MetricCard({
+function MetricRow({
   label,
   forecast,
   actual,
@@ -23,36 +23,38 @@ function MetricCard({
   color: string;
 }) {
   return (
-    <Paper
-      className="min-w-0 rounded-2xl px-3.5 py-3.5"
-      sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: 2,
+        minWidth: 0,
+      }}
     >
+      <Box sx={{ minWidth: 0 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+          {label}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Realizado {formatBRL(actual)}
+        </Typography>
+      </Box>
       <Typography
-        variant="caption"
-        color="text.secondary"
-        className="truncate"
-        sx={{ letterSpacing: 0.2 }}
-      >
-        {label}
-      </Typography>
-      <Typography
-        variant="h6"
-        component="span"
-        className="truncate"
         sx={{
           color,
           fontVariantNumeric: 'tabular-nums',
           fontWeight: 700,
-          fontSize: { xs: '1.05rem', sm: '1.25rem' },
-          lineHeight: 1.2,
+          fontSize: { xs: '1.05rem', sm: '1.15rem' },
+          lineHeight: 1.25,
+          textAlign: 'right',
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
         }}
       >
         {formatBRL(forecast)}
       </Typography>
-      <Typography variant="caption" color="text.secondary" className="truncate">
-        Realizado {formatBRL(actual)}
-      </Typography>
-    </Paper>
+    </Box>
   );
 }
 
@@ -70,73 +72,56 @@ export function StatementKpis({ statement }: StatementKpisProps) {
   const positive = balance >= 0;
 
   return (
-    <Box className="flex flex-col gap-3 findu-anim-fade-in">
+    <Box className="flex flex-col gap-2.5 findu-anim-fade-in">
       <Paper
         className="overflow-hidden rounded-3xl"
         sx={{
           position: 'relative',
-          px: { xs: 2.25, sm: 3 },
-          py: { xs: 2.5, sm: 3 },
+          px: 2.5,
+          py: 2.75,
           border: 'none',
-          background: `linear-gradient(145deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 55%, ${theme.palette.primary.light} 100%)`,
+          background: `linear-gradient(145deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 58%, ${theme.palette.primary.light} 100%)`,
           color: theme.palette.primary.contrastText,
         }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            opacity: 0.18,
-            background:
-              'radial-gradient(80% 70% at 100% 0%, #fff 0%, transparent 55%), radial-gradient(60% 50% at 0% 100%, #fff 0%, transparent 50%)',
-            pointerEvents: 'none',
-          }}
-        />
-        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-          <Typography
-            variant="overline"
-            sx={{ opacity: 0.85, letterSpacing: 1, lineHeight: 1.2 }}
-          >
+        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Typography variant="overline" sx={{ opacity: 0.85, letterSpacing: 1.1 }}>
             Saldo previsto
           </Typography>
           <Typography
-            variant="h4"
             component="p"
             sx={{
               fontWeight: 700,
               fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.03em',
-              fontSize: { xs: '1.75rem', sm: '2.125rem' },
-              lineHeight: 1.15,
-              wordBreak: 'break-word',
+              letterSpacing: '-0.04em',
+              fontSize: { xs: '2rem', sm: '2.25rem' },
+              lineHeight: 1.1,
+              whiteSpace: 'nowrap',
             }}
           >
             {formatBRL(balance)}
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Realizado {formatBRL(balanceActual)}
-            <Box component="span" sx={{ mx: 1, opacity: 0.5 }}>
-              ·
-            </Box>
-            {positive ? 'No azul' : 'Atenção ao saldo'}
+          <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.25 }}>
+            Realizado {formatBRL(balanceActual)} · {positive ? 'No azul' : 'Atenção'}
           </Typography>
         </Box>
       </Paper>
 
-      <div className="grid grid-cols-2 gap-3">
-        <MetricCard
+      <Paper sx={{ borderRadius: 3, px: 2.25, py: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <MetricRow
           label="Receitas"
           forecast={income}
           actual={incomePaid}
           color="success.main"
         />
-        <MetricCard
+        <Box sx={{ borderTop: '1px solid', borderColor: 'divider' }} />
+        <MetricRow
           label="Despesas"
           forecast={expense}
           actual={expensePaid}
           color="error.main"
         />
-      </div>
+      </Paper>
     </Box>
   );
 }

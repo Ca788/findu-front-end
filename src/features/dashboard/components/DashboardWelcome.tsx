@@ -25,28 +25,21 @@ export function DashboardWelcome({ monthLabel }: DashboardWelcomeProps) {
   const firstName = (user?.name ?? '').split(' ')[0] || 'por aí';
 
   return (
-    <Stack spacing={0.5} className="findu-anim-fade-in">
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ letterSpacing: 0.2 }}
-      >
-        {greetingForNow()}
+    <Stack spacing={0.25} className="findu-anim-fade-in">
+      <Typography variant="body2" color="text.secondary">
+        {greetingForNow()}, {firstName}
       </Typography>
       <Typography
         variant="h5"
         component="h1"
         sx={{
           fontWeight: 700,
-          letterSpacing: '-0.02em',
-          fontSize: { xs: '1.5rem', sm: '1.75rem' },
-          lineHeight: 1.2,
+          letterSpacing: '-0.03em',
+          fontSize: { xs: '1.65rem', sm: '1.75rem' },
+          lineHeight: 1.15,
         }}
       >
-        Olá, {firstName}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        Seu resumo de {capitalizeFirst(monthLabel)}
+        {capitalizeFirst(monthLabel)}
       </Typography>
     </Stack>
   );

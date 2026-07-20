@@ -173,18 +173,30 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
         <TextField
           label="Valor da parcela"
           placeholder="0,00"
-          inputMode="decimal"
           fullWidth
           {...register('monthly_amount')}
           error={!!errors.monthly_amount}
           helperText={errors.monthly_amount?.message ?? 'Use vírgula como separador decimal'}
+          slotProps={{
+            htmlInput: {
+              inputMode: 'decimal',
+              enterKeyHint: 'done',
+              autoComplete: 'off',
+            },
+          }}
         />
         {!isEdit && (
           <TextField
             label="Quantidade de parcelas"
             type="number"
             fullWidth
-            slotProps={{ htmlInput: { min: 1 } }}
+            slotProps={{
+              htmlInput: {
+                min: 1,
+                inputMode: 'numeric',
+                pattern: '[0-9]*',
+              },
+            }}
             {...register('total_installments')}
             error={!!errors.total_installments}
             helperText={errors.total_installments?.message}
