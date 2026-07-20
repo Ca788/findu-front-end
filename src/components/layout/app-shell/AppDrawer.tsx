@@ -8,9 +8,13 @@ import {
   APP_DRAWER_EXPANDED_WIDTH,
   APP_DRAWER_MOBILE_WIDTH,
 } from '@/components/layout/app-shell/constants';
+import { useDevice } from '@/hooks/useDevice';
 
 export function AppDrawer() {
   const { isDesktop, collapsed, drawerOpen, closeDrawer } = useAppShell();
+  const { isMobile } = useDevice();
+
+  if (isMobile) return null;
 
   if (!isDesktop) {
     return (

@@ -25,6 +25,7 @@ function AppShellLayout({ children }: AppShellProps) {
       <Box
         component="div"
         sx={{
+          position: 'relative',
           flex: 1,
           minWidth: 0,
           display: 'flex',

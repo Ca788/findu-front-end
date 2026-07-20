@@ -148,11 +148,17 @@ export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDial
         <TextField
           label="Valor"
           placeholder="0,00"
-          inputMode="decimal"
           fullWidth
           {...register('amount')}
           error={!!errors.amount}
           helperText={errors.amount?.message ?? 'Use vírgula como separador decimal'}
+          slotProps={{
+            htmlInput: {
+              inputMode: 'decimal',
+              enterKeyHint: 'done',
+              autoComplete: 'off',
+            },
+          }}
         />
         <TextField
           label="Descrição"
@@ -166,7 +172,14 @@ export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDial
           label="Dia do mês (opcional)"
           type="number"
           fullWidth
-          slotProps={{ htmlInput: { min: 1, max: 31 } }}
+          slotProps={{
+            htmlInput: {
+              min: 1,
+              max: 31,
+              inputMode: 'numeric',
+              pattern: '[0-9]*',
+            },
+          }}
           {...register('day_of_month')}
           error={!!errors.day_of_month}
           helperText={errors.day_of_month?.message ?? 'Se vazio, usa o dia da data de início'}

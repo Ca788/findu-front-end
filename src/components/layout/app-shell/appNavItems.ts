@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import ChatIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import DashboardIcon from '@mui/icons-material/SpaceDashboardOutlined';
@@ -23,6 +24,7 @@ export interface MobileTabNavItem {
   label: string;
   href: string;
   icon: ComponentType<SvgIconProps>;
+  featured?: boolean;
   isActive: (pathname: string) => boolean;
 }
 
@@ -82,13 +84,6 @@ export const appNavItems: AppNavItem[] = [
 
 export const mobileTabNavItems: MobileTabNavItem[] = [
   {
-    label: 'Chat',
-    href: AppRoutePaths.CHAT,
-    icon: ChatIcon,
-    isActive: (pathname) =>
-      pathname === AppRoutePaths.CHAT || pathname.startsWith(`${AppRoutePaths.CHAT}/c`),
-  },
-  {
     label: 'Início',
     href: AppRoutePaths.DASHBOARD,
     icon: DashboardIcon,
@@ -96,7 +91,7 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname === AppRoutePaths.DASHBOARD || pathname.startsWith(`${AppRoutePaths.DASHBOARD}/`),
   },
   {
-    label: 'Extratos',
+    label: 'Extrato',
     href: AppRoutePaths.STATEMENTS,
     icon: ReceiptLongIcon,
     isActive: (pathname) =>
@@ -104,18 +99,51 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname.startsWith(`${AppRoutePaths.STATEMENTS}/`),
   },
   {
-    label: 'Orçamentos',
+    label: 'IA',
+    href: AppRoutePaths.CHAT,
+    icon: AutoAwesomeIcon,
+    featured: true,
+    isActive: (pathname) =>
+      pathname === AppRoutePaths.CHAT ||
+      pathname.startsWith(`${AppRoutePaths.CHAT}/c`) ||
+      pathname.startsWith(APP_CHAT_HISTORY_PATH),
+  },
+  {
+    label: 'Metas',
     href: AppRoutePaths.BUDGETS,
     icon: SavingsIcon,
     isActive: (pathname) =>
       pathname === AppRoutePaths.BUDGETS || pathname.startsWith(`${AppRoutePaths.BUDGETS}/`),
   },
   {
-    label: 'Perfil',
+    label: 'Conta',
     href: AppRoutePaths.PROFILE,
     icon: PersonIcon,
     isActive: (pathname) =>
       pathname === AppRoutePaths.PROFILE || pathname.startsWith(`${AppRoutePaths.PROFILE}/`),
+  },
+];
+
+export const mobileMoreNavItems: AppNavItem[] = [
+  {
+    label: 'Histórico',
+    href: APP_CHAT_HISTORY_PATH,
+    icon: HistoryIcon,
+  },
+  {
+    label: 'Categorias',
+    href: AppRoutePaths.CATEGORIES,
+    icon: CategoryIcon,
+  },
+  {
+    label: 'Recorrentes',
+    href: AppRoutePaths.RECURRENCES,
+    icon: ReplayIcon,
+  },
+  {
+    label: 'Parcelas',
+    href: AppRoutePaths.INSTALLMENTS,
+    icon: CreditScoreIcon,
   },
 ];
 

@@ -18,7 +18,7 @@ interface DashboardRecentEntriesProps {
   monthParam: string;
 }
 
-const RECENT_LIMIT = 6;
+const RECENT_LIMIT = 5;
 
 function EntryLine({ entry }: { entry: Transaction }) {
   const isIncome = entry.transaction_type === 'income';
@@ -30,15 +30,14 @@ function EntryLine({ entry }: { entry: Transaction }) {
     <div className="flex min-w-0 items-center gap-3">
       <Box
         sx={{
-          width: 36,
-          height: 36,
+          width: 40,
+          height: 40,
           borderRadius: '50%',
           flexShrink: 0,
           display: 'grid',
           placeItems: 'center',
-          bgcolor: paid ? 'action.hover' : isIncome ? 'success.main' : 'error.main',
-          color: paid ? 'text.disabled' : 'primary.contrastText',
-          opacity: paid ? 1 : 0.9,
+          bgcolor: paid ? 'action.hover' : 'action.selected',
+          color: paid ? 'text.disabled' : tone,
         }}
       >
         <Icon sx={{ fontSize: 18 }} />
@@ -49,7 +48,7 @@ function EntryLine({ entry }: { entry: Transaction }) {
           variant="body2"
           className="truncate"
           sx={{
-            fontWeight: 500,
+            fontWeight: 600,
             textDecoration: paid ? 'line-through' : 'none',
             color: paid ? 'text.disabled' : 'text.primary',
           }}
@@ -57,7 +56,7 @@ function EntryLine({ entry }: { entry: Transaction }) {
           {entry.description || (isIncome ? 'Receita' : 'Despesa')}
         </Typography>
         <Typography variant="caption" color="text.secondary" className="truncate block">
-          {entry.category?.name ?? 'Sem categoria'} · {paid ? 'pago' : 'pendente'}
+          {entry.category?.name ?? 'Sem categoria'}
         </Typography>
       </div>
 
@@ -65,14 +64,11 @@ function EntryLine({ entry }: { entry: Transaction }) {
         variant="body2"
         sx={{
           flexShrink: 0,
-          maxWidth: '42%',
-          textAlign: 'right',
+          whiteSpace: 'nowrap',
           color: paid ? 'text.disabled' : tone,
           fontVariantNumeric: 'tabular-nums',
           fontWeight: 700,
           textDecoration: paid ? 'line-through' : 'none',
-          fontSize: { xs: '0.8rem', sm: '0.875rem' },
-          wordBreak: 'break-word',
         }}
       >
         {isIncome ? '+' : '−'}
@@ -90,9 +86,9 @@ export function DashboardRecentEntries({
   const visible = entries.slice(0, RECENT_LIMIT);
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-3.5 rounded-2xl px-4 py-4 md:px-5 md:py-5">
-      <div className="flex min-w-0 items-center justify-between gap-2">
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, minWidth: 0 }} className="truncate">
+    <Paper className="flex min-w-0 flex-col gap-3.5 rounded-3xl px-4 py-4">
+      <div className="flex items-center justify-between gap-2">
+        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
           Movimentações
         </Typography>
         <Button
@@ -100,20 +96,19 @@ export function DashboardRecentEntries({
           href={AppRoutePaths.statementDetail(monthParam)}
           size="small"
           variant="text"
-          sx={{ flexShrink: 0 }}
         >
-          Ver extrato
+          Ver tudo
         </Button>
       </div>
 
       {visible.length === 0 && (
         <Typography variant="body2" color="text.secondary">
-          Nenhum lançamento neste mês.
+          Nenhuma movimentação neste mês.
         </Typography>
       )}
 
       {visible.length > 0 && (
-        <Stack spacing={2}>
+        <Stack spacing={2.25}>
           {visible.map((entry) => (
             <EntryLine key={entry.id} entry={entry} />
           ))}

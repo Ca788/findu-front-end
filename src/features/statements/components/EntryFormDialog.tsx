@@ -33,6 +33,7 @@ import {
   entryFormSchema,
   type EntryFormValues,
 } from '@/features/statements/components/entryFormSchema';
+import { MoneyField } from '@/components/common/MoneyField';
 
 interface EntryFormDialogProps {
   open: boolean;
@@ -147,19 +148,17 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
             </FormControl>
           )}
         />
-        <TextField
+        <MoneyField
           label="Valor"
-          placeholder="0,00"
-          inputMode="decimal"
+          emphasize
           autoFocus
-          fullWidth
           {...register('amount')}
           error={!!errors.amount}
           helperText={
             errors.amount?.message ??
             (isGenerated
               ? 'Editar aqui só altera este mês; a regra original não muda.'
-              : 'Use vírgula como separador decimal')
+              : undefined)
           }
         />
         <Controller

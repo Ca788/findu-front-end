@@ -107,26 +107,24 @@ export function FormDialog({
           sx={{
             px: 2,
             pt: 1.5,
-            pb: isMobile ? 'max(12px, env(safe-area-inset-bottom))' : 2,
+            pb: isMobile ? 'max(16px, env(safe-area-inset-bottom))' : 2,
             gap: 1,
-            flexDirection: isMobile ? 'column-reverse' : 'row',
-            '& > :not(style)': isMobile ? { width: '100%', m: 0 } : undefined,
+            flexDirection: 'row',
+            '& > :not(style)': isMobile ? { m: 0 } : undefined,
           }}
         >
-          <Button
-            onClick={onClose}
-            disabled={isSubmitting}
-            size={isMobile ? 'large' : 'medium'}
-            fullWidth={isMobile}
-          >
-            {cancelLabel}
-          </Button>
+          {!isMobile && (
+            <Button onClick={onClose} disabled={isSubmitting}>
+              {cancelLabel}
+            </Button>
+          )}
           <Button
             type="submit"
             variant="contained"
             disabled={isSubmitting}
-            size={isMobile ? 'large' : 'medium'}
+            size="large"
             fullWidth={isMobile}
+            sx={isMobile ? { borderRadius: 999, py: 1.35, fontWeight: 700 } : undefined}
           >
             {isSubmitting ? 'Salvando...' : submitLabel}
           </Button>
