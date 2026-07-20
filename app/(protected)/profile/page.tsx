@@ -1,10 +1,10 @@
-import { PageContainer } from '@/components/layout/PageContainer';
+import { PageContent } from '@/components/layout/PageContent';
 import { ProfilePage } from '@/features/profile/components/ProfilePage';
 
 export default function Page() {
   return (
-    <PageContainer>
+    <PageContent maxWidth="sm">
       <ProfilePage />
-    </PageContainer>
+    </PageContent>
   );
 }

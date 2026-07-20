@@ -22,7 +22,7 @@ function defaultTitle(conversation: Conversation): string {
 }
 
 export function ConversationCard({ conversation, onArchive }: ConversationCardProps) {
-  const href = `${AppRoutePaths.CHAT}/${conversation.id}`;
+  const href = AppRoutePaths.chatConversation(conversation.id);
   return (
     <Paper className="flex items-center gap-3 rounded-2xl px-4 py-3">
       <Link href={href} className="flex flex-1 min-w-0 items-center gap-3 no-underline text-inherit">

@@ -16,19 +16,26 @@ export function DashboardPage() {
   const statementQuery = useStatement(monthParam);
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={{ xs: 2.5, sm: 3 }} className="min-w-0">
       <DashboardWelcome monthLabel={monthLabel} />
 
       {statementQuery.isError && (
-        <Alert severity="error">Erro ao carregar extrato do mês.</Alert>
+        <Alert severity="error" sx={{ borderRadius: 3 }}>
+          Erro ao carregar extrato do mês.
+        </Alert>
       )}
-      {statementQuery.isFetching && <LinearProgress />}
+      {statementQuery.isFetching && (
+        <LinearProgress sx={{ borderRadius: 999, height: 3 }} />
+      )}
 
       <StatementKpis statement={statementQuery.data} />
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-3 lg:grid-cols-2">
         <DashboardBudgets referenceDate={referenceDate} />
-        <DashboardRecentEntries statement={statementQuery.data} monthParam={monthParam} />
+        <DashboardRecentEntries
+          statement={statementQuery.data}
+          monthParam={monthParam}
+        />
       </div>
 
       <StatementSideLists statement={statementQuery.data} />

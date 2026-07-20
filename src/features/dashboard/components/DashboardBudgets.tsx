@@ -29,15 +29,20 @@ function BudgetRow({ budget }: { budget: Budget }) {
   const periodLabel = BUDGET_PERIOD_LABELS[budget.period_type];
 
   return (
-    <Stack spacing={0.5}>
-      <div className="flex items-baseline justify-between gap-2">
-        <Typography variant="body2" className="font-medium">
+    <Stack spacing={0.75} className="min-w-0">
+      <div className="flex min-w-0 items-baseline justify-between gap-2">
+        <Typography variant="body2" className="truncate font-medium" sx={{ fontWeight: 600 }}>
           {periodLabel}
         </Typography>
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ fontVariantNumeric: 'tabular-nums' }}
+          sx={{
+            fontVariantNumeric: 'tabular-nums',
+            flexShrink: 0,
+            textAlign: 'right',
+            maxWidth: '55%',
+          }}
         >
           {formatBRL(budget.spent_amount ?? 0)} / {formatBRL(budget.limit_amount)}
         </Typography>
@@ -46,16 +51,16 @@ function BudgetRow({ budget }: { budget: Budget }) {
         variant="determinate"
         color={color}
         value={Math.min(100, usage)}
-        sx={{ height: 8, borderRadius: 999 }}
+        sx={{ height: 7, borderRadius: 999 }}
       />
-      <div className="flex items-center justify-between">
-        <Typography variant="caption" color="text.secondary">
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <Typography variant="caption" color="text.secondary" className="truncate">
           {formatDateBR(budget.period_start)} — {formatDateBR(budget.period_end)}
         </Typography>
         <Typography
           variant="caption"
           color={color === 'success' ? 'text.secondary' : `${color}.main`}
-          sx={{ fontVariantNumeric: 'tabular-nums' }}
+          sx={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0, fontWeight: 600 }}
         >
           {usage.toFixed(0)}%
         </Typography>
@@ -69,16 +74,17 @@ export function DashboardBudgets({ referenceDate }: DashboardBudgetsProps) {
   const budgets = data ?? [];
 
   return (
-    <Paper className="flex flex-col gap-4 rounded-2xl px-4 py-4 md:px-6 md:py-5">
-      <div className="flex items-center justify-between gap-2">
-        <Typography variant="subtitle1" className="font-semibold">
-          Orçamentos vigentes
+    <Paper className="flex min-w-0 flex-col gap-4 rounded-2xl px-4 py-4 md:px-5 md:py-5">
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <Typography variant="subtitle1" sx={{ fontWeight: 600 }} className="truncate">
+          Orçamentos
         </Typography>
         <Button
           component={Link}
           href={AppRoutePaths.BUDGETS}
           size="small"
           variant="text"
+          sx={{ flexShrink: 0 }}
         >
           Ver todos
         </Button>
@@ -91,7 +97,7 @@ export function DashboardBudgets({ referenceDate }: DashboardBudgetsProps) {
       )}
 
       {isLoading && (
-        <LinearProgress variant="indeterminate" sx={{ borderRadius: 999 }} />
+        <LinearProgress variant="indeterminate" sx={{ borderRadius: 999, height: 3 }} />
       )}
 
       {!isLoading && !isError && budgets.length === 0 && (
