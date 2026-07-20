@@ -24,7 +24,8 @@ export function PageContent({
       <div
         className={`mx-auto w-full ${MAX_WIDTH_CLASS[maxWidth]} px-4 pt-4 sm:px-5 sm:pt-5 md:px-8 md:pt-8`}
         style={{
-          paddingBottom: 'calc(1.5rem + var(--app-safe-bottom))',
+          paddingBottom:
+            'calc(1.5rem + max(0px, var(--app-safe-bottom) - var(--app-bottom-nav-offset, 0px)))',
         }}
       >
         {children}

@@ -8,6 +8,7 @@ import CategoryIcon from '@mui/icons-material/CategoryOutlined';
 import SavingsIcon from '@mui/icons-material/SavingsOutlined';
 import ReplayIcon from '@mui/icons-material/ReplayOutlined';
 import CreditScoreIcon from '@mui/icons-material/CreditScoreOutlined';
+import PersonIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
 export interface AppNavItem {
@@ -16,6 +17,13 @@ export interface AppNavItem {
   icon: ComponentType<SvgIconProps>;
   section?: 'primary' | 'secondary';
   exact?: boolean;
+}
+
+export interface MobileTabNavItem {
+  label: string;
+  href: string;
+  icon: ComponentType<SvgIconProps>;
+  isActive: (pathname: string) => boolean;
 }
 
 export const APP_CHAT_HISTORY_PATH = `${AppRoutePaths.CHAT}/history`;
@@ -69,6 +77,45 @@ export const appNavItems: AppNavItem[] = [
     href: '/budgets',
     icon: SavingsIcon,
     section: 'secondary',
+  },
+];
+
+export const mobileTabNavItems: MobileTabNavItem[] = [
+  {
+    label: 'Chat',
+    href: AppRoutePaths.CHAT,
+    icon: ChatIcon,
+    isActive: (pathname) =>
+      pathname === AppRoutePaths.CHAT || pathname.startsWith(`${AppRoutePaths.CHAT}/c`),
+  },
+  {
+    label: 'Início',
+    href: AppRoutePaths.DASHBOARD,
+    icon: DashboardIcon,
+    isActive: (pathname) =>
+      pathname === AppRoutePaths.DASHBOARD || pathname.startsWith(`${AppRoutePaths.DASHBOARD}/`),
+  },
+  {
+    label: 'Extratos',
+    href: AppRoutePaths.STATEMENTS,
+    icon: ReceiptLongIcon,
+    isActive: (pathname) =>
+      pathname === AppRoutePaths.STATEMENTS ||
+      pathname.startsWith(`${AppRoutePaths.STATEMENTS}/`),
+  },
+  {
+    label: 'Orçamentos',
+    href: AppRoutePaths.BUDGETS,
+    icon: SavingsIcon,
+    isActive: (pathname) =>
+      pathname === AppRoutePaths.BUDGETS || pathname.startsWith(`${AppRoutePaths.BUDGETS}/`),
+  },
+  {
+    label: 'Perfil',
+    href: AppRoutePaths.PROFILE,
+    icon: PersonIcon,
+    isActive: (pathname) =>
+      pathname === AppRoutePaths.PROFILE || pathname.startsWith(`${AppRoutePaths.PROFILE}/`),
   },
 ];
 
