@@ -1,6 +1,8 @@
 'use client';
 
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 
 export function ChatGreeting() {
@@ -8,23 +10,56 @@ export function ChatGreeting() {
   const firstName = (user?.name ?? '').trim().split(/\s+/)[0] || '';
 
   return (
-    <div className="findu-anim-fade-in flex flex-col items-center gap-2 text-center">
-      <Typography
-        variant="h3"
-        component="h2"
-        sx={(theme) => ({
-          background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          color: 'transparent',
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-          fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.75rem' },
-        })}
+    <Box
+      className="findu-anim-fade-in"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 1.75,
+        textAlign: 'center',
+        px: 2,
+      }}
+    >
+      <Box
+        aria-hidden
+        sx={{
+          width: 44,
+          height: 44,
+          borderRadius: '50%',
+          display: 'grid',
+          placeItems: 'center',
+          bgcolor: 'action.hover',
+        }}
       >
-        Olá{firstName ? `, ${firstName}` : ''}! No que você está pensando?
+        <AutoAwesomeOutlinedIcon sx={{ fontSize: 22, color: 'primary.main' }} />
+      </Box>
+
+      {firstName ? (
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontSize: 14, letterSpacing: 0.01 }}
+        >
+          Olá, {firstName}
+        </Typography>
+      ) : null}
+
+      <Typography
+        variant="h4"
+        component="h2"
+        sx={{
+          m: 0,
+          fontWeight: 560,
+          letterSpacing: '-0.03em',
+          lineHeight: 1.2,
+          fontSize: { xs: '1.45rem', sm: '1.7rem' },
+          color: 'text.primary',
+          maxWidth: 280,
+        }}
+      >
+        Como posso ajudar?
       </Typography>
-    </div>
+    </Box>
   );
 }

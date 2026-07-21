@@ -30,7 +30,13 @@ function appendDelta(messages: ChatMessage[], { id, delta }: MessageDelta): Chat
   if (index === -1) return messages;
 
   const next = messages.slice();
-  next[index] = { ...next[index], body: (next[index].body ?? '') + delta };
+  const current = next[index];
+  next[index] = {
+    ...current,
+    body: (current.body ?? '') + delta,
+    // Keep UI in streaming mode until the final upsert marks completed.
+    status: current.status === 'completed' ? current.status : 'processing',
+  };
   return next;
 }
 

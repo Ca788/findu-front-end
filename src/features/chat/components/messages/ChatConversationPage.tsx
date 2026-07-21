@@ -44,6 +44,8 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
 
   const title = conversation?.title?.trim() || 'Conversa';
   const isLoading = status === 'loading';
+  const lastMessage = messages[messages.length - 1];
+  const awaitingReply = isSending || lastMessage?.role === 'user';
 
   return (
     <ChatLayout
@@ -75,10 +77,20 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
             </Box>
           )}
           {isLoading && <LinearProgress />}
-          <MessagesList messages={messages} isLoading={isLoading} />
+          <MessagesList
+            messages={messages}
+            isLoading={isLoading}
+            awaitingReply={awaitingReply}
+          />
         </>
       }
-      composer={<ChatComposer onSubmit={handleSubmit} isSending={isSending} />}
+      composer={
+        <ChatComposer
+          onSubmit={handleSubmit}
+          isSending={isSending}
+          placeholder="Pergunte ao Findu…"
+        />
+      }
     />
   );
 }
