@@ -8,12 +8,13 @@ import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import SendIcon from '@mui/icons-material/SendRounded';
-import AttachFileIcon from '@mui/icons-material/AttachFileOutlined';
+import AddIcon from '@mui/icons-material/AddRounded';
+import SendIcon from '@mui/icons-material/ArrowUpwardRounded';
 import MicIcon from '@mui/icons-material/MicNoneOutlined';
-import StopIcon from '@mui/icons-material/StopCircleOutlined';
-import CloseIcon from '@mui/icons-material/CloseOutlined';
+import StopIcon from '@mui/icons-material/StopRounded';
+import CloseIcon from '@mui/icons-material/CloseRounded';
 import { useAudioRecorder } from '@/features/chat/hooks/useAudioRecorder';
+import { ComposerAttachSheet, type AttachSheetAction } from '@/features/chat/components/screen/ComposerAttachSheet';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import {
   AppErrorResultMapper,
@@ -24,7 +25,8 @@ import type {
   SendMessageInput,
 } from '@/features/chat/models/message.model';
 
-const ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf';
+const ACCEPT_IMAGES = 'image/jpeg,image/png,image/webp,image/heic,image/heif';
+const ACCEPT_FILES = `${ACCEPT_IMAGES},application/pdf`;
 const MAX_FILES = 5;
 const MAX_FILE_SIZE_MB = 15;
 
@@ -54,12 +56,15 @@ export function ChatComposer({
   onSubmit,
   isSending = false,
   disabled = false,
-  placeholder = 'Pergunte algo...',
+  placeholder = 'Pergunte algo…',
   maxRows = 6,
 }: ChatComposerProps) {
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [attachOpen, setAttachOpen] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const filesInputRef = useRef<HTMLInputElement | null>(null);
   const { showError } = useSnackbar();
   const recorder = useAudioRecorder();
 
@@ -71,6 +76,9 @@ export function ChatComposer({
 
   const hasContent = body.trim().length > 0 || files.length > 0;
   const isBusy = isSending || disabled;
+  const isRecording =
+    recorder.status === 'recording' || recorder.status === 'requesting';
+  const isReady = recorder.status === 'ready';
 
   const submitText = async () => {
     if (!hasContent || isBusy) return;
@@ -82,7 +90,9 @@ export function ChatComposer({
       });
       setBody('');
       setFiles([]);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
+      if (filesInputRef.current) filesInputRef.current.value = '';
     } catch (err) {
       const mapped = AppErrorResultMapper.fromAxiosError(
         err as AxiosError<ErrorResponse>,
@@ -91,11 +101,11 @@ export function ChatComposer({
     }
   };
 
-  const submitAudio = async () => {
-    if (!recorder.recorded || isBusy) return;
+  const submitAudioBlob = async (blob: Blob) => {
+    if (isBusy) return;
     try {
       await onSubmit({
-        audio: recorder.recorded.blob,
+        audio: blob,
         client_message_id: createClientId(),
       });
       recorder.reset();
@@ -107,10 +117,19 @@ export function ChatComposer({
     }
   };
 
+  const submitAudio = async () => {
+    if (isRecording) {
+      const recorded = await recorder.stop();
+      if (recorded) await submitAudioBlob(recorded.blob);
+      return;
+    }
+    if (recorder.recorded) await submitAudioBlob(recorder.recorded.blob);
+  };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      submitText();
+      void submitText();
     }
   };
 
@@ -132,24 +151,61 @@ export function ChatComposer({
   };
 
   const startRecording = async () => {
-    await recorder.start();
-    if (recorder.error) showError(recorder.error);
+    const error = await recorder.start();
+    if (error) showError(error);
   };
 
-  const isRecording = recorder.status === 'recording' || recorder.status === 'requesting';
-  const isReady = recorder.status === 'ready';
+  const onAttachSelect = (action: AttachSheetAction) => {
+    switch (action) {
+      case 'gallery':
+        galleryInputRef.current?.click();
+        break;
+      case 'camera':
+        cameraInputRef.current?.click();
+        break;
+      case 'files':
+        filesInputRef.current?.click();
+        break;
+      default: {
+        const _exhaustive: never = action;
+        return _exhaustive;
+      }
+    }
+  };
 
   return (
     <Box
       sx={{
         px: { xs: 1.25, sm: 2, md: 3 },
-        pt: 1.25,
+        pt: 1,
         pb: 1.25,
         mx: 'auto',
         width: '100%',
         maxWidth: 880,
       }}
     >
+      {inAudioMode && isRecording && (
+        <Box
+          sx={(theme) => ({
+            mb: 1,
+            mx: 'auto',
+            maxWidth: 420,
+            px: 2,
+            py: 1.1,
+            borderRadius: 2.5,
+            textAlign: 'center',
+            bgcolor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.1)'
+                : 'grey.100',
+          })}
+        >
+          <Typography variant="caption" sx={{ fontSize: 12.5, color: 'text.primary' }}>
+            Quando terminar de falar, toque em &quot;Parar&quot; ou &quot;Enviar&quot;
+          </Typography>
+        </Box>
+      )}
+
       {!inAudioMode && files.length > 0 && (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1 }}>
           {files.map((file, idx) => (
@@ -167,12 +223,16 @@ export function ChatComposer({
       <Box
         sx={(theme) => ({
           display: 'flex',
-          alignItems: inAudioMode ? 'center' : 'flex-end',
+          alignItems: 'center',
           gap: 0.5,
           px: 1,
-          py: 0.75,
-          borderRadius: 28,
-          bgcolor: 'background.paper',
+          py: 0.65,
+          minHeight: 52,
+          borderRadius: 999,
+          bgcolor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.06)'
+              : 'background.paper',
           border: '1px solid',
           borderColor: 'divider',
           transition: theme.transitions.create(['border-color', 'box-shadow'], {
@@ -188,37 +248,54 @@ export function ChatComposer({
           <AudioModeRow
             status={recorder.status}
             elapsedMs={recorder.elapsedMs}
-            previewUrl={recorder.recorded?.url}
+            levels={recorder.levels}
             isBusy={isBusy}
-            onStop={() => recorder.stop()}
+            onStop={() => void recorder.stop()}
             onCancel={() => recorder.cancel()}
-            onSend={submitAudio}
+            onSend={() => void submitAudio()}
             isRecording={isRecording}
             isReady={isReady}
           />
         ) : (
           <>
-            <Tooltip title="Anexar imagem ou PDF">
+            <Tooltip title="Anexar">
               <span>
                 <IconButton
                   size="small"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => setAttachOpen(true)}
                   disabled={isBusy || files.length >= MAX_FILES}
                   aria-label="Anexar arquivo"
-                  sx={{ alignSelf: 'flex-end', mb: 0.25 }}
                 >
-                  <AttachFileIcon fontSize="small" />
+                  <AddIcon />
                 </IconButton>
               </span>
             </Tooltip>
+
             <input
-              ref={fileInputRef}
+              ref={galleryInputRef}
               type="file"
-              accept={ACCEPT}
+              accept={ACCEPT_IMAGES}
               multiple
               hidden
               onChange={(e) => handleFiles(e.target.files)}
             />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              hidden
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+            <input
+              ref={filesInputRef}
+              type="file"
+              accept={ACCEPT_FILES}
+              multiple
+              hidden
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+
             <TextField
               multiline
               maxRows={maxRows}
@@ -235,25 +312,21 @@ export function ChatComposer({
                 '& .MuiInputBase-root': { px: 0.5, py: 0.75, fontSize: 15 },
               }}
             />
+
             {hasContent ? (
               <Tooltip title="Enviar">
                 <span>
                   <IconButton
                     color="primary"
-                    onClick={submitText}
+                    onClick={() => void submitText()}
                     disabled={isBusy}
                     aria-label="Enviar mensagem"
-                    sx={(theme) => ({
-                      alignSelf: 'flex-end',
-                      mb: 0.25,
+                    sx={{
                       bgcolor: 'primary.main',
                       color: 'primary.contrastText',
                       '&:hover': { bgcolor: 'primary.dark' },
-                      transition: theme.transitions.create('transform', {
-                        duration: theme.transitions.duration.shorter,
-                      }),
                       '&:active': { transform: 'scale(0.94)' },
-                    })}
+                    }}
                   >
                     <SendIcon fontSize="small" />
                   </IconButton>
@@ -263,10 +336,15 @@ export function ChatComposer({
               <Tooltip title="Gravar áudio">
                 <span>
                   <IconButton
-                    onClick={startRecording}
+                    onClick={() => void startRecording()}
                     disabled={isBusy}
                     aria-label="Gravar áudio"
-                    sx={{ alignSelf: 'flex-end', mb: 0.25 }}
+                    sx={(theme) => ({
+                      bgcolor:
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'action.hover',
+                    })}
                   >
                     <MicIcon />
                   </IconButton>
@@ -276,6 +354,13 @@ export function ChatComposer({
           </>
         )}
       </Box>
+
+      <ComposerAttachSheet
+        open={attachOpen}
+        onClose={() => setAttachOpen(false)}
+        onSelect={onAttachSelect}
+        disabled={isBusy || files.length >= MAX_FILES}
+      />
     </Box>
   );
 }
@@ -283,7 +368,7 @@ export function ChatComposer({
 interface AudioModeRowProps {
   status: ReturnType<typeof useAudioRecorder>['status'];
   elapsedMs: number;
-  previewUrl?: string;
+  levels: number[];
   isBusy: boolean;
   onStop: () => void;
   onCancel: () => void;
@@ -295,7 +380,7 @@ interface AudioModeRowProps {
 function AudioModeRow({
   status,
   elapsedMs,
-  previewUrl,
+  levels,
   isBusy,
   onStop,
   onCancel,
@@ -303,6 +388,9 @@ function AudioModeRow({
   isRecording,
   isReady,
 }: AudioModeRowProps) {
+  const canSend =
+    (isReady || isRecording) && status !== 'stopping' && status !== 'requesting';
+
   return (
     <>
       <Tooltip title="Cancelar">
@@ -323,82 +411,96 @@ function AudioModeRow({
           flex: 1,
           display: 'flex',
           alignItems: 'center',
-          gap: 1.25,
-          px: 1.25,
-          py: 0.75,
+          gap: 1,
+          minWidth: 0,
+          px: 0.5,
         }}
       >
-        {isRecording && (
-          <Box
-            aria-hidden
-            sx={{
-              width: 10,
-              height: 10,
-              borderRadius: '50%',
-              bgcolor: 'error.main',
-              animation: 'fu-pulse 1.2s ease-in-out infinite',
-              '@keyframes fu-pulse': {
-                '0%, 100%': { opacity: 1 },
-                '50%': { opacity: 0.35 },
-              },
-            }}
-          />
-        )}
-        {isReady && previewUrl ? (
-          <audio
-            controls
-            src={previewUrl}
-            className="w-full"
-            style={{ height: 32 }}
-            preload="metadata"
-          />
-        ) : (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontVariantNumeric: 'tabular-nums' }}
-          >
-            {status === 'requesting'
-              ? 'Solicitando microfone…'
-              : status === 'stopping'
-                ? 'Finalizando…'
-                : `Gravando · ${formatDuration(elapsedMs)}`}
-          </Typography>
-        )}
+        <Waveform levels={levels} active={isRecording} />
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0, minWidth: 42 }}
+        >
+          {status === 'requesting'
+            ? '…'
+            : status === 'stopping'
+              ? '…'
+              : formatDuration(elapsedMs)}
+        </Typography>
       </Box>
 
-      {isReady ? (
-        <Tooltip title="Enviar áudio">
+      {isRecording && (
+        <Tooltip title="Parar">
           <span>
             <IconButton
-              color="primary"
-              onClick={onSend}
-              disabled={isBusy}
-              aria-label="Enviar áudio"
-              sx={{
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
-                '&:hover': { bgcolor: 'primary.dark' },
-              }}
-            >
-              <SendIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Parar gravação">
-          <span>
-            <IconButton
-              color="primary"
               onClick={onStop}
               disabled={status !== 'recording'}
               aria-label="Parar gravação"
+              sx={(theme) => ({
+                bgcolor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.1)'
+                    : 'action.hover',
+              })}
             >
               <StopIcon />
             </IconButton>
           </span>
         </Tooltip>
       )}
+
+      <Tooltip title="Enviar áudio">
+        <span>
+          <IconButton
+            color="primary"
+            onClick={onSend}
+            disabled={isBusy || !canSend}
+            aria-label="Enviar áudio"
+            sx={{
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              '&:hover': { bgcolor: 'primary.dark' },
+              '&.Mui-disabled': {
+                bgcolor: 'action.disabledBackground',
+              },
+            }}
+          >
+            <SendIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
     </>
+  );
+}
+
+function Waveform({ levels, active }: { levels: number[]; active: boolean }) {
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '2.5px',
+        height: 28,
+        minWidth: 0,
+        opacity: active ? 1 : 0.55,
+      }}
+    >
+      {levels.map((level, index) => (
+        <Box
+          key={index}
+          sx={{
+            width: 2.5,
+            height: `${Math.max(18, level * 100)}%`,
+            borderRadius: 999,
+            bgcolor: 'text.primary',
+            transition: active ? 'height 80ms linear' : 'height 200ms ease',
+          }}
+        />
+      ))}
+    </Box>
   );
 }

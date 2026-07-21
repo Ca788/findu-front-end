@@ -85,9 +85,9 @@ export function ChatScreen() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: { xs: 2.5, md: 3.5 },
+          gap: { xs: 3, md: 4 },
           px: { xs: 1.5, md: 3 },
-          pt: 4,
+          pt: 2,
           pb: {
             xs: 'calc(1.5rem + var(--app-bottom-nav-space))',
             sm: 4,
@@ -105,7 +105,7 @@ export function ChatScreen() {
           <ChatComposer
             onSubmit={handleSubmit}
             isSending={isStarting}
-            placeholder="Pergunte ao Findu..."
+            placeholder="Pergunte ao Findu…"
           />
         </Box>
       </Box>

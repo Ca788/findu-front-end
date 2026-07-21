@@ -1,13 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import Checkbox from '@mui/material/Checkbox';
-import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/EditOutlined';
-import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import RepeatIcon from '@mui/icons-material/RepeatOutlined';
-import PaymentsIcon from '@mui/icons-material/PaymentsOutlined';
+import MoreVertIcon from '@mui/icons-material/MoreVertRounded';
+import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import Box from '@mui/material/Box';
 import { formatBRL } from '@/utils/currency';
 import type { Transaction } from '@/features/transactions/models/transaction.model';
 
@@ -19,32 +22,10 @@ interface EntryRowProps {
   isToggling?: boolean;
 }
 
-function SourceChip({
-  source,
-  installment,
-}: {
-  source: Transaction['source'];
-  installment?: number | null;
-}) {
-  if (source === 'recurrence') {
-    return (
-      <Chip
-        size="small"
-        icon={<RepeatIcon fontSize="small" />}
-        label="Recorrente"
-        variant="outlined"
-      />
-    );
-  }
-  if (source === 'installment') {
-    return (
-      <Chip
-        size="small"
-        icon={<PaymentsIcon fontSize="small" />}
-        label={installment ? `${installment}ª` : 'Parc.'}
-        variant="outlined"
-      />
-    );
+function sourceLabel(entry: Transaction): string | null {
+  if (entry.source === 'recurrence') return 'Recorrente';
+  if (entry.source === 'installment') {
+    return entry.installment_number ? `${entry.installment_number}ª parc.` : 'Parcela';
   }
   return null;
 }
@@ -59,18 +40,56 @@ export function EntryRow({
   const paid = entry.status === 'paid';
   const amount = Number(entry.amount);
   const amountColor = entry.transaction_type === 'income' ? 'success.main' : 'error.main';
+  const source = sourceLabel(entry);
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
 
   return (
-    <div className="flex items-start gap-2 rounded-2xl border border-black/5 bg-white/70 px-2.5 py-2.5 dark:border-white/10 dark:bg-white/5 sm:items-center sm:gap-3 sm:px-3">
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        px: 1.25,
+        py: 1.25,
+        borderRadius: 3,
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+      }}
+    >
       <Checkbox
         checked={paid}
         onChange={() => onToggle(entry)}
         disabled={isToggling}
-        sx={{ mt: { xs: -0.25, sm: 0 }, p: 0.75 }}
+        sx={{ p: 0.75 }}
+        slotProps={{
+          input: {
+            'aria-label': paid ? 'Marcar pendente' : 'Marcar pago',
+          },
+        }}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex flex-wrap items-center gap-1.5">
+      <Box
+        role="button"
+        tabIndex={0}
+        onClick={() => onEdit(entry)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onEdit(entry);
+          }
+        }}
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.25,
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography
             variant="body2"
             sx={{
@@ -79,66 +98,59 @@ export function EntryRow({
               color: paid ? 'text.disabled' : 'text.primary',
               lineHeight: 1.3,
             }}
-            className="min-w-0 break-words"
+            className="truncate"
           >
             {entry.description || 'Sem descrição'}
           </Typography>
-          <SourceChip source={entry.source} installment={entry.installment_number} />
-        </div>
-        {entry.category?.name && (
-          <Typography variant="caption" color="text.secondary">
-            {entry.category.name}
+          <Typography variant="caption" color="text.secondary" className="truncate block">
+            {[entry.category?.name, source].filter(Boolean).join(' · ') || 'Manual'}
           </Typography>
-        )}
+        </Box>
+
         <Typography
           variant="body2"
-          className="sm:hidden"
           sx={{
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
             color: paid ? 'text.disabled' : amountColor,
             fontVariantNumeric: 'tabular-nums',
             fontWeight: 700,
             textDecoration: paid ? 'line-through' : 'none',
-            mt: 0.25,
           }}
         >
-          {entry.transaction_type === 'expense' ? '- ' : '+ '}
+          {entry.transaction_type === 'expense' ? '−' : '+'}
           {formatBRL(amount)}
         </Typography>
-      </div>
+      </Box>
 
-      <Typography
-        variant="body1"
-        className="hidden sm:block"
-        sx={{
-          color: paid ? 'text.disabled' : amountColor,
-          fontVariantNumeric: 'tabular-nums',
-          fontWeight: 600,
-          textDecoration: paid ? 'line-through' : 'none',
-          whiteSpace: 'nowrap',
-        }}
+      <IconButton
+        size="small"
+        aria-label="Mais opções"
+        onClick={(event) => setMenuAnchor(event.currentTarget)}
       >
-        {entry.transaction_type === 'expense' ? '- ' : '+ '}
-        {formatBRL(amount)}
-      </Typography>
+        <MoreVertIcon fontSize="small" />
+      </IconButton>
 
-      <div className="flex shrink-0 items-center">
-        <IconButton
-          size="small"
-          onClick={() => onEdit(entry)}
-          aria-label="Editar"
-          sx={{ touchAction: 'manipulation' }}
+      <Menu
+        anchorEl={menuAnchor}
+        open={!!menuAnchor}
+        onClose={() => setMenuAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuItem
+          onClick={() => {
+            setMenuAnchor(null);
+            onDelete(entry);
+          }}
+          sx={{ color: 'error.main' }}
         >
-          <EditIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={() => onDelete(entry)}
-          aria-label="Excluir"
-          sx={{ touchAction: 'manipulation' }}
-        >
-          <DeleteIcon fontSize="small" />
-        </IconButton>
-      </div>
-    </div>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>Excluir</ListItemText>
+        </MenuItem>
+      </Menu>
+    </Box>
   );
 }

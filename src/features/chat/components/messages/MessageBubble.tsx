@@ -3,7 +3,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import { TypingDots } from '@/features/chat/components/messages/TypingDots';
+import { ThinkingStatus } from '@/features/chat/components/messages/ThinkingStatus';
 import { formatTimeBR } from '@/utils/date';
 import { AttachmentChip } from '@/features/chat/components/messages/AttachmentChip';
 import { AudioMessagePlayer } from '@/features/chat/components/messages/AudioMessagePlayer';
@@ -24,6 +24,24 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const hasBody = !!message.body && message.body.length > 0;
   const isStreaming = pending && hasBody;
   const hasAudio = message.kind === 'audio' && !!message.audio_url;
+  const isThinking = !isUser && pending && !hasBody && !hasAudio;
+
+  if (isThinking) {
+    return (
+      <Box
+        className="findu-anim-fade-in"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 0.5,
+          py: 0.5,
+        }}
+      >
+        <ThinkingStatus urgent={message.status === 'pending'} />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -40,14 +58,18 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           maxWidth: { xs: '88%', sm: '78%' },
           px: 2,
           py: 1.25,
-          borderRadius: 3,
-          bgcolor: isUser ? 'primary.main' : 'background.paper',
-          color: isUser ? 'primary.contrastText' : 'text.primary',
-          border: isUser ? 'none' : '1px solid',
-          borderColor: 'divider',
-          boxShadow: isUser
-            ? `0 1px 2px ${theme.palette.primary.main}33`
-            : 'none',
+          borderRadius: isUser ? '22px 22px 6px 22px' : '22px 22px 22px 6px',
+          bgcolor: isUser
+            ? theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.1)'
+              : 'primary.main'
+            : 'transparent',
+          color: isUser
+            ? theme.palette.mode === 'dark'
+              ? 'text.primary'
+              : 'primary.contrastText'
+            : 'text.primary',
+          border: isUser ? 'none' : 'none',
           wordBreak: 'break-word',
         })}
       >
@@ -63,18 +85,37 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           <Typography
             variant="body2"
             component="div"
-            sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: 14.5, lineHeight: 1.55 }}
+            sx={{
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              fontSize: 15,
+              lineHeight: 1.65,
+              letterSpacing: 0.01,
+            }}
           >
             {message.body}
             {isStreaming && (
-              <span
-                aria-hidden="true"
-                className="ml-0.5 inline-block w-0.5 h-[1em] align-[-2px] bg-current animate-pulse"
+              <Box
+                component="span"
+                aria-hidden
+                sx={{
+                  display: 'inline-block',
+                  width: 7,
+                  height: 7,
+                  ml: 0.75,
+                  mb: '1px',
+                  borderRadius: '50%',
+                  bgcolor: 'primary.main',
+                  verticalAlign: 'baseline',
+                  animation: 'fu-stream-dot 1.1s ease-in-out infinite',
+                  '@keyframes fu-stream-dot': {
+                    '0%, 100%': { opacity: 0.35, transform: 'scale(0.85)' },
+                    '50%': { opacity: 1, transform: 'scale(1)' },
+                  },
+                }}
               />
             )}
           </Typography>
-        ) : pending ? (
-          <TypingDots />
         ) : hasAudio ? null : (
           <Typography variant="body2" color="text.secondary">
             (sem conteúdo)

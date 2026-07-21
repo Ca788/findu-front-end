@@ -4,7 +4,6 @@ import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
-import { PageHeader } from '@/components/common/PageHeader';
 import { useStatementsList } from '@/features/statements/hooks/useStatementsList';
 import { StatementCard } from '@/features/statements/components/StatementCard';
 import { currentMonthParam } from '@/features/statements/utils/month';
@@ -27,27 +26,47 @@ export function StatementsListPage() {
   );
 
   return (
-    <Stack spacing={3}>
-      <PageHeader eyebrow="Financeiro" title="Extratos mensais" />
+    <Stack spacing={2.5}>
+      <Stack spacing={0.25}>
+        <Typography variant="body2" color="text.secondary">
+          Financeiro
+        </Typography>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            letterSpacing: '-0.03em',
+            fontSize: { xs: '1.65rem', sm: '1.75rem' },
+          }}
+        >
+          Extratos
+        </Typography>
+      </Stack>
 
       {query.isError && <Alert severity="error">Erro ao carregar extratos.</Alert>}
-      {query.isFetching && <LinearProgress />}
+      {query.isFetching && <LinearProgress sx={{ height: 3, borderRadius: 999 }} />}
 
       {current.length > 0 && (
         <Section title="Este mês">
-          {current.map((row) => <StatementCard key={row.month} summary={row} />)}
+          {current.map((row) => (
+            <StatementCard key={row.month} summary={row} />
+          ))}
         </Section>
       )}
 
       {future.length > 0 && (
-        <Section title="Próximos meses">
-          {future.map((row) => <StatementCard key={row.month} summary={row} />)}
+        <Section title="Próximos">
+          {future.map((row) => (
+            <StatementCard key={row.month} summary={row} />
+          ))}
         </Section>
       )}
 
       {past.length > 0 && (
-        <Section title="Meses anteriores">
-          {[...past].reverse().map((row) => <StatementCard key={row.month} summary={row} />)}
+        <Section title="Anteriores">
+          {[...past].reverse().map((row) => (
+            <StatementCard key={row.month} summary={row} />
+          ))}
         </Section>
       )}
 
@@ -63,8 +82,14 @@ export function StatementsListPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <Typography variant="subtitle2" color="text.secondary">{title}</Typography>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
+      <Typography
+        variant="overline"
+        color="text.secondary"
+        sx={{ letterSpacing: 1 }}
+      >
+        {title}
+      </Typography>
+      <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
     </div>
   );
 }
