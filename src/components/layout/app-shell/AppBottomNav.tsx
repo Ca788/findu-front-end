@@ -9,13 +9,15 @@ import {
   APP_BOTTOM_NAV_FLOAT_GAP,
   APP_BOTTOM_NAV_HEIGHT,
 } from '@/components/layout/app-shell/constants';
+import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
 import { useDevice } from '@/hooks/useDevice';
 
 export function AppBottomNav() {
   const pathname = usePathname() ?? '';
   const { isMobile } = useDevice();
+  const { keyboardOpen } = useAppShell();
 
-  if (!isMobile) return null;
+  if (!isMobile || keyboardOpen) return null;
 
   return (
     <Box
@@ -51,7 +53,7 @@ export function AppBottomNav() {
               key={item.href}
               component={Link}
               href={item.href}
-              aria-label="Chat com a IA Findu"
+              aria-label="Chat Findu"
               aria-current={active ? 'page' : undefined}
               className="findu-ai-orb"
               sx={{

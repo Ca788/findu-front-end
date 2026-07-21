@@ -6,7 +6,7 @@ export function LoginScreen() {
     <AuthCard
       eyebrow="Findu"
       title="Entrar"
-      description="Acesse sua conta para continuar."
+      description="Acesse sua conta. No app, você pode ativar a digital depois do login."
     >
       <LoginForm />
     </AuthCard>

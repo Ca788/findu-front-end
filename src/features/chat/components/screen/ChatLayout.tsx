@@ -2,6 +2,7 @@
 
 import { type ReactNode } from 'react';
 import Box from '@mui/material/Box';
+import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
 import { useDevice } from '@/hooks/useDevice';
 
 interface ChatLayoutProps {
@@ -12,6 +13,7 @@ interface ChatLayoutProps {
 
 export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
   const { isMobile } = useDevice();
+  const { keyboardOpen } = useAppShell();
 
   return (
     <Box
@@ -24,7 +26,7 @@ export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
         bgcolor: 'background.default',
       }}
     >
-      {topbar && (
+      {topbar && !keyboardOpen && (
         <Box
           sx={{
             flexShrink: 0,
@@ -53,9 +55,10 @@ export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
           bgcolor: 'background.default',
           borderTop: '1px solid',
           borderColor: 'divider',
-          paddingBottom: isMobile
-            ? 'var(--app-bottom-nav-space)'
-            : 'var(--app-safe-bottom)',
+          paddingBottom:
+            isMobile && !keyboardOpen
+              ? 'var(--app-bottom-nav-space)'
+              : 'var(--app-safe-bottom)',
         }}
       >
         {composer}

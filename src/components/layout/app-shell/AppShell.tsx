@@ -1,27 +1,45 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import Box from '@mui/material/Box';
-import { AppShellProvider } from '@/components/layout/app-shell/AppShellContext';
+import {
+  AppShellProvider,
+  useAppShell,
+} from '@/components/layout/app-shell/AppShellContext';
 import { AppDrawer } from '@/components/layout/app-shell/AppDrawer';
 import { AppHeader } from '@/components/layout/app-shell/AppHeader';
 import { AppBottomNav } from '@/components/layout/app-shell/AppBottomNav';
+import { RecentConversationsDrawer } from '@/features/chat/components/conversations/RecentConversationsDrawer';
 
 interface AppShellProps {
   children: ReactNode;
 }
 
 function AppShellLayout({ children }: AppShellProps) {
+  const { recentOpen, closeRecent, keyboardOpen, keyboardInset } = useAppShell();
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--keyboard-inset',
+      `${keyboardInset}px`,
+    );
+    document.documentElement.dataset.keyboard = keyboardOpen ? 'open' : 'closed';
+  }, [keyboardInset, keyboardOpen]);
+
   return (
     <Box
       sx={{
-        height: '100dvh',
+        height: keyboardOpen
+          ? `calc(100dvh - ${keyboardInset}px)`
+          : '100dvh',
         bgcolor: 'background.default',
         display: 'flex',
         overflow: 'hidden',
+        transition: 'height 120ms linear',
       }}
     >
       <AppDrawer />
+      <RecentConversationsDrawer open={recentOpen} onClose={closeRecent} />
       <Box
         component="div"
         sx={{
