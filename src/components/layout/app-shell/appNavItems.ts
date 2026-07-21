@@ -99,7 +99,7 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname.startsWith(`${AppRoutePaths.STATEMENTS}/`),
   },
   {
-    label: 'IA',
+    label: 'Chat',
     href: AppRoutePaths.CHAT,
     icon: AutoAwesomeIcon,
     featured: true,

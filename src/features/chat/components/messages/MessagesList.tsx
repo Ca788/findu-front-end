@@ -10,7 +10,6 @@ import type { ChatMessage } from '@/features/chat/models/message.model';
 interface MessagesListProps {
   messages: ChatMessage[];
   isLoading: boolean;
-  /** Show thinking state immediately after send, before the assistant row arrives. */
   awaitingReply?: boolean;
 }
 

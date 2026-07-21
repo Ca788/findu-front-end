@@ -12,7 +12,7 @@ import {
   AppErrorResultMapper,
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
-import { parseAmountInput } from '@/utils/currency';
+import { formatAmountForInput, parseAmountInput } from '@/utils/currency';
 import { toLocalDateInput } from '@/utils/date';
 import type {
   Budget,
@@ -61,9 +61,7 @@ export function BudgetFormDialog({ open, budget, onClose }: BudgetFormDialogProp
       period_type: budget?.period_type ?? 'monthly',
       period_start: toLocalDateInput(budget?.period_start),
       period_end: toLocalDateInput(budget?.period_end),
-      limit_amount: budget?.limit_amount
-        ? String(budget.limit_amount).replace('.', ',')
-        : '',
+      limit_amount: formatAmountForInput(budget?.limit_amount),
     });
   }, [open, budget, reset]);
 

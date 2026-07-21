@@ -79,13 +79,34 @@ export function StatementKpis({ statement }: StatementKpisProps) {
           position: 'relative',
           px: 2.5,
           py: 2.75,
-          border: 'none',
-          background: `linear-gradient(145deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 58%, ${theme.palette.primary.light} 100%)`,
-          color: theme.palette.primary.contrastText,
+          border: '1px solid',
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.08)'
+              : 'rgba(15,47,92,0.12)',
+          background:
+            theme.palette.mode === 'dark'
+              ? 'linear-gradient(145deg, #0B1A2E 0%, #12305A 52%, #1A4578 100%)'
+              : 'linear-gradient(145deg, #0F2F5C 0%, #1E4F96 55%, #2F6FE0 100%)',
+          color: '#F5F8FC',
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 18px 40px rgba(0,0,0,0.35)'
+              : '0 14px 32px rgba(15,47,92,0.18)',
         }}
       >
+        <Box
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'radial-gradient(120% 80% at 100% 0%, rgba(75,134,240,0.22) 0%, transparent 55%)',
+            pointerEvents: 'none',
+          }}
+        />
         <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-          <Typography variant="overline" sx={{ opacity: 0.85, letterSpacing: 1.1 }}>
+          <Typography variant="overline" sx={{ opacity: 0.78, letterSpacing: 1.1 }}>
             Saldo previsto
           </Typography>
           <Typography
@@ -101,7 +122,7 @@ export function StatementKpis({ statement }: StatementKpisProps) {
           >
             {formatBRL(balance)}
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.25 }}>
+          <Typography variant="body2" sx={{ opacity: 0.82, mt: 0.25 }}>
             Realizado {formatBRL(balanceActual)} · {positive ? 'No azul' : 'Atenção'}
           </Typography>
         </Box>

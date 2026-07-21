@@ -18,7 +18,8 @@ import {
   AppErrorResultMapper,
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
-import { parseAmountInput } from '@/utils/currency';
+import { formatAmountForInput, parseAmountInput } from '@/utils/currency';
+import { MoneyField } from '@/components/common/MoneyField';
 import { localTodayInput, toLocalDateInput } from '@/utils/date';
 import type {
   RecurrenceRule,
@@ -76,7 +77,7 @@ export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDial
     if (!open) return;
     reset({
       transaction_type: rule?.transaction_type ?? 'expense',
-      amount: rule?.amount ? String(rule.amount).replace('.', ',') : '',
+      amount: formatAmountForInput(rule?.amount),
       description: rule?.description ?? '',
       day_of_month: rule?.day_of_month ? String(rule.day_of_month) : '',
       starts_on: toLocalDateInput(rule?.starts_on) || localTodayInput(),
@@ -145,20 +146,11 @@ export function RecurrenceFormDialog({ open, rule, onClose }: RecurrenceFormDial
             </FormControl>
           )}
         />
-        <TextField
+        <MoneyField
           label="Valor"
-          placeholder="0,00"
-          fullWidth
           {...register('amount')}
           error={!!errors.amount}
-          helperText={errors.amount?.message ?? 'Use vírgula como separador decimal'}
-          slotProps={{
-            htmlInput: {
-              inputMode: 'decimal',
-              enterKeyHint: 'done',
-              autoComplete: 'off',
-            },
-          }}
+          helperText={errors.amount?.message}
         />
         <TextField
           label="Descrição"

@@ -10,7 +10,7 @@ import { useUpdateConversation } from '@/features/chat/hooks/useUpdateConversati
 import { useSendMessage } from '@/features/chat/hooks/useSendMessage';
 import { ChatConversationHeader } from '@/features/chat/components/messages/ChatConversationHeader';
 import { MessagesList } from '@/features/chat/components/messages/MessagesList';
-import { AgentSegmentedControl } from '@/features/chat/components/screen/AgentSegmentedControl';
+import { ChatOptionsBar } from '@/features/chat/components/screen/ChatOptionsBar';
 import { ChatComposer } from '@/features/chat/components/screen/ChatComposer';
 import { ChatLayout } from '@/features/chat/components/screen/ChatLayout';
 import type { AgentId } from '@/features/chat/models/agent.model';
@@ -26,14 +26,35 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
   const updateConversation = useUpdateConversation();
   const { send, isSending } = useSendMessage(conversationId);
 
-  const [pendingAgentId, setPendingAgentId] = useState<AgentId | null>(null);
-  const activeAgentId = pendingAgentId ?? conversation?.agent_id ?? null;
+  const [pendingAgentId, setPendingAgentId] = useState<AgentId | null | undefined>(
+    undefined,
+  );
+  const [pendingModelId, setPendingModelId] = useState<string | null | undefined>(
+    undefined,
+  );
+
+  const activeAgentId =
+    pendingAgentId !== undefined
+      ? pendingAgentId
+      : (conversation?.agent_id ?? null);
+  const activeModelId =
+    pendingModelId !== undefined
+      ? pendingModelId
+      : (conversation?.model_id ?? null);
 
   const handleSelectAgent = (agentId: AgentId | null) => {
     setPendingAgentId(agentId);
     updateConversation.mutate(
       { id: conversationId, agent_id: agentId },
-      { onSettled: () => setPendingAgentId(null) },
+      { onSettled: () => setPendingAgentId(undefined) },
+    );
+  };
+
+  const handleSelectModel = (modelId: string | null) => {
+    setPendingModelId(modelId);
+    updateConversation.mutate(
+      { id: conversationId, model_id: modelId },
+      { onSettled: () => setPendingModelId(undefined) },
     );
   };
 
@@ -57,14 +78,16 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
             maxWidth: 880,
             display: 'flex',
             flexDirection: 'column',
-            gap: 0.75,
+            gap: 0.5,
             px: { xs: 0.5, md: 1 },
           }}
         >
           <ChatConversationHeader title={title} />
-          <AgentSegmentedControl
+          <ChatOptionsBar
+            selectedModelId={activeModelId}
             selectedAgentId={activeAgentId}
-            onSelect={handleSelectAgent}
+            onSelectModel={handleSelectModel}
+            onSelectAgent={handleSelectAgent}
             disabled={updateConversation.isPending}
           />
         </Box>

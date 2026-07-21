@@ -26,15 +26,15 @@
   0%,
   100% {
     box-shadow:
-      0 0 0 4px var(--mui-palette-background-default, #131314),
-      0 8px 28px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 40%, transparent),
-      0 0 18px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 55%, transparent);
+      0 0 0 4px var(--mui-palette-background-default, #0f1115),
+      0 8px 28px color-mix(in srgb, var(--mui-palette-primary-main, #2f6fe0) 35%, transparent),
+      0 0 16px color-mix(in srgb, var(--mui-palette-primary-dark, #163a7a) 45%, transparent);
   }
   50% {
     box-shadow:
-      0 0 0 4px var(--mui-palette-background-default, #131314),
-      0 10px 34px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 55%, transparent),
-      0 0 28px color-mix(in srgb, var(--mui-palette-primary-main, #8ab4f8) 75%, transparent);
+      0 0 0 4px var(--mui-palette-background-default, #0f1115),
+      0 10px 34px color-mix(in srgb, var(--mui-palette-primary-main, #2f6fe0) 48%, transparent),
+      0 0 24px color-mix(in srgb, var(--mui-palette-primary-dark, #163a7a) 55%, transparent);
   }
 }
 
@@ -108,21 +108,21 @@ body {
   background:
     radial-gradient(
       60% 55% at 50% 78%,
-      rgba(138, 180, 248, 0.18) 0%,
-      rgba(138, 180, 248, 0.06) 35%,
+      rgba(47, 111, 224, 0.16) 0%,
+      rgba(22, 58, 122, 0.08) 35%,
       transparent 70%
     ),
     radial-gradient(
-      45% 40% at 30% 60%,
-      rgba(167, 139, 250, 0.14) 0%,
+      45% 40% at 28% 58%,
+      rgba(26, 69, 120, 0.18) 0%,
       transparent 70%
     ),
     radial-gradient(
-      45% 40% at 75% 50%,
-      rgba(99, 102, 241, 0.12) 0%,
+      45% 40% at 78% 48%,
+      rgba(47, 111, 224, 0.10) 0%,
       transparent 70%
     );
-  opacity: 0.85;
+  opacity: 0.9;
   animation: findu-aurora-drift 14s ease-in-out infinite alternate;
 }
 
@@ -130,18 +130,18 @@ body {
   background:
     radial-gradient(
       60% 55% at 50% 78%,
-      rgba(66, 133, 244, 0.10) 0%,
-      rgba(66, 133, 244, 0.03) 35%,
+      rgba(30, 79, 150, 0.10) 0%,
+      rgba(30, 79, 150, 0.03) 35%,
       transparent 70%
     ),
     radial-gradient(
-      45% 40% at 30% 60%,
-      rgba(167, 139, 250, 0.08) 0%,
+      45% 40% at 28% 60%,
+      rgba(15, 47, 92, 0.08) 0%,
       transparent 70%
     ),
     radial-gradient(
       45% 40% at 75% 50%,
-      rgba(99, 102, 241, 0.07) 0%,
+      rgba(47, 111, 224, 0.07) 0%,
       transparent 70%
     );
   opacity: 0.9;

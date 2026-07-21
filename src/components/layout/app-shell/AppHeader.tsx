@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -9,12 +10,28 @@ import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
 import { useDevice } from '@/hooks/useDevice';
+import { AppRoutePaths } from '@/constants/AppRoutePaths';
+
+function isChatRoute(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === AppRoutePaths.CHAT ||
+    pathname.startsWith(`${AppRoutePaths.CHAT}/`)
+  );
+}
 
 export function AppHeader() {
   const title = usePageTitle();
-  const { isDesktop, openDrawer } = useAppShell();
+  const pathname = usePathname();
+  const { isDesktop, openDrawer, openRecent, keyboardOpen } = useAppShell();
   const { isMobile } = useDevice();
-  const showMenuButton = !isDesktop && !isMobile;
+  const chatRoute = isChatRoute(pathname);
+  const showMenuButton = !isDesktop && !isMobile && !chatRoute;
+  const showRecentButton = chatRoute;
+
+  if (keyboardOpen && isMobile) {
+    return null;
+  }
 
   return (
     <header
@@ -24,6 +41,19 @@ export function AppHeader() {
         paddingTop: 'var(--app-safe-top)',
       }}
     >
+      {showRecentButton && (
+        <Tooltip title="Recentes">
+          <IconButton
+            onClick={openRecent}
+            aria-label="Abrir recentes"
+            edge="start"
+            size="medium"
+          >
+            <MenuIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+
       {showMenuButton && (
         <Tooltip title="Abrir menu">
           <IconButton
@@ -42,12 +72,12 @@ export function AppHeader() {
         component="h1"
         className="flex-1 truncate font-semibold tracking-tight"
         sx={{
-          pl: isMobile ? 0.5 : 0.5,
+          pl: 0.5,
           fontSize: { xs: '1.15rem', sm: '1.05rem' },
           letterSpacing: '-0.02em',
         }}
       >
-        {title}
+        {chatRoute ? 'Chat' : title}
       </Typography>
 
       <ThemeToggleButton />

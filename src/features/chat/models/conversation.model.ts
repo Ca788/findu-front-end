@@ -5,6 +5,7 @@ export interface Conversation {
   title: string | null;
   archived_at: string | null;
   agent_id: AgentId | null;
+  model_id: string | null;
   messages_count?: number;
   created_at: string;
   updated_at: string;
@@ -13,4 +14,5 @@ export interface Conversation {
 export interface ConversationInput {
   title?: string;
   agent_id?: AgentId | null;
+  model_id?: string | null;
 }

@@ -9,13 +9,15 @@ import {
   APP_BOTTOM_NAV_FLOAT_GAP,
   APP_BOTTOM_NAV_HEIGHT,
 } from '@/components/layout/app-shell/constants';
+import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
 import { useDevice } from '@/hooks/useDevice';
 
 export function AppBottomNav() {
   const pathname = usePathname() ?? '';
   const { isMobile } = useDevice();
+  const { keyboardOpen } = useAppShell();
 
-  if (!isMobile) return null;
+  if (!isMobile || keyboardOpen) return null;
 
   return (
     <Box
@@ -51,7 +53,7 @@ export function AppBottomNav() {
               key={item.href}
               component={Link}
               href={item.href}
-              aria-label="Chat com a IA Findu"
+              aria-label="Chat Findu"
               aria-current={active ? 'page' : undefined}
               className="findu-ai-orb"
               sx={{
@@ -63,11 +65,12 @@ export function AppBottomNav() {
                 placeItems: 'center',
                 textDecoration: 'none',
                 color: 'primary.contrastText',
-                bgcolor: 'primary.main',
+                background: (theme) =>
+                  `linear-gradient(160deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 48%, ${theme.palette.primary.dark} 100%)`,
                 flexShrink: 0,
                 WebkitTapHighlightColor: 'transparent',
                 boxShadow: (theme) =>
-                  `0 0 0 4px ${theme.palette.background.default}, 0 8px 28px ${theme.palette.primary.main}66`,
+                  `0 0 0 4px ${theme.palette.background.default}, 0 8px 24px ${theme.palette.primary.dark}88`,
               }}
             >
               <Icon sx={{ fontSize: 26 }} />
