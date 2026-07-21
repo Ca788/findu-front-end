@@ -23,15 +23,11 @@ function isChatRoute(pathname: string | null): boolean {
 export function AppHeader() {
   const title = usePageTitle();
   const pathname = usePathname();
-  const { isDesktop, openDrawer, openRecent, keyboardOpen } = useAppShell();
+  const { isDesktop, openDrawer, openRecent } = useAppShell();
   const { isMobile } = useDevice();
   const chatRoute = isChatRoute(pathname);
   const showMenuButton = !isDesktop && !isMobile && !chatRoute;
   const showRecentButton = chatRoute;
-
-  if (keyboardOpen && isMobile) {
-    return null;
-  }
 
   return (
     <header

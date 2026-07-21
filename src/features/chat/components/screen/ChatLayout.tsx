@@ -26,7 +26,7 @@ export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
         bgcolor: 'background.default',
       }}
     >
-      {topbar && !keyboardOpen && (
+      {topbar && (
         <Box
           sx={{
             flexShrink: 0,

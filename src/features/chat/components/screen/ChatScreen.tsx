@@ -61,26 +61,24 @@ export function ChatScreen() {
         bgcolor: 'background.default',
       }}
     >
-      {!keyboardOpen && (
-        <Box sx={{ flexShrink: 0, px: { xs: 1.5, md: 3 }, py: 1 }}>
-          <Box
-            sx={{
-              mx: 'auto',
-              width: '100%',
-              maxWidth: 880,
-              px: { xs: 0.5, md: 1 },
-            }}
-          >
-            <ChatOptionsBar
-              selectedModelId={selectedModelId}
-              selectedAgentId={selectedAgentId}
-              onSelectModel={setSelectedModelId}
-              onSelectAgent={setSelectedAgentId}
-              disabled={isStarting}
-            />
-          </Box>
+      <Box sx={{ flexShrink: 0, px: { xs: 1.5, md: 3 }, py: 1 }}>
+        <Box
+          sx={{
+            mx: 'auto',
+            width: '100%',
+            maxWidth: 880,
+            px: { xs: 0.5, md: 1 },
+          }}
+        >
+          <ChatOptionsBar
+            selectedModelId={selectedModelId}
+            selectedAgentId={selectedAgentId}
+            onSelectModel={setSelectedModelId}
+            onSelectAgent={setSelectedAgentId}
+            disabled={isStarting}
+          />
         </Box>
-      )}
+      </Box>
 
       {isStarting && <LinearProgress />}
 
