@@ -34,7 +34,6 @@ function appendDelta(messages: ChatMessage[], { id, delta }: MessageDelta): Chat
   next[index] = {
     ...current,
     body: (current.body ?? '') + delta,
-    // Keep UI in streaming mode until the final upsert marks completed.
     status: current.status === 'completed' ? current.status : 'processing',
   };
   return next;

@@ -240,6 +240,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capgo/capacitor-native-biometric@npm:^8.6.2":
+  version: 8.6.2
+  resolution: "@capgo/capacitor-native-biometric@npm:8.6.2"
+  peerDependencies:
+    "@capacitor/core": ">=8.0.0"
+  checksum: 10c0/54b87a6f799abfc0fae6120ac4b1126a08d489961de11fbaa1d058d25d639a077a6c011f72654fd83e242b2567111495bc6e4ea2bf406a0264c9184823c67134
+  languageName: node
+  linkType: hard
+
 "@emnapi/core@npm:1.10.0, @emnapi/core@npm:^1.10.0":
   version: 1.10.0
   resolution: "@emnapi/core@npm:1.10.0"
@@ -3172,6 +3181,7 @@ __metadata:
     "@capacitor/android": "npm:^8.4.2"
     "@capacitor/cli": "npm:^8.4.2"
     "@capacitor/core": "npm:^8.4.2"
+    "@capgo/capacitor-native-biometric": "npm:^8.6.2"
     "@emotion/cache": "npm:^11.14.0"
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
