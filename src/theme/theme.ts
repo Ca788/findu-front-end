@@ -5,20 +5,20 @@ import { createTheme, Theme } from '@mui/material/styles';
 export type ThemeMode = 'light' | 'dark';
 
 const DARK_PALETTE = {
-  bgDefault: '#131314',
-  bgPaper:   '#1B1C1D',
-  bgRaised:  '#1F2022',
+  bgDefault: '#0F1115',
+  bgPaper:   '#171A21',
+  bgRaised:  '#1C212B',
   border:    'rgba(255, 255, 255, 0.08)',
   borderHi:  'rgba(255, 255, 255, 0.14)',
-  textHi:    '#E3E3E3',
+  textHi:    '#E8EAED',
   textMid:   '#9AA0A6',
   textLow:   '#5F6368',
   actionHover:    'rgba(255, 255, 255, 0.06)',
-  actionSelected: 'rgba(138, 180, 248, 0.16)',
-  primaryMain:    '#8AB4F8',
-  primaryDark:    '#669DF6',
-  primaryLight:   '#A8C7FA',
-  primaryContrast:'#0B1424',
+  actionSelected: 'rgba(47, 111, 224, 0.18)',
+  primaryMain:    '#2F6FE0',
+  primaryDark:    '#163A7A',
+  primaryLight:   '#4B86F0',
+  primaryContrast:'#FFFFFF',
 };
 
 const LIGHT_PALETTE = {
@@ -31,10 +31,10 @@ const LIGHT_PALETTE = {
   textMid:   '#5F6368',
   textLow:   '#9AA0A6',
   actionHover:    'rgba(60, 64, 67, 0.06)',
-  actionSelected: 'rgba(26, 115, 232, 0.10)',
-  primaryMain:    '#1A73E8',
-  primaryDark:    '#1557B0',
-  primaryLight:   '#4285F4',
+  actionSelected: 'rgba(30, 79, 150, 0.12)',
+  primaryMain:    '#1E4F96',
+  primaryDark:    '#0F2F5C',
+  primaryLight:   '#2F6FE0',
   primaryContrast:'#FFFFFF',
 };
 
@@ -68,7 +68,7 @@ export function getTheme(mode: ThemeMode): Theme {
       divider: p.border,
       error:   { main: mode === 'dark' ? '#F28B82' : '#D93025' },
       warning: { main: mode === 'dark' ? '#FDD663' : '#F29900' },
-      info:    { main: mode === 'dark' ? '#8AB4F8' : '#1A73E8' },
+      info:    { main: mode === 'dark' ? '#2F6FE0' : '#1E4F96' },
       success: { main: mode === 'dark' ? '#81C995' : '#1E8E3E' },
       action: {
         hover:    p.actionHover,

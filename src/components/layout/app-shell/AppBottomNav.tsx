@@ -65,11 +65,12 @@ export function AppBottomNav() {
                 placeItems: 'center',
                 textDecoration: 'none',
                 color: 'primary.contrastText',
-                bgcolor: 'primary.main',
+                background: (theme) =>
+                  `linear-gradient(160deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 48%, ${theme.palette.primary.dark} 100%)`,
                 flexShrink: 0,
                 WebkitTapHighlightColor: 'transparent',
                 boxShadow: (theme) =>
-                  `0 0 0 4px ${theme.palette.background.default}, 0 8px 28px ${theme.palette.primary.main}66`,
+                  `0 0 0 4px ${theme.palette.background.default}, 0 8px 24px ${theme.palette.primary.dark}88`,
               }}
             >
               <Icon sx={{ fontSize: 26 }} />

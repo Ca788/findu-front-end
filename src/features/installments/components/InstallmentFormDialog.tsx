@@ -19,7 +19,8 @@ import {
   AppErrorResultMapper,
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
-import { formatBRL, parseAmountInput } from '@/utils/currency';
+import { formatAmountForInput, formatBRL, parseAmountInput } from '@/utils/currency';
+import { MoneyField } from '@/components/common/MoneyField';
 import { localTodayInput, toLocalDateInput } from '@/utils/date';
 import type {
   InstallmentPlan,
@@ -79,9 +80,7 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
     reset({
       description: plan?.description ?? '',
       transaction_type: plan?.transaction_type ?? 'expense',
-      monthly_amount: plan?.monthly_amount
-        ? String(plan.monthly_amount).replace('.', ',')
-        : '',
+      monthly_amount: formatAmountForInput(plan?.monthly_amount),
       total_installments: plan?.total_installments
         ? String(plan.total_installments)
         : '5',
@@ -170,20 +169,11 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
             )}
           />
         )}
-        <TextField
+        <MoneyField
           label="Valor da parcela"
-          placeholder="0,00"
-          fullWidth
           {...register('monthly_amount')}
           error={!!errors.monthly_amount}
-          helperText={errors.monthly_amount?.message ?? 'Use vírgula como separador decimal'}
-          slotProps={{
-            htmlInput: {
-              inputMode: 'decimal',
-              enterKeyHint: 'done',
-              autoComplete: 'off',
-            },
-          }}
+          helperText={errors.monthly_amount?.message}
         />
         {!isEdit && (
           <TextField

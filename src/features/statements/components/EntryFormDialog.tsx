@@ -19,7 +19,7 @@ import {
   AppErrorResultMapper,
   type ErrorResponse,
 } from '@/infrastructure/AppResponse';
-import { parseAmountInput } from '@/utils/currency';
+import { formatAmountForInput, parseAmountInput } from '@/utils/currency';
 import { toIsoDate, toLocalDateInput } from '@/utils/date';
 import type {
   Transaction,
@@ -76,7 +76,7 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
   useEffect(() => {
     if (!open) return;
     reset({
-      amount: entry?.amount ? String(entry.amount).replace('.', ',') : '',
+      amount: formatAmountForInput(entry?.amount),
       transaction_type: entry?.transaction_type ?? 'expense',
       status: entry?.status ?? 'pending',
       description: entry?.description ?? '',
