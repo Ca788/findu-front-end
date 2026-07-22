@@ -1,13 +1,12 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/MenuOutlined';
 import { UserMenu } from '@/features/auth/components/userMenu/UserMenu';
 import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
-import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
 import { useDevice } from '@/hooks/useDevice';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
@@ -21,7 +20,6 @@ function isChatRoute(pathname: string | null): boolean {
 }
 
 export function AppHeader() {
-  const title = usePageTitle();
   const pathname = usePathname();
   const { isDesktop, openDrawer, openRecent } = useAppShell();
   const { isMobile } = useDevice();
@@ -63,18 +61,7 @@ export function AppHeader() {
         </Tooltip>
       )}
 
-      <Typography
-        variant="subtitle1"
-        component="h1"
-        className="flex-1 truncate font-semibold tracking-tight"
-        sx={{
-          pl: 0.5,
-          fontSize: { xs: '1.15rem', sm: '1.05rem' },
-          letterSpacing: '-0.02em',
-        }}
-      >
-        {chatRoute ? 'Chat' : title}
-      </Typography>
+      <Box sx={{ flex: 1, minWidth: 0 }} />
 
       <ThemeToggleButton />
       <UserMenu />

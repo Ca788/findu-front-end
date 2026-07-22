@@ -13,29 +13,24 @@ import {
 } from '@/infrastructure/AppResponse';
 import { useCreateConversation } from '@/features/chat/hooks/useCreateConversation';
 import { sendMessage } from '@/features/chat/gateway/messages.gateway';
-import { ChatOptionsBar } from '@/features/chat/components/screen/ChatOptionsBar';
 import { ChatComposer } from '@/features/chat/components/screen/ChatComposer';
 import { ChatGreeting } from '@/features/chat/components/screen/ChatGreeting';
 import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
-import type { AgentId } from '@/features/chat/models/agent.model';
+import { useDevice } from '@/hooks/useDevice';
 import type { SendMessageInput } from '@/features/chat/models/message.model';
 
 export function ChatScreen() {
   const router = useRouter();
   const { showError } = useSnackbar();
   const { keyboardOpen } = useAppShell();
-  const [selectedAgentId, setSelectedAgentId] = useState<AgentId | null>(null);
-  const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
+  const { isMobile } = useDevice();
   const [isStarting, setIsStarting] = useState(false);
   const createConversation = useCreateConversation();
 
   const handleSubmit = async (input: SendMessageInput) => {
     setIsStarting(true);
     try {
-      const conversation = await createConversation.mutateAsync({
-        agent_id: selectedAgentId,
-        model_id: selectedModelId,
-      });
+      const conversation = await createConversation.mutateAsync({});
       const message = await sendMessage(conversation.id, input);
       router.replace(AppRoutePaths.chatConversation(conversation.id));
       return message;
@@ -61,25 +56,6 @@ export function ChatScreen() {
         bgcolor: 'background.default',
       }}
     >
-      <Box sx={{ flexShrink: 0, px: { xs: 1.5, md: 3 }, py: 1 }}>
-        <Box
-          sx={{
-            mx: 'auto',
-            width: '100%',
-            maxWidth: 880,
-            px: { xs: 0.5, md: 1 },
-          }}
-        >
-          <ChatOptionsBar
-            selectedModelId={selectedModelId}
-            selectedAgentId={selectedAgentId}
-            onSelectModel={setSelectedModelId}
-            onSelectAgent={setSelectedAgentId}
-            disabled={isStarting}
-          />
-        </Box>
-      </Box>
-
       {isStarting && <LinearProgress />}
 
       <Box
@@ -90,24 +66,32 @@ export function ChatScreen() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: keyboardOpen ? 'flex-end' : 'center',
-          gap: { xs: 3, md: 4 },
+          justifyContent: 'center',
           px: { xs: 1.5, md: 3 },
-          pt: keyboardOpen ? 1 : 2,
-          pb: keyboardOpen
-            ? 'var(--app-safe-bottom)'
-            : {
-                xs: 'calc(1.5rem + var(--app-bottom-nav-space))',
-                sm: 4,
-              },
+          py: 2,
         }}
       >
-        {!keyboardOpen && <ChatGreeting />}
+        <ChatGreeting />
+      </Box>
+
+      <Box
+        sx={{
+          flexShrink: 0,
+          bgcolor: 'background.default',
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          paddingBottom:
+            isMobile && !keyboardOpen
+              ? 'var(--app-bottom-nav-space)'
+              : 'var(--app-safe-bottom)',
+        }}
+      >
         <Box
-          className="findu-anim-fade-in-soft"
           sx={{
+            mx: 'auto',
             width: '100%',
             maxWidth: 760,
+            px: { xs: 0, sm: 1.5 },
           }}
         >
           <ChatComposer

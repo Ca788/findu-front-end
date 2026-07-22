@@ -1,33 +1,23 @@
 'use client';
 
 import Link from 'next/link';
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
-interface ChatConversationHeaderProps {
-  title: string;
-}
-
-export function ChatConversationHeader({ title }: ChatConversationHeaderProps) {
+export function ChatConversationHeader() {
   return (
-    <header className="flex items-center gap-1.5">
-      <Typography
-        variant="subtitle2"
-        component="h2"
-        sx={{
-          flex: 1,
-          fontWeight: 600,
-          letterSpacing: '-0.01em',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {title}
-      </Typography>
+    <Box
+      component="header"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        minHeight: 36,
+      }}
+    >
       <Tooltip title="Nova conversa">
         <IconButton
           component={Link}
@@ -38,6 +28,6 @@ export function ChatConversationHeader({ title }: ChatConversationHeaderProps) {
           <AddIcon fontSize="small" />
         </IconButton>
       </Tooltip>
-    </header>
+    </Box>
   );
 }

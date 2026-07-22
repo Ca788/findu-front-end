@@ -24,7 +24,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const hasBody = !!message.body && message.body.length > 0;
   const isStreaming = pending && hasBody;
   const hasAudio = message.kind === 'audio' && !!message.audio_url;
-  const isThinking = !isUser && pending && !hasBody && !hasAudio;
+  const hasAttachments = !!message.attachments && message.attachments.length > 0;
+  const hasContent = hasBody || hasAudio || hasAttachments;
+  const isThinking = !isUser && pending && !hasContent;
 
   if (isThinking) {
     return (
@@ -116,17 +118,18 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               />
             )}
           </Typography>
-        ) : hasAudio ? null : (
-          <Typography variant="body2" color="text.secondary">
-            (sem conteúdo)
-          </Typography>
-        )}
-        {message.attachments && message.attachments.length > 0 && (
-          <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {message.attachments.map((att) => (
+        ) : null}
+        {hasAttachments && (
+          <Box sx={{ mt: hasBody || hasAudio ? 1 : 0, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {message.attachments!.map((att) => (
               <AttachmentChip key={att.id} attachment={att} />
             ))}
           </Box>
+        )}
+        {!hasContent && (
+          <Typography variant="body2" color="text.secondary">
+            (sem conteúdo)
+          </Typography>
         )}
       </Box>
 

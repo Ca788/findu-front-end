@@ -7,6 +7,8 @@ import { useDashboardMonth } from '@/features/dashboard/hooks/useDashboardMonth'
 import { DashboardWelcome } from '@/features/dashboard/components/DashboardWelcome';
 import { DashboardBudgets } from '@/features/dashboard/components/DashboardBudgets';
 import { DashboardRecentEntries } from '@/features/dashboard/components/DashboardRecentEntries';
+import { DashboardCashflowChart } from '@/features/dashboard/components/DashboardCashflowChart';
+import { DashboardQuickActions } from '@/features/dashboard/components/DashboardQuickActions';
 import { useStatement } from '@/features/statements/hooks/useStatement';
 import { StatementKpis } from '@/features/statements/components/StatementKpis';
 import { StatementSideLists } from '@/features/statements/components/StatementSideLists';
@@ -29,6 +31,10 @@ export function DashboardPage() {
       )}
 
       <StatementKpis statement={statementQuery.data} />
+
+      <DashboardQuickActions />
+
+      <DashboardCashflowChart />
 
       <div className="grid min-w-0 gap-3 lg:grid-cols-2">
         <DashboardBudgets referenceDate={referenceDate} />

@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Box from '@mui/material/Box';
 import {
   AppShellProvider,
@@ -16,26 +17,20 @@ interface AppShellProps {
 }
 
 function AppShellLayout({ children }: AppShellProps) {
-  const { recentOpen, closeRecent, keyboardOpen, keyboardInset } = useAppShell();
+  const pathname = usePathname() ?? '';
+  const { recentOpen, closeRecent, keyboardOpen } = useAppShell();
 
   useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--keyboard-inset',
-      `${keyboardInset}px`,
-    );
     document.documentElement.dataset.keyboard = keyboardOpen ? 'open' : 'closed';
-  }, [keyboardInset, keyboardOpen]);
+  }, [keyboardOpen]);
 
   return (
     <Box
       sx={{
-        height: keyboardOpen
-          ? `calc(100dvh - ${keyboardInset}px)`
-          : '100dvh',
+        height: '100dvh',
         bgcolor: 'background.default',
         display: 'flex',
         overflow: 'hidden',
-        transition: 'height 120ms linear',
       }}
     >
       <AppDrawer />
@@ -63,7 +58,20 @@ function AppShellLayout({ children }: AppShellProps) {
             overflow: 'hidden',
           }}
         >
-          {children}
+          <Box
+            key={pathname}
+            className="findu-anim-tab-enter"
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
+            {children}
+          </Box>
         </Box>
         <AppBottomNav />
       </Box>

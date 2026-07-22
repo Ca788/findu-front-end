@@ -3,6 +3,7 @@ import { MuiProvider } from '@/providers/MuiProvider';
 import { ReduxProvider } from '@/providers/ReduxProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { SnackbarProvider } from '@/providers/SnackbarProvider';
+import { NativeAppEffects } from '@/providers/NativeAppEffects';
 import { AuthBootstrap } from '@/features/auth/components/AuthBootstrap';
 
 interface AppProvidersProps {
@@ -15,6 +16,7 @@ export function AppProviders({ children }: AppProvidersProps) {
       <QueryProvider>
         <MuiProvider>
           <SnackbarProvider>
+            <NativeAppEffects />
             <AuthBootstrap />
             {children}
           </SnackbarProvider>

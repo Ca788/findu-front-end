@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { AuthCard } from '@/features/auth/components/AuthCard';
+import { AuthFormShell } from '@/features/auth/components/AuthFormShell';
 import { ResetPasswordForm } from '@/features/auth/components/resetPassword/ResetPasswordForm';
 
 function ResetPasswordRoute() {
@@ -12,13 +12,12 @@ function ResetPasswordRoute() {
   const token = searchParams.get('token') ?? '';
 
   return (
-    <AuthCard
-      eyebrow="FindU"
+    <AuthFormShell
       title="Definir nova senha"
       description="Escolha uma nova senha para sua conta."
     >
       <ResetPasswordForm token={token} />
-    </AuthCard>
+    </AuthFormShell>
   );
 }
 
@@ -26,8 +25,16 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <Box className="flex justify-center py-12">
-          <CircularProgress />
+        <Box
+          sx={{
+            minHeight: '100dvh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: '#0B1220',
+          }}
+        >
+          <CircularProgress sx={{ color: '#fff' }} />
         </Box>
       }
     >

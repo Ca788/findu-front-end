@@ -69,6 +69,8 @@ export function AppBottomNav() {
                   `linear-gradient(160deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 48%, ${theme.palette.primary.dark} 100%)`,
                 flexShrink: 0,
                 WebkitTapHighlightColor: 'transparent',
+                transform: active ? 'scale(1.04)' : 'scale(1)',
+                transition: 'transform 220ms ease, box-shadow 220ms ease',
                 boxShadow: (theme) =>
                   `0 0 0 4px ${theme.palette.background.default}, 0 8px 24px ${theme.palette.primary.dark}88`,
               }}
@@ -93,21 +95,28 @@ export function AppBottomNav() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 0.2,
+              gap: 0.25,
               borderRadius: 999,
               textDecoration: 'none',
-              color: active ? 'text.primary' : 'text.secondary',
+              color: active ? 'primary.contrastText' : 'text.secondary',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
             <Box
               sx={{
-                px: 1.25,
-                py: 0.35,
-                borderRadius: 999,
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
                 display: 'grid',
                 placeItems: 'center',
-                bgcolor: active ? 'action.selected' : 'transparent',
+                bgcolor: active ? 'primary.main' : 'transparent',
+                color: active ? 'primary.contrastText' : 'inherit',
+                transform: active ? 'scale(1.05)' : 'scale(1)',
+                transition:
+                  'background-color 220ms ease, transform 220ms ease, color 220ms ease',
+                boxShadow: active
+                  ? (theme) => `0 6px 16px ${theme.palette.primary.main}55`
+                  : 'none',
               }}
             >
               <Icon sx={{ fontSize: 22, color: 'inherit' }} />
@@ -118,10 +127,12 @@ export function AppBottomNav() {
                 fontSize: 10,
                 lineHeight: 1.1,
                 fontWeight: active ? 700 : 500,
+                color: active ? 'text.primary' : 'text.secondary',
                 maxWidth: '100%',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                transition: 'color 220ms ease, font-weight 220ms ease',
               }}
             >
               {item.label}

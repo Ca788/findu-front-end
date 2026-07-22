@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import { formatBRL } from '@/utils/currency';
+import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import type { Statement } from '@/features/statements/models/statement.model';
 
 interface StatementKpisProps {
@@ -105,8 +107,36 @@ export function StatementKpis({ statement }: StatementKpisProps) {
             pointerEvents: 'none',
           }}
         />
-        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-          <Typography variant="overline" sx={{ opacity: 0.78, letterSpacing: 1.1 }}>
+        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 1,
+            }}
+          >
+            <Typography
+              sx={{ fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em' }}
+            >
+              Conta
+            </Typography>
+            <Typography
+              component={Link}
+              href={AppRoutePaths.STATEMENTS}
+              sx={{
+                color: 'inherit',
+                opacity: 0.85,
+                fontSize: 13,
+                fontWeight: 600,
+                textDecoration: 'none',
+                '&:hover': { opacity: 1 },
+              }}
+            >
+              Ver extrato ›
+            </Typography>
+          </Box>
+          <Typography variant="body2" sx={{ opacity: 0.78, fontWeight: 500 }}>
             Saldo previsto
           </Typography>
           <Typography
@@ -115,14 +145,14 @@ export function StatementKpis({ statement }: StatementKpisProps) {
               fontWeight: 700,
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '-0.04em',
-              fontSize: { xs: '2rem', sm: '2.25rem' },
-              lineHeight: 1.1,
+              fontSize: { xs: '2.1rem', sm: '2.35rem' },
+              lineHeight: 1.05,
               whiteSpace: 'nowrap',
             }}
           >
             {formatBRL(balance)}
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.82, mt: 0.25 }}>
+          <Typography variant="body2" sx={{ opacity: 0.82 }}>
             Realizado {formatBRL(balanceActual)} · {positive ? 'No azul' : 'Atenção'}
           </Typography>
         </Box>

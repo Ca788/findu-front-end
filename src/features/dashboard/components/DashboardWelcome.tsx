@@ -8,11 +8,6 @@ interface DashboardWelcomeProps {
   monthLabel: string;
 }
 
-function capitalizeFirst(value: string): string {
-  if (!value) return value;
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
 function greetingForNow(): string {
   const hour = new Date().getHours();
   if (hour < 12) return 'Bom dia';
@@ -25,21 +20,26 @@ export function DashboardWelcome({ monthLabel }: DashboardWelcomeProps) {
   const firstName = (user?.name ?? '').split(' ')[0] || 'por aí';
 
   return (
-    <Stack spacing={0.25} className="findu-anim-fade-in">
-      <Typography variant="body2" color="text.secondary">
+    <Stack spacing={0.35} className="findu-anim-fade-in">
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ fontWeight: 500 }}
+      >
         {greetingForNow()}, {firstName}
       </Typography>
       <Typography
         variant="h5"
-        component="h1"
+        component="p"
         sx={{
           fontWeight: 700,
           letterSpacing: '-0.03em',
-          fontSize: { xs: '1.65rem', sm: '1.75rem' },
+          fontSize: { xs: '1.45rem', sm: '1.6rem' },
           lineHeight: 1.15,
+          color: 'text.primary',
         }}
       >
-        {capitalizeFirst(monthLabel)}
+        {monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)}
       </Typography>
     </Stack>
   );
