@@ -64,7 +64,9 @@ export function useAudioRecorder({
   const rafRef = useRef<number | null>(null);
   const levelBarsRef = useRef(levelBars);
 
-  levelBarsRef.current = levelBars;
+  useEffect(() => {
+    levelBarsRef.current = levelBars;
+  }, [levelBars]);
 
   const clearTimers = useCallback(() => {
     if (tickRef.current) {

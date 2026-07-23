@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { sendMessage } from '@/features/chat/gateway/messages.gateway';
 import type { ChatMessage, SendMessageInput } from '@/features/chat/models/message.model';
 
@@ -53,7 +53,10 @@ export function useSendMessage(
 ) {
   const [isSending, setIsSending] = useState(false);
   const optionsRef = useRef(options);
-  optionsRef.current = options;
+
+  useEffect(() => {
+    optionsRef.current = options;
+  }, [options]);
 
   const send = useCallback(
     async (input: SendMessageInput): Promise<ChatMessage> => {
