@@ -86,7 +86,7 @@ export function DashboardRecentEntries({
   const visible = entries.slice(0, RECENT_LIMIT);
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-3.5 rounded-3xl px-4 py-4">
+    <Paper className="flex min-w-0 flex-col gap-3.5 rounded-xl px-4 py-4">
       <div className="flex items-center justify-between gap-2">
         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
           Movimentações

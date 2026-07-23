@@ -1,6 +1,6 @@
 'use client';
 
-import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 
@@ -20,27 +20,26 @@ export function DashboardWelcome({ monthLabel }: DashboardWelcomeProps) {
   const firstName = (user?.name ?? '').split(' ')[0] || 'por aí';
 
   return (
-    <Stack spacing={0.35} className="findu-anim-fade-in">
+    <Box className="findu-anim-fade-in" sx={{ pt: 0.25 }}>
       <Typography
         variant="body2"
         color="text.secondary"
-        sx={{ fontWeight: 500 }}
+        sx={{ fontWeight: 500, mb: 0.35 }}
       >
         {greetingForNow()}, {firstName}
       </Typography>
       <Typography
-        variant="h5"
-        component="p"
+        component="h1"
         sx={{
-          fontWeight: 700,
-          letterSpacing: '-0.03em',
-          fontSize: { xs: '1.45rem', sm: '1.6rem' },
+          fontWeight: 750,
+          letterSpacing: '-0.035em',
+          fontSize: { xs: '1.55rem', sm: '1.7rem' },
           lineHeight: 1.15,
           color: 'text.primary',
         }}
       >
         {monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)}
       </Typography>
-    </Stack>
+    </Box>
   );
 }

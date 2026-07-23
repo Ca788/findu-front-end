@@ -14,6 +14,7 @@ export interface ChatMessage {
   id: string;
   conversation_id: string;
   parent_message_id: string | null;
+  client_message_id?: string | null;
   role: MessageRole;
   kind: MessageKind;
   body: string | null;

@@ -28,7 +28,7 @@ function CategoryBreakdown({
   const visible = compact ? rows.slice(0, 4) : rows;
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-3 rounded-3xl px-4 py-4">
+    <Paper className="flex min-w-0 flex-col gap-3 rounded-xl px-4 py-4">
       <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
         Por categoria
       </Typography>
@@ -79,7 +79,7 @@ function InstallmentsList({
   const visible = compact ? plans.slice(0, 2) : plans;
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-2.5 rounded-3xl px-4 py-4">
+    <Paper className="flex min-w-0 flex-col gap-2.5 rounded-xl px-4 py-4">
       <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
         Parcelas
       </Typography>
@@ -116,7 +116,7 @@ function RecurrencesList({
   const visible = compact ? rules.slice(0, 3) : rules;
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-2.5 rounded-3xl px-4 py-4">
+    <Paper className="flex min-w-0 flex-col gap-2.5 rounded-xl px-4 py-4">
       <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
         Recorrentes
       </Typography>

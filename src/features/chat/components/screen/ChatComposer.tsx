@@ -82,17 +82,18 @@ export function ChatComposer({
 
   const submitText = async () => {
     if (!hasContent || isBusy) return;
+    const payload = {
+      body: body.trim() || undefined,
+      attachments: files.length > 0 ? files : undefined,
+      client_message_id: createClientId(),
+    };
+    setBody('');
+    setFiles([]);
+    if (galleryInputRef.current) galleryInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+    if (filesInputRef.current) filesInputRef.current.value = '';
     try {
-      await onSubmit({
-        body: body.trim() || undefined,
-        attachments: files.length > 0 ? files : undefined,
-        client_message_id: createClientId(),
-      });
-      setBody('');
-      setFiles([]);
-      if (galleryInputRef.current) galleryInputRef.current.value = '';
-      if (cameraInputRef.current) cameraInputRef.current.value = '';
-      if (filesInputRef.current) filesInputRef.current.value = '';
+      await onSubmit(payload);
     } catch (err) {
       const mapped = AppErrorResultMapper.fromAxiosError(
         err as AxiosError<ErrorResponse>,
@@ -103,12 +104,12 @@ export function ChatComposer({
 
   const submitAudioBlob = async (blob: Blob) => {
     if (isBusy) return;
+    recorder.reset();
     try {
       await onSubmit({
         audio: blob,
         client_message_id: createClientId(),
       });
-      recorder.reset();
     } catch (err) {
       const mapped = AppErrorResultMapper.fromAxiosError(
         err as AxiosError<ErrorResponse>,

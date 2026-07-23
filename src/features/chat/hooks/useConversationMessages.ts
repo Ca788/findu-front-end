@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getCableConsumer } from '@/infrastructure/cable.client';
 import { listMessages } from '@/features/chat/gateway/messages.gateway';
 import type { ChatMessage } from '@/features/chat/models/message.model';
@@ -16,12 +16,29 @@ type ConversationEvent =
   | { type: 'message.upserted'; message: ChatMessage }
   | { type: 'message.delta'; message: MessageDelta };
 
+function sameMessage(a: ChatMessage, b: ChatMessage): boolean {
+  if (a.id === b.id) return true;
+  if (a.client_message_id && a.client_message_id === b.client_message_id) return true;
+  if (b.client_message_id && a.id === b.client_message_id) return true;
+  return false;
+}
+
 function upsert(messages: ChatMessage[], incoming: ChatMessage): ChatMessage[] {
-  const index = messages.findIndex((message) => message.id === incoming.id);
+  const index = messages.findIndex((message) => sameMessage(message, incoming));
   if (index === -1) return [...messages, incoming];
 
+  const previous = messages[index];
   const next = messages.slice();
-  next[index] = { ...next[index], ...incoming };
+  next[index] = {
+    ...previous,
+    ...incoming,
+    client_message_id:
+      incoming.client_message_id ?? previous.client_message_id ?? null,
+    attachments:
+      incoming.attachments && incoming.attachments.length > 0
+        ? incoming.attachments
+        : previous.attachments,
+  };
   return next;
 }
 
@@ -107,5 +124,19 @@ export function useConversationMessages(conversationId: string | undefined) {
     };
   }, [conversationId]);
 
-  return { messages, status };
+  const addOptimistic = useCallback((message: ChatMessage) => {
+    setMessages((current) => upsert(current, message));
+  }, []);
+
+  const markOptimisticFailed = useCallback((clientMessageId: string) => {
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === clientMessageId || message.client_message_id === clientMessageId
+          ? { ...message, status: 'failed' as const }
+          : message,
+      ),
+    );
+  }, []);
+
+  return { messages, status, addOptimistic, markOptimisticFailed };
 }

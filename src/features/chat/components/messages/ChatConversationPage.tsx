@@ -19,8 +19,12 @@ interface ChatConversationPageProps {
 
 export function ChatConversationPage({ conversationId }: ChatConversationPageProps) {
   useConversation(conversationId);
-  const { messages, status } = useConversationMessages(conversationId);
-  const { send, isSending } = useSendMessage(conversationId);
+  const { messages, status, addOptimistic, markOptimisticFailed } =
+    useConversationMessages(conversationId);
+  const { send, isSending } = useSendMessage(conversationId, {
+    onOptimistic: addOptimistic,
+    onOptimisticFailed: markOptimisticFailed,
+  });
 
   const handleSubmit = useCallback(
     (input: SendMessageInput) => send(input),
@@ -29,7 +33,9 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
 
   const isLoading = status === 'loading';
   const lastMessage = messages[messages.length - 1];
-  const awaitingReply = isSending || lastMessage?.role === 'user';
+  const awaitingReply =
+    isSending ||
+    (lastMessage?.role === 'user' && lastMessage.status !== 'failed');
 
   return (
     <ChatLayout
