@@ -124,9 +124,10 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
     }
   };
 
+  const entries = useMemo(() => statement?.entries ?? [], [statement?.entries]);
   const filteredEntries = useMemo(
-    () => filterStatementEntries(statement?.entries ?? [], filters),
-    [statement?.entries, filters],
+    () => filterStatementEntries(entries, filters),
+    [entries, filters],
   );
   const pendingEntries = filteredEntries.filter((entry) => entry.status === 'pending');
   const paidEntries = filteredEntries.filter((entry) => entry.status === 'paid');

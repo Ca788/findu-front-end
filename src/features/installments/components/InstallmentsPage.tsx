@@ -71,14 +71,15 @@ export function InstallmentsPage() {
   const [selected, setSelected] = useState<InstallmentPlan | null>(null);
   const [canceling, setCanceling] = useState<InstallmentPlan | null>(null);
 
+  const plans = useMemo(() => query.data?.data ?? [], [query.data?.data]);
   const visiblePlans = useMemo(
     () =>
-      (query.data?.data ?? []).filter((plan) =>
+      plans.filter((plan) =>
         tab === 'active'
           ? plan.status === 'active'
           : plan.status === 'completed' || plan.status === 'canceled',
       ),
-    [query.data?.data, tab],
+    [plans, tab],
   );
 
   const openCreate = () => {
