@@ -10,6 +10,7 @@ import SavingsIcon from '@mui/icons-material/SavingsOutlined';
 import ReplayIcon from '@mui/icons-material/ReplayOutlined';
 import CreditScoreIcon from '@mui/icons-material/CreditScoreOutlined';
 import PersonIcon from '@mui/icons-material/PersonOutlineOutlined';
+import AppsIcon from '@mui/icons-material/AppsOutlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
 export interface AppNavItem {
@@ -80,6 +81,12 @@ export const appNavItems: AppNavItem[] = [
     icon: SavingsIcon,
     section: 'secondary',
   },
+  {
+    label: 'Conta',
+    href: AppRoutePaths.PROFILE,
+    icon: PersonIcon,
+    section: 'secondary',
+  },
 ];
 
 export const mobileTabNavItems: MobileTabNavItem[] = [
@@ -104,9 +111,7 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
     icon: AutoAwesomeIcon,
     featured: true,
     isActive: (pathname) =>
-      pathname === AppRoutePaths.CHAT ||
-      pathname.startsWith(`${AppRoutePaths.CHAT}/c`) ||
-      pathname.startsWith(APP_CHAT_HISTORY_PATH),
+      pathname === AppRoutePaths.CHAT || pathname.startsWith(`${AppRoutePaths.CHAT}/c`),
   },
   {
     label: 'Metas',
@@ -116,15 +121,31 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname === AppRoutePaths.BUDGETS || pathname.startsWith(`${AppRoutePaths.BUDGETS}/`),
   },
   {
-    label: 'Conta',
-    href: AppRoutePaths.PROFILE,
-    icon: PersonIcon,
+    label: 'Todos',
+    href: AppRoutePaths.TODOS,
+    icon: AppsIcon,
     isActive: (pathname) =>
-      pathname === AppRoutePaths.PROFILE || pathname.startsWith(`${AppRoutePaths.PROFILE}/`),
+      pathname === AppRoutePaths.TODOS ||
+      pathname.startsWith(`${AppRoutePaths.TODOS}/`) ||
+      pathname === AppRoutePaths.PROFILE ||
+      pathname.startsWith(`${AppRoutePaths.PROFILE}/`) ||
+      pathname === AppRoutePaths.CATEGORIES ||
+      pathname.startsWith(`${AppRoutePaths.CATEGORIES}/`) ||
+      pathname === AppRoutePaths.RECURRENCES ||
+      pathname.startsWith(`${AppRoutePaths.RECURRENCES}/`) ||
+      pathname === AppRoutePaths.INSTALLMENTS ||
+      pathname.startsWith(`${AppRoutePaths.INSTALLMENTS}/`) ||
+      pathname.startsWith(APP_CHAT_HISTORY_PATH),
   },
 ];
 
-export const mobileMoreNavItems: AppNavItem[] = [
+/** Menu do hub mobile "Todos" — atalhos fora das tabs principais. */
+export const todosHubNavItems: AppNavItem[] = [
+  {
+    label: 'Conta',
+    href: AppRoutePaths.PROFILE,
+    icon: PersonIcon,
+  },
   {
     label: 'Histórico',
     href: APP_CHAT_HISTORY_PATH,

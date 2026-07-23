@@ -17,6 +17,7 @@ import { ChatComposer } from '@/features/chat/components/screen/ChatComposer';
 import { ChatGreeting } from '@/features/chat/components/screen/ChatGreeting';
 import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
 import { useDevice } from '@/hooks/useDevice';
+import type { ChatSuggestedPrompt } from '@/features/chat/constants/chatSuggestedPrompts';
 import type { SendMessageInput } from '@/features/chat/models/message.model';
 
 export function ChatScreen() {
@@ -45,6 +46,11 @@ export function ChatScreen() {
     }
   };
 
+  const handleSelectPrompt = (prompt: ChatSuggestedPrompt) => {
+    if (isStarting) return;
+    void handleSubmit({ body: prompt.message });
+  };
+
   return (
     <Box
       className="findu-aurora-glow"
@@ -71,7 +77,7 @@ export function ChatScreen() {
           py: 2,
         }}
       >
-        <ChatGreeting />
+        <ChatGreeting onSelectPrompt={handleSelectPrompt} disabled={isStarting} />
       </Box>
 
       <Box

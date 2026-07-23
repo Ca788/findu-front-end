@@ -15,6 +15,7 @@ export class AppRoutePaths {
   static readonly CHAT = '/chat';
   static readonly CHAT_CONVERSATION = '/chat/c';
   static readonly PROFILE = '/profile';
+  static readonly TODOS = '/todos';
 
   static statementDetail(month: string): string {
     return `${this.STATEMENTS_DETAIL}?month=${encodeURIComponent(month)}`;
