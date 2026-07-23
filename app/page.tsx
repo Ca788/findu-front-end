@@ -4,8 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { PageContainer } from '@/components/layout/PageContainer';
-import { LoginScreen } from '@/features/auth/components/login/LoginScreen';
+import { AuthWelcomeScreen } from '@/features/auth/components/AuthWelcomeScreen';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
@@ -35,9 +34,5 @@ export default function Home() {
     );
   }
 
-  return (
-    <PageContainer contentClassName="w-full max-w-md">
-      <LoginScreen />
-    </PageContainer>
-  );
+  return <AuthWelcomeScreen />;
 }

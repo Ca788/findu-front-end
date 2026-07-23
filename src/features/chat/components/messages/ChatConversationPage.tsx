@@ -1,19 +1,16 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useConversation } from '@/features/chat/hooks/useConversation';
 import { useConversationMessages } from '@/features/chat/hooks/useConversationMessages';
-import { useUpdateConversation } from '@/features/chat/hooks/useUpdateConversation';
 import { useSendMessage } from '@/features/chat/hooks/useSendMessage';
 import { ChatConversationHeader } from '@/features/chat/components/messages/ChatConversationHeader';
 import { MessagesList } from '@/features/chat/components/messages/MessagesList';
-import { ChatOptionsBar } from '@/features/chat/components/screen/ChatOptionsBar';
 import { ChatComposer } from '@/features/chat/components/screen/ChatComposer';
 import { ChatLayout } from '@/features/chat/components/screen/ChatLayout';
-import type { AgentId } from '@/features/chat/models/agent.model';
 import type { SendMessageInput } from '@/features/chat/models/message.model';
 
 interface ChatConversationPageProps {
@@ -21,52 +18,24 @@ interface ChatConversationPageProps {
 }
 
 export function ChatConversationPage({ conversationId }: ChatConversationPageProps) {
-  const { data: conversation } = useConversation(conversationId);
-  const { messages, status } = useConversationMessages(conversationId);
-  const updateConversation = useUpdateConversation();
-  const { send, isSending } = useSendMessage(conversationId);
-
-  const [pendingAgentId, setPendingAgentId] = useState<AgentId | null | undefined>(
-    undefined,
-  );
-  const [pendingModelId, setPendingModelId] = useState<string | null | undefined>(
-    undefined,
-  );
-
-  const activeAgentId =
-    pendingAgentId !== undefined
-      ? pendingAgentId
-      : (conversation?.agent_id ?? null);
-  const activeModelId =
-    pendingModelId !== undefined
-      ? pendingModelId
-      : (conversation?.model_id ?? null);
-
-  const handleSelectAgent = (agentId: AgentId | null) => {
-    setPendingAgentId(agentId);
-    updateConversation.mutate(
-      { id: conversationId, agent_id: agentId },
-      { onSettled: () => setPendingAgentId(undefined) },
-    );
-  };
-
-  const handleSelectModel = (modelId: string | null) => {
-    setPendingModelId(modelId);
-    updateConversation.mutate(
-      { id: conversationId, model_id: modelId },
-      { onSettled: () => setPendingModelId(undefined) },
-    );
-  };
+  useConversation(conversationId);
+  const { messages, status, addOptimistic, markOptimisticFailed } =
+    useConversationMessages(conversationId);
+  const { send, isSending } = useSendMessage(conversationId, {
+    onOptimistic: addOptimistic,
+    onOptimisticFailed: markOptimisticFailed,
+  });
 
   const handleSubmit = useCallback(
     (input: SendMessageInput) => send(input),
     [send],
   );
 
-  const title = conversation?.title?.trim() || 'Conversa';
   const isLoading = status === 'loading';
   const lastMessage = messages[messages.length - 1];
-  const awaitingReply = isSending || lastMessage?.role === 'user';
+  const awaitingReply =
+    isSending ||
+    (lastMessage?.role === 'user' && lastMessage.status !== 'failed');
 
   return (
     <ChatLayout
@@ -82,14 +51,7 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
             px: { xs: 0.5, md: 1 },
           }}
         >
-          <ChatConversationHeader title={title} />
-          <ChatOptionsBar
-            selectedModelId={activeModelId}
-            selectedAgentId={activeAgentId}
-            onSelectModel={handleSelectModel}
-            onSelectAgent={handleSelectAgent}
-            disabled={updateConversation.isPending}
-          />
+          <ChatConversationHeader />
         </Box>
       }
       messages={

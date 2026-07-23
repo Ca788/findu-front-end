@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AxiosError } from 'axios';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
@@ -10,6 +10,8 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
 import Chip from '@mui/material/Chip';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import EditIcon from '@mui/icons-material/EditOutlined';
@@ -30,6 +32,8 @@ import {
 } from '@/features/installments/hooks/useInstallmentPlans';
 import { InstallmentFormDialog } from '@/features/installments/components/InstallmentFormDialog';
 import type { InstallmentPlan } from '@/features/installments/models/installment.model';
+
+type InstallmentTab = 'active' | 'history';
 
 function statusColor(status: InstallmentPlan['status']): 'primary' | 'success' | 'default' {
   switch (status) {
@@ -62,11 +66,21 @@ export function InstallmentsPage() {
   const { showSuccess, showError } = useSnackbar();
   const query = useInstallmentPlans({ page: 1, perPage: 50 });
   const cancelMutation = useCancelInstallmentPlan();
+  const [tab, setTab] = useState<InstallmentTab>('active');
   const [isFormOpen, setFormOpen] = useState(false);
   const [selected, setSelected] = useState<InstallmentPlan | null>(null);
   const [canceling, setCanceling] = useState<InstallmentPlan | null>(null);
 
-  const plans = query.data?.data ?? [];
+  const plans = useMemo(() => query.data?.data ?? [], [query.data?.data]);
+  const visiblePlans = useMemo(
+    () =>
+      plans.filter((plan) =>
+        tab === 'active'
+          ? plan.status === 'active'
+          : plan.status === 'completed' || plan.status === 'canceled',
+      ),
+    [plans, tab],
+  );
 
   const openCreate = () => {
     setSelected(null);
@@ -101,6 +115,16 @@ export function InstallmentsPage() {
         }
       />
 
+      <Tabs
+        value={tab}
+        onChange={(_, value: InstallmentTab) => setTab(value)}
+        variant="fullWidth"
+        sx={{ minHeight: 40 }}
+      >
+        <Tab value="active" label="Ativos" sx={{ textTransform: 'none', minHeight: 40 }} />
+        <Tab value="history" label="Histórico" sx={{ textTransform: 'none', minHeight: 40 }} />
+      </Tabs>
+
       {query.isError && <Alert severity="error">Erro ao carregar parcelamentos.</Alert>}
       {query.isFetching && <LinearProgress />}
 
@@ -112,8 +136,16 @@ export function InstallmentsPage() {
         </Typography>
       )}
 
+      {!query.isFetching && plans.length > 0 && visiblePlans.length === 0 && (
+        <Typography variant="body2" color="text.secondary">
+          {tab === 'active'
+            ? 'Nenhum parcelamento ativo no momento.'
+            : 'Nenhum parcelamento concluído ou cancelado ainda.'}
+        </Typography>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2">
-        {plans.map((plan) => {
+        {visiblePlans.map((plan) => {
           const paidPercent =
             plan.total_installments > 0
               ? Math.round((plan.paid_count / plan.total_installments) * 100)
@@ -200,7 +232,7 @@ export function InstallmentsPage() {
       <ConfirmDialog
         open={!!canceling}
         title="Cancelar parcelamento"
-        description={`Cancelar "${canceling?.description || 'este parcelamento'}"? As parcelas futuras pendentes serão removidas, mas o histórico já pago fica preservado.`}
+        description={`Cancelar "${canceling?.description || 'este parcelamento'}"? As parcelas futuras pendentes serão removidas e o plano vai para o histórico como cancelado. O histórico já pago fica preservado.`}
         confirmColor="error"
         confirmLabel="Cancelar parcelamento"
         isLoading={cancelMutation.isPending}
@@ -216,7 +248,7 @@ export function InstallmentsPage() {
           sx={{
             position: 'fixed',
             right: 16,
-            bottom: 'max(16px, env(safe-area-inset-bottom))',
+            bottom: 'calc(var(--app-bottom-nav-space, 80px) + 8px)',
             zIndex: (theme) => theme.zIndex.speedDial,
           }}
         >

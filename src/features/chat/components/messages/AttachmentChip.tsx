@@ -12,7 +12,10 @@ interface AttachmentChipProps {
 }
 
 export function AttachmentChip({ attachment }: AttachmentChipProps) {
-  const href = absoluteApiUrl(attachment.url);
+  const href =
+    attachment.url.startsWith('blob:') || attachment.url.startsWith('http')
+      ? attachment.url
+      : absoluteApiUrl(attachment.url);
   const isImage = attachment.content_type.startsWith('image/');
 
   if (isImage) {

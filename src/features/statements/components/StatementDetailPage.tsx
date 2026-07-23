@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
@@ -53,13 +53,33 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
   const [isFormOpen, setFormOpen] = useState(false);
   const [selected, setSelected] = useState<Transaction | null>(null);
   const [deleting, setDeleting] = useState<Transaction | null>(null);
-  const [filters, setFilters] = useState<StatementEntryFilters>(DEFAULT_ENTRY_FILTERS);
+  const [filtersState, setFiltersState] = useState<{
+    month: string;
+    value: StatementEntryFilters;
+  }>(() => ({ month, value: DEFAULT_ENTRY_FILTERS }));
 
   const statement = query.data;
 
-  useEffect(() => {
-    setFilters(DEFAULT_ENTRY_FILTERS);
-  }, [month]);
+  if (filtersState.month !== month) {
+    setFiltersState({ month, value: DEFAULT_ENTRY_FILTERS });
+  }
+
+  const filters =
+    filtersState.month === month ? filtersState.value : DEFAULT_ENTRY_FILTERS;
+
+  const setFilters = (
+    next:
+      | StatementEntryFilters
+      | ((prev: StatementEntryFilters) => StatementEntryFilters),
+  ) => {
+    setFiltersState((prev) => {
+      const current = prev.month === month ? prev.value : DEFAULT_ENTRY_FILTERS;
+      return {
+        month,
+        value: typeof next === 'function' ? next(current) : next,
+      };
+    });
+  };
 
   const goToMonth = (nextMonth: string) => {
     router.push(AppRoutePaths.statementDetail(nextMonth));
@@ -104,7 +124,7 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
     }
   };
 
-  const entries = statement?.entries ?? [];
+  const entries = useMemo(() => statement?.entries ?? [], [statement?.entries]);
   const filteredEntries = useMemo(
     () => filterStatementEntries(entries, filters),
     [entries, filters],

@@ -171,7 +171,7 @@ export function RecurrencesPage() {
           sx={{
             position: 'fixed',
             right: 16,
-            bottom: 'max(16px, env(safe-area-inset-bottom))',
+            bottom: 'calc(var(--app-bottom-nav-space, 80px) + 8px)',
             zIndex: (theme) => theme.zIndex.speedDial,
           }}
         >
