@@ -42,5 +42,5 @@ jobs:
 
       - name: Build
         env:
-          NEXT_PUBLIC_API_BASE_URL: https://findu-api.fly.dev/api/v1
+          NEXT_PUBLIC_API_BASE_URL: https://findu-web.yellowcoast-21752100.westus2.azurecontainerapps.io/api/v1
         run: yarn build
