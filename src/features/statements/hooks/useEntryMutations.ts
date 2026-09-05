@@ -8,11 +8,17 @@ import {
 } from '@/features/statements/gateway/statements.gateway';
 import { STATEMENT_KEY } from '@/features/statements/hooks/useStatement';
 import { STATEMENTS_LIST_KEY } from '@/features/statements/hooks/useStatementsList';
+import { CATEGORIES_LIST_KEY } from '@/features/categories/hooks/useCategories';
+import { CATEGORY_TOTALS_KEY } from '@/features/categories/hooks/useCategoryTotals';
+import { CATEGORY_TRANSACTIONS_KEY } from '@/features/categories/hooks/useCategoryTransactions';
 import type { TransactionInput } from '@/features/transactions/models/transaction.model';
 
 function invalidate(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: [STATEMENT_KEY] });
   queryClient.invalidateQueries({ queryKey: [STATEMENTS_LIST_KEY] });
+  queryClient.invalidateQueries({ queryKey: [CATEGORIES_LIST_KEY] });
+  queryClient.invalidateQueries({ queryKey: [CATEGORY_TOTALS_KEY] });
+  queryClient.invalidateQueries({ queryKey: [CATEGORY_TRANSACTIONS_KEY] });
 }
 
 export function useCreateEntry(month: string) {

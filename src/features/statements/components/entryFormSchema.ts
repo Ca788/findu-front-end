@@ -13,6 +13,16 @@ export const entryFormSchema = z.object({
   description: z.string().max(200, 'Máximo de 200 caracteres').optional().or(z.literal('')),
   occurred_at: z.string().optional().or(z.literal('')),
   category_id: z.string().optional().or(z.literal('')),
+  category_name: z.string().max(60, 'Máximo de 60 caracteres').optional().or(z.literal('')),
+  payer_name: z.string().max(120, 'Máximo de 120 caracteres').optional().or(z.literal('')),
+  payer_phone: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .refine((raw) => {
+      if (!raw) return true;
+      return raw.replace(/\D/g, '').length >= 8;
+    }, 'Informe um WhatsApp válido'),
 });
 
 export type EntryFormValues = z.infer<typeof entryFormSchema>;

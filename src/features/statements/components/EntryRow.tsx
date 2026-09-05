@@ -103,7 +103,8 @@ export function EntryRow({
             {entry.description || 'Sem descrição'}
           </Typography>
           <Typography variant="caption" color="text.secondary" className="truncate block">
-            {[entry.category?.name, source].filter(Boolean).join(' · ') || 'Manual'}
+            {[entry.category?.name, entry.payer_name, source].filter(Boolean).join(' · ') ||
+              'Manual'}
           </Typography>
         </Box>
 

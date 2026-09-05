@@ -7,9 +7,20 @@ import type { PaginationQueryParams } from '@/infrastructure/api-query-params';
 import type {
   Category,
   CategoryInput,
+  CategoryPeriodFilters,
+  CategoryTotal,
 } from '@/features/categories/models/category.model';
+import type { Transaction } from '@/features/transactions/models/transaction.model';
 
 const BASE_PATH = '/financial/categories';
+
+export interface ListCategoryTotalsParams
+  extends CategoryPeriodFilters, PaginationQueryParams {}
+
+export interface ListCategoryTransactionsParams
+  extends CategoryPeriodFilters, PaginationQueryParams {
+  categoryId: string;
+}
 
 export async function listCategories(
   params?: PaginationQueryParams,
@@ -53,4 +64,44 @@ export async function updateCategory(
 
 export async function deleteCategory(id: string): Promise<void> {
   await authorizedApiClient.delete(`${BASE_PATH}/${id}`);
+}
+
+export async function listCategoryTotals(
+  params?: ListCategoryTotalsParams,
+): Promise<PaginatedSuccessResponse<CategoryTotal>> {
+  const response = await authorizedApiClient.get<
+    PaginatedSuccessResponse<CategoryTotal>
+  >(`${BASE_PATH}/totals`, {
+    params: {
+      page: params?.page ?? 1,
+      perPage: params?.perPage ?? 10,
+      view: params?.view ?? 'extended',
+      from: params?.from,
+      to: params?.to,
+      transaction_type: params?.transaction_type,
+      status: params?.status,
+      payer_phone: params?.payer_phone,
+    },
+  });
+  return response.data;
+}
+
+export async function listCategoryTransactions(
+  params: ListCategoryTransactionsParams,
+): Promise<PaginatedSuccessResponse<Transaction>> {
+  const response = await authorizedApiClient.get<
+    PaginatedSuccessResponse<Transaction>
+  >(`${BASE_PATH}/${params.categoryId}/transactions`, {
+    params: {
+      page: params.page ?? 1,
+      perPage: params.perPage ?? 10,
+      view: params.view ?? 'extended',
+      from: params.from,
+      to: params.to,
+      transaction_type: params.transaction_type,
+      status: params.status,
+      payer_phone: params.payer_phone,
+    },
+  });
+  return response.data;
 }

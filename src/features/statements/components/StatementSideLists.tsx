@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import { formatBRL } from '@/utils/currency';
+import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import type {
   Statement,
   StatementByCategory,
@@ -20,9 +22,11 @@ interface StatementSideListsProps {
 function CategoryBreakdown({
   rows,
   compact,
+  month,
 }: {
   rows: StatementByCategory[];
   compact?: boolean;
+  month: string;
 }) {
   if (rows.length === 0) return null;
   const visible = compact ? rows.slice(0, 4) : rows;
@@ -40,9 +44,21 @@ function CategoryBreakdown({
         return (
           <Box key={row.category_id ?? 'uncategorized'} className="min-w-0">
             <div className="mb-1 flex items-baseline justify-between gap-2">
-              <Typography variant="body2" sx={{ fontWeight: 600 }} className="min-w-0 truncate">
-                {row.category_name || 'Sem categoria'}
-              </Typography>
+              {row.category_id ? (
+                <Typography
+                  component={Link}
+                  href={AppRoutePaths.categoryDetail(row.category_id, month)}
+                  variant="body2"
+                  sx={{ fontWeight: 600, color: 'inherit' }}
+                  className="min-w-0 truncate no-underline"
+                >
+                  {row.category_name || 'Sem categoria'}
+                </Typography>
+              ) : (
+                <Typography variant="body2" sx={{ fontWeight: 600 }} className="min-w-0 truncate">
+                  {row.category_name || 'Sem categoria'}
+                </Typography>
+              )}
               <Typography
                 variant="caption"
                 color="text.secondary"
@@ -153,7 +169,11 @@ export function StatementSideLists({
     <div className="flex min-w-0 flex-col gap-3">
       <InstallmentsList plans={statement.installments_active} compact={compact} />
       <RecurrencesList rules={statement.recurrences_active} compact={compact} />
-      <CategoryBreakdown rows={statement.by_category} compact={compact} />
+      <CategoryBreakdown
+        rows={statement.by_category}
+        compact={compact}
+        month={statement.month}
+      />
     </div>
   );
 }

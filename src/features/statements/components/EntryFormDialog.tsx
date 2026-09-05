@@ -49,6 +49,9 @@ const DEFAULT_VALUES: EntryFormValues = {
   description: '',
   occurred_at: '',
   category_id: '',
+  category_name: '',
+  payer_name: '',
+  payer_phone: '',
 };
 
 export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialogProps) {
@@ -82,19 +85,30 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
       description: entry?.description ?? '',
       occurred_at: toLocalDateInput(entry?.occurred_at),
       category_id: entry?.category_id ?? '',
+      category_name: '',
+      payer_name: entry?.payer_name ?? '',
+      payer_phone: entry?.payer_phone ?? '',
     });
   }, [open, entry, reset]);
 
   const onSubmit = async (values: EntryFormValues) => {
     try {
+      const categoryName = values.category_name?.trim();
       const input: TransactionInput = {
         amount: parseAmountInput(values.amount) ?? 0,
         transaction_type: values.transaction_type,
         status: values.status,
         description: values.description || null,
         occurred_at: toIsoDate(values.occurred_at),
-        category_id: values.category_id || null,
+        payer_name: values.payer_name?.trim() || null,
+        payer_phone: values.payer_phone?.trim() || null,
       };
+
+      if (!isEdit && categoryName) {
+        input.category_name = categoryName;
+      } else {
+        input.category_id = values.category_id || null;
+      }
 
       if (isEdit && entry) {
         await updateMutation.mutateAsync({ id: entry.id, input });
@@ -223,6 +237,35 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
               ))}
             </TextField>
           )}
+        />
+        {!isEdit && (
+          <TextField
+            label="Ou nova categoria"
+            fullWidth
+            {...register('category_name')}
+            error={!!errors.category_name}
+            helperText={
+              errors.category_name?.message ??
+              'Se preencher, cria a categoria no mesmo envio.'
+            }
+          />
+        )}
+        <TextField
+          label="Pagador"
+          fullWidth
+          {...register('payer_name')}
+          error={!!errors.payer_name}
+          helperText={errors.payer_name?.message}
+        />
+        <TextField
+          label="WhatsApp do pagador"
+          fullWidth
+          {...register('payer_phone')}
+          error={!!errors.payer_phone}
+          helperText={
+            errors.payer_phone?.message ??
+            'Usado para enviar o comprovante no WhatsApp.'
+          }
         />
       </Stack>
     </FormDialog>

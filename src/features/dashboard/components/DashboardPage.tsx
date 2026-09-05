@@ -12,6 +12,7 @@ import { DashboardEndingInstallments } from '@/features/dashboard/components/Das
 import { useStatement } from '@/features/statements/hooks/useStatement';
 import { AccountBalanceCard } from '@/features/statements/components/AccountBalanceCard';
 import { StatementSideLists } from '@/features/statements/components/StatementSideLists';
+import { DashboardInsights } from '@/features/insights/components/DashboardInsights';
 
 export function DashboardPage() {
   const { monthParam, referenceDate, monthLabel } = useDashboardMonth();
@@ -33,6 +34,8 @@ export function DashboardPage() {
       <DashboardEndingInstallments />
 
       <AccountBalanceCard statement={statementQuery.data} />
+
+      <DashboardInsights period={monthParam} />
 
       <DashboardCashflowChart />
 

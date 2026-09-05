@@ -12,6 +12,7 @@ import { CategoriesCardList } from '@/features/categories/components/list/Catego
 import { DataPagination } from '@/components/common/DataPagination';
 import { CategoryFormDialog } from '@/features/categories/components/form/CategoryFormDialog';
 import { DeleteCategoryDialog } from '@/features/categories/components/delete/DeleteCategoryDialog';
+import { CategoryTotalsSection } from '@/features/categories/components/totals/CategoryTotalsSection';
 
 export function CategoriesPage() {
   const [page, setPage] = useState(1);
@@ -72,6 +73,8 @@ export function CategoriesPage() {
         category={dialogs.selected}
         onClose={dialogs.close}
       />
+
+      <CategoryTotalsSection />
     </Stack>
   );
 }

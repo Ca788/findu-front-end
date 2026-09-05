@@ -5,6 +5,7 @@ import ChatIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import DashboardIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLongOutlined';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import CategoryIcon from '@mui/icons-material/CategoryOutlined';
 import SavingsIcon from '@mui/icons-material/SavingsOutlined';
 import ReplayIcon from '@mui/icons-material/ReplayOutlined';
@@ -76,6 +77,12 @@ export const appNavItems: AppNavItem[] = [
     section: 'secondary',
   },
   {
+    label: 'Comprovantes',
+    href: AppRoutePaths.RECEIPTS,
+    icon: PictureAsPdfIcon,
+    section: 'secondary',
+  },
+  {
     label: 'Orçamentos',
     href: '/budgets',
     icon: SavingsIcon,
@@ -135,11 +142,13 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname.startsWith(`${AppRoutePaths.RECURRENCES}/`) ||
       pathname === AppRoutePaths.INSTALLMENTS ||
       pathname.startsWith(`${AppRoutePaths.INSTALLMENTS}/`) ||
+      pathname === AppRoutePaths.RECEIPTS ||
+      pathname.startsWith(`${AppRoutePaths.RECEIPTS}/`) ||
       pathname.startsWith(APP_CHAT_HISTORY_PATH),
   },
 ];
 
-/** Menu do hub mobile "Todos" — atalhos fora das tabs principais. */
+
 export const todosHubNavItems: AppNavItem[] = [
   {
     label: 'Conta',
@@ -155,6 +164,11 @@ export const todosHubNavItems: AppNavItem[] = [
     label: 'Categorias',
     href: AppRoutePaths.CATEGORIES,
     icon: CategoryIcon,
+  },
+  {
+    label: 'Comprovantes',
+    href: AppRoutePaths.RECEIPTS,
+    icon: PictureAsPdfIcon,
   },
   {
     label: 'Recorrentes',

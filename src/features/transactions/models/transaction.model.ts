@@ -16,6 +16,8 @@ export interface Transaction {
   occurred_at?: string | null;
   category_id?: string | null;
   category?: Category | null;
+  payer_name?: string | null;
+  payer_phone?: string | null;
   artifact_id?: string | null;
   installment_plan_id?: string | null;
   installment_number?: number | null;
@@ -34,6 +36,9 @@ export interface TransactionInput {
   description?: string | null;
   occurred_at?: string | null;
   category_id?: string | null;
+  category_name?: string | null;
+  payer_name?: string | null;
+  payer_phone?: string | null;
   artifact_id?: string | null;
 }
 
