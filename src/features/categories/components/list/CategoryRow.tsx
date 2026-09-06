@@ -15,6 +15,7 @@ export function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
   return (
     <TableRow hover>
       <TableCell>{category.name}</TableCell>
+      <TableCell>{category.whatsapp || '—'}</TableCell>
       <TableCell align="right" width={120}>
         <RowActions
           onEdit={() => onEdit(category)}

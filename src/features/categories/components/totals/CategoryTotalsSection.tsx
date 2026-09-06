@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/SendOutlined';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
@@ -18,14 +20,17 @@ import { useCategoryTotals } from '@/features/categories/hooks/useCategoryTotals
 import { currentMonthParam } from '@/features/statements/utils/month';
 import { formatBRL } from '@/utils/currency';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
+import { ReceiptFormDialog } from '@/features/receipts/components/ReceiptFormDialog';
 import type { CategoryTotal } from '@/features/categories/models/category.model';
 
 function TotalsRow({
   row,
   onOpen,
+  onSend,
 }: {
   row: CategoryTotal;
   onOpen: (row: CategoryTotal) => void;
+  onSend: (row: CategoryTotal) => void;
 }) {
   const clickable = !!row.category_id;
 
@@ -46,6 +51,20 @@ function TotalsRow({
         {formatBRL(row.balance)}
       </TableCell>
       <TableCell align="right">{row.transactions_count ?? '—'}</TableCell>
+      <TableCell align="right" width={56}>
+        {row.category_id && row.whatsapp ? (
+          <IconButton
+            size="small"
+            aria-label="Enviar comprovante"
+            onClick={(event) => {
+              event.stopPropagation();
+              onSend(row);
+            }}
+          >
+            <SendIcon fontSize="small" />
+          </IconButton>
+        ) : null}
+      </TableCell>
     </TableRow>
   );
 }
@@ -53,9 +72,11 @@ function TotalsRow({
 function TotalsCard({
   row,
   onOpen,
+  onSend,
 }: {
   row: CategoryTotal;
   onOpen: (row: CategoryTotal) => void;
+  onSend: (row: CategoryTotal) => void;
 }) {
   const clickable = !!row.category_id;
 
@@ -83,6 +104,19 @@ function TotalsCard({
           {formatBRL(row.balance)}
         </Typography>
       </div>
+      {row.category_id && row.whatsapp ? (
+        <IconButton
+          size="small"
+          aria-label="Enviar comprovante"
+          sx={{ alignSelf: 'flex-end' }}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSend(row);
+          }}
+        >
+          <SendIcon fontSize="small" />
+        </IconButton>
+      ) : null}
     </Paper>
   );
 }
@@ -92,6 +126,7 @@ export function CategoryTotalsSection() {
   const [month, setMonth] = useState(currentMonthParam);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [sending, setSending] = useState<CategoryTotal | null>(null);
 
   const { data, isLoading, isFetching, isError } = useCategoryTotals({
     page,
@@ -136,12 +171,13 @@ export function CategoryTotalsSection() {
                 <TableCell align="right">Despesas</TableCell>
                 <TableCell align="right">Saldo</TableCell>
                 <TableCell align="right">Lançamentos</TableCell>
+                <TableCell align="right" width={56} />
               </TableRow>
             </TableHead>
             <TableBody>
               {!isLoading && rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" className="py-10">
+                  <TableCell colSpan={6} align="center" className="py-10">
                     <Typography variant="body2" color="text.secondary">
                       Nenhum lançamento neste mês.
                     </Typography>
@@ -153,6 +189,7 @@ export function CategoryTotalsSection() {
                   key={row.category_id ?? 'uncategorized'}
                   row={row}
                   onOpen={openCategory}
+                  onSend={setSending}
                 />
               ))}
             </TableBody>
@@ -173,6 +210,7 @@ export function CategoryTotalsSection() {
             key={row.category_id ?? 'uncategorized'}
             row={row}
             onOpen={openCategory}
+            onSend={setSending}
           />
         ))}
       </div>
@@ -189,6 +227,13 @@ export function CategoryTotalsSection() {
           }}
         />
       )}
+
+      <ReceiptFormDialog
+        open={!!sending?.category_id}
+        categoryId={sending?.category_id ?? undefined}
+        month={month}
+        onClose={() => setSending(null)}
+      />
     </div>
   );
 }

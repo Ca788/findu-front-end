@@ -43,20 +43,24 @@ export function CategoryFormDialog({
     formState: { errors },
   } = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
-    defaultValues: { name: '' },
+    defaultValues: { name: '', whatsapp: '' },
   });
 
   useEffect(() => {
-    if (open) reset({ name: category?.name ?? '' });
+    if (open) reset({ name: category?.name ?? '', whatsapp: category?.whatsapp ?? '' });
   }, [open, category, reset]);
 
   const onSubmit = async (values: CategoryFormValues) => {
     try {
+      const input = {
+        name: values.name,
+        whatsapp: values.whatsapp?.trim() || null,
+      };
       if (isEdit && category) {
-        await updateMutation.mutateAsync({ id: category.id, input: values });
+        await updateMutation.mutateAsync({ id: category.id, input });
         showSuccess('Categoria atualizada');
       } else {
-        await createMutation.mutateAsync(values);
+        await createMutation.mutateAsync(input);
         showSuccess('Categoria criada');
       }
       onClose();

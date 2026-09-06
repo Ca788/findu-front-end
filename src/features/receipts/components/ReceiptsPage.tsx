@@ -177,8 +177,7 @@ export function ReceiptsPage() {
 
       {!query.isFetching && receipts.length === 0 && (
         <Typography variant="body2" color="text.secondary">
-          Gere um PDF por pagador e, se quiser, envie no WhatsApp. O pagador precisa
-          estar no lançamento.
+          Cadastre o WhatsApp na categoria e envie o total pago do período.
         </Typography>
       )}
 

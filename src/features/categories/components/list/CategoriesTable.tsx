@@ -32,13 +32,14 @@ export function CategoriesTable({
         <TableHead>
           <TableRow>
             <TableCell>Nome</TableCell>
+            <TableCell>WhatsApp</TableCell>
             <TableCell align="right" width={120}>Ações</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {isEmpty && (
             <TableRow>
-              <TableCell colSpan={2} align="center" className="py-10">
+                  <TableCell colSpan={3} align="center" className="py-10">
                 <Typography variant="body2" color="text.secondary">
                   Nenhuma categoria cadastrada.
                 </Typography>

@@ -5,17 +5,20 @@ export type TransactionStatusFilter = 'pending' | 'paid';
 export interface Category {
   id: string;
   name: string;
+  whatsapp?: string | null;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CategoryInput {
   name: string;
+  whatsapp?: string | null;
 }
 
 export interface CategoryTotal {
   category_id: string | null;
   category_name: string;
+  whatsapp?: string | null;
   income: string;
   expense: string;
   balance: string;

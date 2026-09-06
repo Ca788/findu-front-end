@@ -3,6 +3,7 @@ export type SerializerView = 'default' | 'extended';
 
 export interface Receipt {
   id: string;
+  category_id?: string | null;
   payer_name: string | null;
   payer_phone: string;
   period_start: string;
@@ -18,8 +19,7 @@ export interface Receipt {
 }
 
 export interface ReceiptInput {
-  payer_phone: string;
-  payer_name?: string | null;
+  category_id: string;
   from?: string | null;
   to?: string | null;
   transaction_type?: 'expense' | 'income' | null;

@@ -11,13 +11,26 @@ interface CategoryFormFieldsProps {
 
 export function CategoryFormFields({ register, errors }: CategoryFormFieldsProps) {
   return (
-    <TextField
-      label="Nome"
-      autoFocus
-      fullWidth
-      {...register('name')}
-      error={!!errors.name}
-      helperText={errors.name?.message}
-    />
+    <>
+      <TextField
+        label="Nome"
+        autoFocus
+        fullWidth
+        {...register('name')}
+        error={!!errors.name}
+        helperText={errors.name?.message}
+      />
+      <TextField
+        label="WhatsApp"
+        fullWidth
+        sx={{ mt: 2 }}
+        {...register('whatsapp')}
+        error={!!errors.whatsapp}
+        helperText={
+          errors.whatsapp?.message ??
+          'Número que recebe o comprovante do total pago nesta categoria.'
+        }
+      />
+    </>
   );
 }

@@ -18,9 +18,16 @@ export function CategoryCardItem({
 }: CategoryCardItemProps) {
   return (
     <Paper className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
-      <Typography variant="body1" className="min-w-0 flex-1 truncate font-medium">
-        {category.name}
-      </Typography>
+      <div className="min-w-0 flex-1">
+        <Typography variant="body1" className="truncate font-medium">
+          {category.name}
+        </Typography>
+        {category.whatsapp && (
+          <Typography variant="caption" color="text.secondary">
+            {category.whatsapp}
+          </Typography>
+        )}
+      </div>
       <RowActions
         onEdit={() => onEdit(category)}
         onDelete={() => onDelete(category)}
