@@ -3,10 +3,10 @@ const AZURE_API_BASE_URL =
 
 export function resolveApiBaseUrl(raw: string | undefined): string {
   const value = raw?.trim() ?? '';
-  if (!value || value.includes('findu-api.fly.dev')) {
-    return AZURE_API_BASE_URL;
+  if (value.includes('localhost') || /^\d{1,3}(\.\d{1,3}){3}/.test(value)) {
+    return value;
   }
-  return value;
+  return AZURE_API_BASE_URL;
 }
 
 export const API_BASE_URL = resolveApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL);
