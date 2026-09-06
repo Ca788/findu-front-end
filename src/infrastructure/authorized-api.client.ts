@@ -3,9 +3,10 @@ import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import { AppStorageKeys } from '@/constants/AppStorageKeys';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { disconnectCable } from '@/infrastructure/cable.client';
+import { API_BASE_URL } from '@/constants/apiBaseUrl';
 
 const authorizedApiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: API_BASE_URL,
   timeout: 30_000,
   headers: {
     'Content-Type': 'application/json',

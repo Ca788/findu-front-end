@@ -1,12 +1,13 @@
 import { createConsumer, type Consumer } from '@rails/actioncable';
 import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import { AppStorageKeys } from '@/constants/AppStorageKeys';
+import { API_BASE_URL } from '@/constants/apiBaseUrl';
 
 let consumer: Consumer | null = null;
 let activeToken: string | null = null;
 
 function buildCableUrl(token: string): string {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+  const base = API_BASE_URL;
   const url = new URL(base, 'http://localhost');
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   url.pathname = '/cable';
