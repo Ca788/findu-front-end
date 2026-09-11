@@ -29,6 +29,7 @@ import { useSnackbar } from '@/providers/SnackbarProvider';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import type { AppErrorResult } from '@/infrastructure/AppResponse';
 import {
+  disableBiometricLogin,
   enableBiometricLogin,
   isBiometricAvailable,
   isBiometricEnabled,
@@ -117,11 +118,21 @@ export function LoginForm() {
   const handlePasswordContinue = passwordForm.handleSubmit(async (data) => {
     try {
       await login({ email, password: data.password }).unwrap();
+
       if (bioAvailable && !isBiometricEnabled()) {
         setPendingPassword(data.password);
         setEnableDialogOpen(true);
         return;
       }
+
+      if (bioAvailable) {
+        try {
+          await enableBiometricLogin(email, data.password);
+        } catch {
+          /* ignore */
+        }
+      }
+
       finishLogin();
     } catch (err) {
       const message =
@@ -153,12 +164,39 @@ export function LoginForm() {
   const handleBiometricLogin = async () => {
     setBioLoading(true);
     try {
-      const credentials = await loginWithBiometric();
-      if (!credentials) {
-        showError('Digital não configurada');
-        return;
+      const result = await loginWithBiometric();
+
+      switch (result.status) {
+        case 'cancelled':
+          return;
+        case 'unavailable':
+          setBioEnabled(false);
+          showError('Biometria indisponível neste aparelho. Entre com sua senha.');
+          return;
+        case 'not_enrolled':
+          setBioEnabled(false);
+          showError('Digital desativada. Entre com sua senha para ativar novamente.');
+          return;
+        case 'success':
+          break;
+        default: {
+          const exhaustive: never = result;
+          return exhaustive;
+        }
       }
-      await login(credentials).unwrap();
+
+      try {
+        await login(result.credentials).unwrap();
+      } catch (err) {
+        if ((err as AppErrorResult)?.httpStatusCode === 401) {
+          await disableBiometricLogin();
+          setBioEnabled(false);
+          showError('Suas credenciais mudaram. Entre com a senha para reativar a digital.');
+          return;
+        }
+        throw err;
+      }
+
       finishLogin();
     } catch (err) {
       const message =

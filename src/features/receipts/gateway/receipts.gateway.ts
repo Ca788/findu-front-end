@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import authorizedApiClient from '@/infrastructure/authorized-api.client';
 import type {
   PaginatedSuccessResponse,
@@ -57,9 +58,23 @@ export async function deliverReceipt(id: string): Promise<Receipt> {
 export async function downloadReceipt(id: string, filename: string): Promise<void> {
   const response = await authorizedApiClient.get<Blob>(`${BASE_PATH}/${id}/download`, {
     responseType: 'blob',
+    headers: { Accept: 'application/pdf' },
   });
+  const blob = new Blob([response.data], { type: 'application/pdf' });
+  const file = new File([blob], filename, { type: 'application/pdf' });
 
-  const url = URL.createObjectURL(response.data);
+  if (Capacitor.isNativePlatform()) {
+    if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener');
+    return;
+  }
+
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;

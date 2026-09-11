@@ -81,7 +81,7 @@ export function RecurrencesPage() {
       {!query.isFetching && rules.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           Você ainda não cadastrou nenhuma recorrência. Cadastre coisas como aluguel,
-          internet, academia ou salário — o sistema criará automaticamente os
+          internet, academia ou salário. O sistema criará automaticamente os
           lançamentos dos próximos meses.
         </Typography>
       )}

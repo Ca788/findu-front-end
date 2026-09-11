@@ -7,6 +7,12 @@ import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 
 const SERVER = 'com.findu.app';
 
+export type BiometricLoginResult =
+  | { status: 'success'; credentials: { email: string; password: string } }
+  | { status: 'cancelled' }
+  | { status: 'unavailable' }
+  | { status: 'not_enrolled' };
+
 export async function isBiometricAvailable(): Promise<boolean> {
   if (!Capacitor.isNativePlatform()) return false;
   try {
@@ -37,24 +43,36 @@ export async function disableBiometricLogin(): Promise<void> {
   appStorage.remove(AppStorageKeys.BIOMETRIC_ENABLED);
 }
 
-export async function loginWithBiometric(): Promise<{ email: string; password: string } | null> {
-  if (!isBiometricEnabled()) return null;
+export async function loginWithBiometric(): Promise<BiometricLoginResult> {
+  if (!isBiometricEnabled()) return { status: 'not_enrolled' };
 
-  const available = await isBiometricAvailable();
-  if (!available) return null;
+  if (!(await isBiometricAvailable())) return { status: 'unavailable' };
 
-  await NativeBiometric.verifyIdentity({
-    reason: 'Desbloqueie o Findu',
-    title: 'Findu',
-    subtitle: 'Entre com a digital',
-    description: 'Use a biometria do aparelho para continuar',
-  });
+  try {
+    await NativeBiometric.verifyIdentity({
+      reason: 'Desbloqueie o Findu',
+      title: 'Findu',
+      subtitle: 'Entre com a digital',
+      description: 'Use a biometria do aparelho para continuar',
+    });
+  } catch {
+    return { status: 'cancelled' };
+  }
 
-  const credentials = await NativeBiometric.getCredentials({ server: SERVER });
-  if (!credentials.username || !credentials.password) return null;
+  try {
+    const credentials = await NativeBiometric.getCredentials({ server: SERVER });
 
-  return {
-    email: credentials.username,
-    password: credentials.password,
-  };
+    if (!credentials?.username || !credentials?.password) {
+      await disableBiometricLogin();
+      return { status: 'not_enrolled' };
+    }
+
+    return {
+      status: 'success',
+      credentials: { email: credentials.username, password: credentials.password },
+    };
+  } catch {
+    await disableBiometricLogin();
+    return { status: 'not_enrolled' };
+  }
 }

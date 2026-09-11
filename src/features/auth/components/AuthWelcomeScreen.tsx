@@ -76,7 +76,7 @@ export function AuthWelcomeScreen() {
             maxWidth: 320,
           }}
         >
-          Suas finanças com clareza — e um assistente que realmente ajuda.
+          Suas finanças com clareza e um assistente que realmente ajuda.
         </Typography>
 
         <StackButtons />

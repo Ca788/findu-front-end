@@ -133,7 +133,7 @@ export function ReceiptsPage() {
         id: receipt.id,
         filename: receipt.filename ?? `comprovante-${receipt.id}.pdf`,
       });
-      showSuccess('Download iniciado');
+      showSuccess('PDF pronto. No celular, compartilhe ou abra o arquivo.');
     } catch (err) {
       const mapped = AppErrorResultMapper.fromAxiosError(
         err as AxiosError<ErrorResponse>,
