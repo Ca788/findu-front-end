@@ -13,6 +13,7 @@ import {
 
 interface DashboardInsightsProps {
   period: string;
+  limit?: number;
 }
 
 function severityColor(
@@ -33,10 +34,10 @@ function severityColor(
   }
 }
 
-export function DashboardInsights({ period }: DashboardInsightsProps) {
+export function DashboardInsights({ period, limit = 3 }: DashboardInsightsProps) {
   const { data, isLoading, isError } = useInsights({
     page: 1,
-    perPage: 5,
+    perPage: limit,
     period,
     view: 'default',
   });

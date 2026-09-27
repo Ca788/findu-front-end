@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { optionalPhoneSchema } from '@/utils/maskedInput';
 
 export const entryFormSchema = z.object({
   amount: z
@@ -15,14 +16,7 @@ export const entryFormSchema = z.object({
   category_id: z.string().optional().or(z.literal('')),
   category_name: z.string().max(60, 'Máximo de 60 caracteres').optional().or(z.literal('')),
   payer_name: z.string().max(120, 'Máximo de 120 caracteres').optional().or(z.literal('')),
-  payer_phone: z
-    .string()
-    .optional()
-    .or(z.literal(''))
-    .refine((raw) => {
-      if (!raw) return true;
-      return raw.replace(/\D/g, '').length >= 8;
-    }, 'Informe um WhatsApp válido'),
+  payer_phone: optionalPhoneSchema,
 });
 
 export type EntryFormValues = z.infer<typeof entryFormSchema>;

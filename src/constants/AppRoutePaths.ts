@@ -35,4 +35,14 @@ export class AppRoutePaths {
   static chatConversation(id: string): string {
     return `${this.CHAT_CONVERSATION}?id=${encodeURIComponent(id)}`;
   }
+
+  static safeNext(value: string | null | undefined): string {
+    if (!value || !value.startsWith('/') || value.startsWith('//')) {
+      return this.DASHBOARD;
+    }
+    if (value === this.LOGIN || value.startsWith(`${this.LOGIN}?`)) {
+      return this.DASHBOARD;
+    }
+    return value;
+  }
 }

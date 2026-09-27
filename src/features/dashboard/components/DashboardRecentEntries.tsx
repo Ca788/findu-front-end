@@ -16,9 +16,8 @@ import type { Transaction } from '@/features/transactions/models/transaction.mod
 interface DashboardRecentEntriesProps {
   statement?: Statement;
   monthParam: string;
+  limit?: number;
 }
-
-const RECENT_LIMIT = 5;
 
 function EntryLine({ entry }: { entry: Transaction }) {
   const isIncome = entry.transaction_type === 'income';
@@ -49,14 +48,14 @@ function EntryLine({ entry }: { entry: Transaction }) {
           className="truncate"
           sx={{
             fontWeight: 600,
-            textDecoration: paid ? 'line-through' : 'none',
-            color: paid ? 'text.disabled' : 'text.primary',
+            color: 'text.primary',
           }}
         >
           {entry.description || (isIncome ? 'Receita' : 'Despesa')}
         </Typography>
         <Typography variant="caption" color="text.secondary" className="truncate block">
           {entry.category?.name ?? 'Sem categoria'}
+          {paid ? ' · Pago' : ''}
         </Typography>
       </div>
 
@@ -65,10 +64,10 @@ function EntryLine({ entry }: { entry: Transaction }) {
         sx={{
           flexShrink: 0,
           whiteSpace: 'nowrap',
-          color: paid ? 'text.disabled' : tone,
+          color: tone,
           fontVariantNumeric: 'tabular-nums',
           fontWeight: 700,
-          textDecoration: paid ? 'line-through' : 'none',
+          opacity: paid ? 0.72 : 1,
         }}
       >
         {isIncome ? '+' : '−'}
@@ -81,9 +80,10 @@ function EntryLine({ entry }: { entry: Transaction }) {
 export function DashboardRecentEntries({
   statement,
   monthParam,
+  limit = 5,
 }: DashboardRecentEntriesProps) {
   const entries = statement?.entries ?? [];
-  const visible = entries.slice(0, RECENT_LIMIT);
+  const visible = entries.slice(0, limit);
 
   return (
     <Paper className="flex min-w-0 flex-col gap-3.5 rounded-xl px-4 py-4">

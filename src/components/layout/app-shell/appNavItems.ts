@@ -128,7 +128,7 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname === AppRoutePaths.BUDGETS || pathname.startsWith(`${AppRoutePaths.BUDGETS}/`),
   },
   {
-    label: 'Todos',
+    label: 'Mais',
     href: AppRoutePaths.TODOS,
     icon: AppsIcon,
     isActive: (pathname) =>
@@ -149,17 +149,7 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
 ];
 
 
-export const todosHubNavItems: AppNavItem[] = [
-  {
-    label: 'Conta',
-    href: AppRoutePaths.PROFILE,
-    icon: PersonIcon,
-  },
-  {
-    label: 'Histórico',
-    href: APP_CHAT_HISTORY_PATH,
-    icon: HistoryIcon,
-  },
+export const moreOrganizeItems: AppNavItem[] = [
   {
     label: 'Categorias',
     href: AppRoutePaths.CATEGORIES,
@@ -181,6 +171,35 @@ export const todosHubNavItems: AppNavItem[] = [
     icon: CreditScoreIcon,
   },
 ];
+
+export const moreAccountItems: AppNavItem[] = [
+  {
+    label: 'Conta',
+    href: AppRoutePaths.PROFILE,
+    icon: PersonIcon,
+  },
+  {
+    label: 'Histórico',
+    href: APP_CHAT_HISTORY_PATH,
+    icon: HistoryIcon,
+  },
+];
+
+export function sectionTitle(pathname: string): string {
+  const active = findActiveNavItem(pathname);
+  if (active) return active.label;
+
+  if (
+    pathname === AppRoutePaths.TODOS ||
+    pathname.startsWith(`${AppRoutePaths.TODOS}/`)
+  ) {
+    return 'Mais';
+  }
+
+  if (pathname.startsWith(`${AppRoutePaths.CHAT}/`)) return 'Chat';
+
+  return 'Findu';
+}
 
 export function findActiveNavItem(pathname: string | null | undefined): AppNavItem | undefined {
   if (!pathname) return undefined;

@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
@@ -14,12 +14,14 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, isLoading } = useCurrentUser();
   const router = useRouter();
+  const pathname = usePathname() ?? AppRoutePaths.DASHBOARD;
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace(AppRoutePaths.LOGIN);
+      const next = encodeURIComponent(pathname);
+      router.replace(`${AppRoutePaths.LOGIN}?next=${next}`);
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, pathname, router]);
 
   if (isLoading || !isAuthenticated) {
     return (

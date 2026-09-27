@@ -24,7 +24,7 @@ export function ChatScreen() {
   const router = useRouter();
   const { showError } = useSnackbar();
   const { keyboardOpen } = useAppShell();
-  const { isMobile } = useDevice();
+  const { isDesktop } = useDevice();
   const [isStarting, setIsStarting] = useState(false);
   const createConversation = useCreateConversation();
 
@@ -87,7 +87,7 @@ export function ChatScreen() {
           borderTop: '1px solid',
           borderColor: 'divider',
           paddingBottom:
-            isMobile && !keyboardOpen
+            !isDesktop && !keyboardOpen
               ? 'var(--app-bottom-nav-space)'
               : 'var(--app-safe-bottom)',
         }}

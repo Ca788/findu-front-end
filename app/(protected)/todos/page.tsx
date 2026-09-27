@@ -3,7 +3,7 @@ import { TodosPage } from '@/features/todos/components/TodosPage';
 
 export default function Page() {
   return (
-    <PageContent maxWidth="sm">
+    <PageContent maxWidth="lg">
       <TodosPage />
     </PageContent>
   );

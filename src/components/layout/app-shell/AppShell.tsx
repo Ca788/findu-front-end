@@ -18,7 +18,7 @@ interface AppShellProps {
 
 function AppShellLayout({ children }: AppShellProps) {
   const pathname = usePathname() ?? '';
-  const { recentOpen, closeRecent, keyboardOpen } = useAppShell();
+  const { recentOpen, closeRecent, keyboardOpen, keyboardInset } = useAppShell();
 
   useEffect(() => {
     document.documentElement.dataset.keyboard = keyboardOpen ? 'open' : 'closed';
@@ -27,7 +27,7 @@ function AppShellLayout({ children }: AppShellProps) {
   return (
     <Box
       sx={{
-        height: '100dvh',
+        height: keyboardOpen ? `calc(100dvh - ${keyboardInset}px)` : '100dvh',
         bgcolor: 'background.default',
         display: 'flex',
         overflow: 'hidden',

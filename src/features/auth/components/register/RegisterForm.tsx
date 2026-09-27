@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
@@ -8,18 +8,21 @@ import NextLink from 'next/link';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { EmailField } from '@/components/common/EmailField';
+import { PhoneField } from '@/components/common/PhoneField';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import { useRegister } from '@/features/auth/hooks/useRegister';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import type { AppErrorResult } from '@/infrastructure/AppResponse';
+import { optionalPhoneSchema, phoneDigits, requiredEmailSchema } from '@/utils/maskedInput';
 
 const registerSchema = z
   .object({
-    name: z.string().min(1, 'Nome obrigatório').min(2, 'Nome muito curto'),
-    email: z.email('Email inválido').min(1, 'Email obrigatório'),
-    phone: z.string().optional(),
+    name: z.string().trim().min(1, 'Nome obrigatório').min(2, 'Nome muito curto'),
+    email: requiredEmailSchema,
+    phone: optionalPhoneSchema,
     password: z.string().min(6, 'Mínimo de 6 caracteres'),
     passwordConfirmation: z.string().min(1, 'Confirme a senha'),
   })
@@ -37,10 +40,13 @@ export function RegisterForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
     defaultValues: {
       name: '',
       email: '',
@@ -51,7 +57,7 @@ export function RegisterForm() {
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
-    const phone = data.phone?.trim();
+    const phone = phoneDigits(data.phone ?? '');
     const payload = {
       name: data.name,
       email: data.email,
@@ -63,7 +69,7 @@ export function RegisterForm() {
     try {
       await registerUser(payload).unwrap();
       showSuccess('Conta criada com sucesso');
-      router.replace(AppRoutePaths.CHAT);
+      router.replace(AppRoutePaths.DASHBOARD);
     } catch (err) {
       const message =
         (err as AppErrorResult)?.data?.message ?? 'Erro ao criar conta';
@@ -82,23 +88,33 @@ export function RegisterForm() {
           error={!!errors.name}
           helperText={errors.name?.message}
         />
-        <TextField
-          label="Email"
-          type="email"
-          autoComplete="email"
-          fullWidth
-          {...register('email')}
-          error={!!errors.email}
-          helperText={errors.email?.message}
+        <Controller
+          name="email"
+          control={control}
+          render={({ field, fieldState }) => (
+            <EmailField
+              label="E-mail"
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+            />
+          )}
         />
-        <TextField
-          label="Telefone (opcional)"
-          type="tel"
-          autoComplete="tel"
-          fullWidth
-          {...register('phone')}
-          error={!!errors.phone}
-          helperText={errors.phone?.message}
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field, fieldState }) => (
+            <PhoneField
+              label="Telefone (opcional)"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+            />
+          )}
         />
         <TextField
           label="Senha"

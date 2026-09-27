@@ -14,10 +14,10 @@ import { useDevice } from '@/hooks/useDevice';
 
 export function AppBottomNav() {
   const pathname = usePathname() ?? '';
-  const { isMobile } = useDevice();
+  const { isDesktop } = useDevice();
   const { keyboardOpen } = useAppShell();
 
-  if (!isMobile || keyboardOpen) return null;
+  if (isDesktop || keyboardOpen) return null;
 
   return (
     <Box
@@ -124,7 +124,7 @@ export function AppBottomNav() {
             <Typography
               component="span"
               sx={{
-                fontSize: 10,
+                fontSize: 12,
                 lineHeight: 1.1,
                 fontWeight: active ? 700 : 500,
                 color: active ? 'text.primary' : 'text.secondary',

@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { AuthBrandPanel } from '@/features/auth/components/AuthBrandPanel';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
 interface AuthFormShellProps {
@@ -18,19 +19,30 @@ export function AuthFormShell({ title, description, children }: AuthFormShellPro
   return (
     <Box
       sx={{
-        position: 'relative',
         minHeight: '100dvh',
         display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
+        flexDirection: { xs: 'column', md: 'row' },
         bgcolor: '#0B1220',
       }}
     >
+      <AuthBrandPanel />
+      <Box
+        sx={{
+          position: 'relative',
+          flex: { xs: '1 1 auto', md: '0 0 560px' },
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: { md: 'center' },
+          minHeight: '100dvh',
+          overflow: 'hidden',
+        }}
+      >
       <Box
         component="img"
         src="/auth/hero.jpg"
         alt=""
         sx={{
+          display: { md: 'none' },
           position: 'absolute',
           inset: 0,
           width: '100%',
@@ -41,6 +53,7 @@ export function AuthFormShell({ title, description, children }: AuthFormShellPro
       />
       <Box
         sx={{
+          display: { md: 'none' },
           position: 'absolute',
           inset: 0,
           background:
@@ -52,13 +65,13 @@ export function AuthFormShell({ title, description, children }: AuthFormShellPro
         sx={{
           position: 'relative',
           zIndex: 1,
-          px: 2.5,
-          pt: 'calc(1rem + var(--app-safe-top, 0px))',
-          pb: 'calc(1.5rem + var(--app-safe-bottom, 0px))',
+          px: { xs: 2.5, md: 5 },
+          pt: { xs: 'calc(1rem + var(--app-safe-top, 0px))', md: 4 },
+          pb: { xs: 'calc(1.5rem + var(--app-safe-bottom, 0px))', md: 4 },
           maxWidth: 440,
           width: '100%',
           mx: 'auto',
-          flex: 1,
+          flex: { xs: 1, md: '0 0 auto' },
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -106,17 +119,18 @@ export function AuthFormShell({ title, description, children }: AuthFormShellPro
 
         <Box
           sx={{
-            mt: 'auto',
+            mt: { xs: 'auto', md: 0 },
             bgcolor: 'background.paper',
-            borderRadius: '28px 28px 0 0',
+            borderRadius: { xs: '28px 28px 0 0', md: '28px' },
             px: { xs: 2.5, sm: 3 },
             py: 3,
-            flex: 1,
+            flex: { xs: 1, md: '0 0 auto' },
             boxShadow: '0 -12px 40px rgba(0,0,0,0.25)',
           }}
         >
           {children}
         </Box>
+      </Box>
       </Box>
     </Box>
   );
