@@ -1,18 +1,28 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useState } from 'react';
 import {
+  addMonths,
   currentMonthParam,
   formatMonthLabel,
 } from '@/features/statements/utils/month';
-import { localTodayInput } from '@/utils/date';
 
 export function useDashboardMonth() {
-  return useMemo(() => {
-    const monthParam = currentMonthParam();
-    const referenceDate = localTodayInput();
-    const monthLabel = formatMonthLabel(monthParam);
+  const [monthParam, setMonthParam] = useState(currentMonthParam);
 
-    return { monthParam, referenceDate, monthLabel };
+  const onPreviousMonth = useCallback(() => {
+    setMonthParam((current) => addMonths(current, -1));
   }, []);
+
+  const onNextMonth = useCallback(() => {
+    setMonthParam((current) => addMonths(current, 1));
+  }, []);
+
+  return {
+    monthParam,
+    referenceDate: `${monthParam}-01`,
+    monthLabel: formatMonthLabel(monthParam),
+    onPreviousMonth,
+    onNextMonth,
+  };
 }

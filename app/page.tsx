@@ -14,7 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace(AppRoutePaths.CHAT);
+      router.replace(AppRoutePaths.DASHBOARD);
     }
   }, [isLoading, isAuthenticated, router]);
 

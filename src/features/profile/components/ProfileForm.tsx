@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { PhoneField } from '@/components/common/PhoneField';
+import { maskBrPhone, phoneDigits } from '@/utils/maskedInput';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -20,7 +22,7 @@ import type { AppErrorResult } from '@/infrastructure/AppResponse';
 function buildDefaultValues(name?: string, phone?: string | null): ProfileFormValues {
   return {
     name: name ?? '',
-    phone: phone ?? '',
+    phone: maskBrPhone(phone ?? ''),
     avatar: undefined,
   };
 }
@@ -41,6 +43,8 @@ export function ProfileForm() {
     formState: { errors, isDirty },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
     defaultValues: buildDefaultValues(user?.name, user?.phone),
   });
 
@@ -58,7 +62,7 @@ export function ProfileForm() {
     try {
       await update({
         name: values.name.trim(),
-        phone: values.phone?.trim() ? values.phone.trim() : null,
+        phone: phoneDigits(values.phone ?? '') || null,
         avatar: values.avatar ?? null,
         removeAvatar: removeAvatar && !values.avatar,
       }).unwrap();
@@ -113,15 +117,20 @@ export function ProfileForm() {
           helperText={errors.name?.message}
           disabled={isLoading}
         />
-        <TextField
-          label="Telefone"
-          autoComplete="tel"
-          fullWidth
-          placeholder="+55 11 99999-9999"
-          {...register('phone')}
-          error={!!errors.phone}
-          helperText={errors.phone?.message ?? 'Opcional'}
-          disabled={isLoading}
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field, fieldState }) => (
+            <PhoneField
+              label="Telefone"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message ?? 'Opcional'}
+              disabled={isLoading}
+            />
+          )}
         />
         <TextField
           label="Email"

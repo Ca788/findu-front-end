@@ -20,7 +20,7 @@ export function AppDrawerBrand({ collapsed, onClose }: AppDrawerBrandProps) {
       className={`flex items-center gap-2 px-3 ${collapsed ? 'justify-center' : ''}`}
       sx={{ height: 'var(--app-header-height)', flexShrink: 0 }}
     >
-      <Link href={AppRoutePaths.CHAT} className="flex items-center gap-2 no-underline text-inherit">
+      <Link href={AppRoutePaths.DASHBOARD} className="flex items-center gap-2 no-underline text-inherit">
         <Image
           src="/logo.webp"
           alt="Findu"

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { optionalPhoneSchema } from '@/utils/maskedInput';
 
 const MAX_AVATAR_MB = 5;
 const AVATAR_ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const;
@@ -24,12 +25,7 @@ const avatarSchema = z
 
 export const profileFormSchema = z.object({
   name: z.string().trim().min(1, 'Nome obrigatório').max(120, 'Máximo 120 caracteres'),
-  phone: z
-    .string()
-    .trim()
-    .max(20, 'Máximo 20 caracteres')
-    .optional()
-    .or(z.literal('')),
+  phone: optionalPhoneSchema,
   avatar: avatarSchema,
 });
 

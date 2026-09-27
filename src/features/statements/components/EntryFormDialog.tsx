@@ -34,11 +34,14 @@ import {
   type EntryFormValues,
 } from '@/features/statements/components/entryFormSchema';
 import { MoneyField } from '@/components/common/MoneyField';
+import { PhoneField } from '@/components/common/PhoneField';
+import { maskBrPhone, phoneDigits } from '@/utils/maskedInput';
 
 interface EntryFormDialogProps {
   open: boolean;
   month: string;
   entry?: Transaction | null;
+  initialType?: Transaction['transaction_type'];
   onClose: () => void;
 }
 
@@ -54,7 +57,13 @@ const DEFAULT_VALUES: EntryFormValues = {
   payer_phone: '',
 };
 
-export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialogProps) {
+export function EntryFormDialog({
+  open,
+  month,
+  entry,
+  initialType = 'expense',
+  onClose,
+}: EntryFormDialogProps) {
   const isEdit = !!entry;
   const { showSuccess, showError } = useSnackbar();
   const createMutation = useCreateEntry(month);
@@ -73,23 +82,25 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
     formState: { errors },
   } = useForm<EntryFormValues>({
     resolver: zodResolver(entryFormSchema),
-    defaultValues: DEFAULT_VALUES,
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+    defaultValues: { ...DEFAULT_VALUES, transaction_type: initialType },
   });
 
   useEffect(() => {
     if (!open) return;
     reset({
       amount: formatAmountForInput(entry?.amount),
-      transaction_type: entry?.transaction_type ?? 'expense',
+      transaction_type: entry?.transaction_type ?? initialType,
       status: entry?.status ?? 'pending',
       description: entry?.description ?? '',
       occurred_at: toLocalDateInput(entry?.occurred_at),
       category_id: entry?.category_id ?? '',
       category_name: '',
       payer_name: entry?.payer_name ?? '',
-      payer_phone: entry?.payer_phone ?? '',
+      payer_phone: maskBrPhone(entry?.payer_phone ?? ''),
     });
-  }, [open, entry, reset]);
+  }, [open, entry, initialType, reset]);
 
   const onSubmit = async (values: EntryFormValues) => {
     try {
@@ -101,7 +112,7 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
         description: values.description || null,
         occurred_at: toIsoDate(values.occurred_at),
         payer_name: values.payer_name?.trim() || null,
-        payer_phone: values.payer_phone?.trim() || null,
+        payer_phone: phoneDigits(values.payer_phone ?? '') || null,
       };
 
       if (!isEdit && categoryName) {
@@ -257,15 +268,22 @@ export function EntryFormDialog({ open, month, entry, onClose }: EntryFormDialog
           error={!!errors.payer_name}
           helperText={errors.payer_name?.message}
         />
-        <TextField
-          label="WhatsApp do pagador"
-          fullWidth
-          {...register('payer_phone')}
-          error={!!errors.payer_phone}
-          helperText={
-            errors.payer_phone?.message ??
-            'Usado para enviar o comprovante no WhatsApp.'
-          }
+        <Controller
+          name="payer_phone"
+          control={control}
+          render={({ field, fieldState }) => (
+            <PhoneField
+              label="WhatsApp do pagador"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={!!fieldState.error}
+              helperText={
+                fieldState.error?.message ??
+                'Usado para enviar o comprovante no WhatsApp.'
+              }
+            />
+          )}
         />
       </Stack>
     </FormDialog>

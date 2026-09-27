@@ -12,7 +12,7 @@ interface ChatLayoutProps {
 }
 
 export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
-  const { isMobile } = useDevice();
+  const { isDesktop } = useDevice();
   const { keyboardOpen } = useAppShell();
 
   return (
@@ -56,7 +56,7 @@ export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
           borderTop: '1px solid',
           borderColor: 'divider',
           paddingBottom:
-            isMobile && !keyboardOpen
+            !isDesktop && !keyboardOpen
               ? 'var(--app-bottom-nav-space)'
               : 'var(--app-safe-bottom)',
         }}

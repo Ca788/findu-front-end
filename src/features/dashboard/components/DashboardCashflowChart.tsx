@@ -26,6 +26,17 @@ function toNumber(value: string | number | undefined): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function ChartKey({ color, label }: { color: string; label: string }) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color }} />
+      <Typography variant="caption" color="text.secondary">
+        {label}
+      </Typography>
+    </Box>
+  );
+}
+
 function monthAxisLabel(month: string): string {
   const date = parseMonth(month);
   return new Intl.DateTimeFormat('pt-BR', { month: 'short' })
@@ -34,7 +45,7 @@ function monthAxisLabel(month: string): string {
     .toLowerCase();
 }
 
-export function DashboardCashflowChart() {
+export function DashboardCashflowChart({ height = 220 }: { height?: number }) {
   const theme = useTheme();
   const to = currentMonthParam();
   const from = addMonths(to, -5);
@@ -71,10 +82,25 @@ export function DashboardCashflowChart() {
       <Typography sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.35 }}>
         Fluxo recente
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-        Entradas e saídas pagas · últimos 6 meses
-      </Typography>
-      <Box sx={{ width: '100%', height: 220 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 1,
+          mb: 1.5,
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          Entradas e saídas pagas · últimos 6 meses
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1.5, flexShrink: 0 }}>
+          <ChartKey color={theme.palette.primary.main} label="Entradas" />
+          <ChartKey color="#E85D4C" label="Saídas" />
+        </Box>
+      </Box>
+      <Box sx={{ width: '100%', height }}>
         {rows.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={rows} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>

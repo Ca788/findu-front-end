@@ -3,7 +3,7 @@ import { DashboardPage } from '@/features/dashboard/components/DashboardPage';
 
 export default function Page() {
   return (
-    <PageContent maxWidth="md">
+    <PageContent maxWidth="full">
       <DashboardPage />
     </PageContent>
   );

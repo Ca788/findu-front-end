@@ -10,13 +10,13 @@
   --app-bottom-nav-space: var(--app-safe-bottom);
 }
 
-@media (max-width: 599.95px) {
+@media (max-width: 899.95px) {
   :root {
     --app-bottom-nav-space: calc(64px + 10px + 12px + var(--app-safe-bottom));
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   :root {
     --app-header-height: 64px;
   }

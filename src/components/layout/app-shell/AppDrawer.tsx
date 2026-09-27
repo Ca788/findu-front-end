@@ -6,40 +6,11 @@ import { AppDrawerContent } from '@/components/layout/app-shell/AppDrawerContent
 import {
   APP_DRAWER_COLLAPSED_WIDTH,
   APP_DRAWER_EXPANDED_WIDTH,
-  APP_DRAWER_MOBILE_WIDTH,
 } from '@/components/layout/app-shell/constants';
-import { useDevice } from '@/hooks/useDevice';
-
 export function AppDrawer() {
-  const { isDesktop, collapsed, drawerOpen, closeDrawer } = useAppShell();
-  const { isMobile } = useDevice();
+  const { isDesktop, collapsed } = useAppShell();
 
-  if (isMobile) return null;
-
-  if (!isDesktop) {
-    return (
-      <Drawer
-        variant="temporary"
-        open={drawerOpen}
-        onClose={closeDrawer}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          '& .MuiDrawer-paper': {
-            width: APP_DRAWER_MOBILE_WIDTH,
-            maxWidth: 360,
-            borderRight: '1px solid',
-            borderColor: 'divider',
-          },
-        }}
-      >
-        <AppDrawerContent
-          collapsed={false}
-          onNavigate={closeDrawer}
-          onClose={closeDrawer}
-        />
-      </Drawer>
-    );
-  }
+  if (!isDesktop) return null;
 
   const width = collapsed ? APP_DRAWER_COLLAPSED_WIDTH : APP_DRAWER_EXPANDED_WIDTH;
 

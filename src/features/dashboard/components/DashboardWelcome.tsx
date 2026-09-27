@@ -1,11 +1,16 @@
 'use client';
 
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeftRounded';
+import ChevronRightIcon from '@mui/icons-material/ChevronRightRounded';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 
 interface DashboardWelcomeProps {
   monthLabel: string;
+  onPreviousMonth: () => void;
+  onNextMonth: () => void;
 }
 
 function greetingForNow(): string {
@@ -15,12 +20,16 @@ function greetingForNow(): string {
   return 'Boa noite';
 }
 
-export function DashboardWelcome({ monthLabel }: DashboardWelcomeProps) {
+export function DashboardWelcome({
+  monthLabel,
+  onPreviousMonth,
+  onNextMonth,
+}: DashboardWelcomeProps) {
   const { user } = useCurrentUser();
   const firstName = (user?.name ?? '').split(' ')[0] || 'por aí';
 
   return (
-    <Box className="findu-anim-fade-in" sx={{ pt: 0.25 }}>
+    <Box className="findu-anim-fade-in" sx={{ pt: 0.25, minWidth: 0 }}>
       <Typography
         variant="body2"
         color="text.secondary"
@@ -28,18 +37,31 @@ export function DashboardWelcome({ monthLabel }: DashboardWelcomeProps) {
       >
         {greetingForNow()}, {firstName}
       </Typography>
-      <Typography
-        component="h1"
-        sx={{
-          fontWeight: 750,
-          letterSpacing: '-0.035em',
-          fontSize: { xs: '1.55rem', sm: '1.7rem' },
-          lineHeight: 1.15,
-          color: 'text.primary',
-        }}
-      >
-        {monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, minWidth: 0 }}>
+        <IconButton
+          aria-label="Mês anterior"
+          onClick={onPreviousMonth}
+          size="small"
+        >
+          <ChevronLeftIcon />
+        </IconButton>
+        <Typography
+          component="h1"
+          sx={{
+            fontWeight: 700,
+            letterSpacing: '-0.035em',
+            fontSize: { xs: '1.45rem', md: '1.75rem' },
+            lineHeight: 1.15,
+            color: 'text.primary',
+            minWidth: 0,
+          }}
+        >
+          {monthLabel}
+        </Typography>
+        <IconButton aria-label="Próximo mês" onClick={onNextMonth} size="small">
+          <ChevronRightIcon />
+        </IconButton>
+      </Box>
     </Box>
   );
 }

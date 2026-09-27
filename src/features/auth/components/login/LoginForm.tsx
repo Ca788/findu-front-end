@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOffOutlined';
+import { EmailField } from '@/components/common/EmailField';
+import { AuthBrandPanel } from '@/features/auth/components/AuthBrandPanel';
+import { requiredEmailSchema } from '@/utils/maskedInput';
 import { useLogin } from '@/features/auth/hooks/useLogin';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
@@ -39,7 +42,7 @@ import {
 const REMEMBER_EMAIL_KEY = 'findu.login.rememberEmail';
 
 const emailSchema = z.object({
-  email: z.email('Email inválido').min(1, 'Email obrigatório'),
+  email: requiredEmailSchema,
 });
 
 const passwordSchema = z.object({
@@ -66,6 +69,8 @@ export function LoginForm() {
 
   const emailForm = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
     defaultValues: { email: '' },
   });
 
@@ -94,7 +99,8 @@ export function LoginForm() {
 
   const finishLogin = () => {
     showSuccess('Login realizado com sucesso');
-    router.replace(AppRoutePaths.CHAT);
+    const next = new URLSearchParams(window.location.search).get('next');
+    router.replace(AppRoutePaths.safeNext(next));
   };
 
   const handleEmailContinue = emailForm.handleSubmit((data) => {
@@ -219,7 +225,7 @@ export function LoginForm() {
 
   const emailValue = emailForm.watch('email');
   const passwordValue = passwordForm.watch('password');
-  const canContinueEmail = !!emailValue?.trim() && !emailForm.formState.errors.email;
+  const canContinueEmail = requiredEmailSchema.safeParse(emailValue ?? '').success;
   const canContinuePassword = !!passwordValue?.trim();
 
   return (
@@ -228,19 +234,31 @@ export function LoginForm() {
         sx={{
           minHeight: '100dvh',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: { xs: 'column', md: 'row' },
           bgcolor: '#0B1220',
-          background:
-            'radial-gradient(120% 70% at 50% -10%, rgba(47,111,224,0.28) 0%, transparent 55%), linear-gradient(180deg, #102A52 0%, #0B1220 42%, #070B14 100%)',
           color: '#fff',
-          px: 2.5,
-          pt: 'calc(0.75rem + var(--app-safe-top, 0px))',
-          pb: 'calc(1.5rem + var(--app-safe-bottom, 0px))',
         }}
       >
+        <AuthBrandPanel />
         <Box
           sx={{
-            display: 'grid',
+            flex: { xs: '1 1 auto', md: '0 0 520px' },
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: { xs: 'flex-start', md: 'center' },
+            minHeight: '100dvh',
+            px: { xs: 2.5, md: 6 },
+            pt: { xs: 'calc(0.75rem + var(--app-safe-top, 0px))', md: 6 },
+            pb: { xs: 'calc(1.5rem + var(--app-safe-bottom, 0px))', md: 6 },
+            background: {
+              xs: 'radial-gradient(120% 70% at 50% -10%, rgba(47,111,224,0.28) 0%, transparent 55%), linear-gradient(180deg, #102A52 0%, #0B1220 42%, #070B14 100%)',
+              md: '#0B1220',
+            },
+          }}
+        >
+        <Box
+          sx={{
+            display: { xs: 'grid', md: 'none' },
             gridTemplateColumns: '40px 1fr 40px',
             alignItems: 'center',
             mb: 4,
@@ -270,7 +288,7 @@ export function LoginForm() {
           key={step}
           className="findu-anim-tab-enter"
           sx={{
-            flex: 1,
+            flex: { xs: 1, md: '0 0 auto' },
             display: 'flex',
             flexDirection: 'column',
             maxWidth: 440,
@@ -283,7 +301,7 @@ export function LoginForm() {
               component="form"
               onSubmit={handleEmailContinue}
               noValidate
-              sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+              sx={{ display: 'flex', flexDirection: 'column', flex: { xs: 1, md: '0 0 auto' } }}
             >
               <Typography
                 component="h1"
@@ -298,18 +316,22 @@ export function LoginForm() {
                 Digite seu e-mail
               </Typography>
 
-              <TextField
-                label="Seu e-mail"
-                placeholder="Digite seu e-mail"
-                type="email"
-                autoComplete="email"
-                autoFocus
-                fullWidth
-                {...emailForm.register('email')}
-                error={!!emailForm.formState.errors.email}
-                helperText={emailForm.formState.errors.email?.message}
-                slotProps={{ inputLabel: { shrink: true } }}
-                sx={fieldSx}
+              <Controller
+                name="email"
+                control={emailForm.control}
+                render={({ field, fieldState }) => (
+                  <EmailField
+                    label="Seu e-mail"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    autoFocus
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    slotProps={{ inputLabel: { shrink: true } }}
+                    sx={fieldSx}
+                  />
+                )}
               />
 
               <FormControlLabel
@@ -350,7 +372,7 @@ export function LoginForm() {
                 </Button>
               )}
 
-              <Box sx={{ flex: 1 }} />
+              <Box sx={{ flex: 1, display: { md: 'none' } }} />
 
               <Button
                 type="submit"
@@ -383,8 +405,23 @@ export function LoginForm() {
               component="form"
               onSubmit={handlePasswordContinue}
               noValidate
-              sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+              sx={{ display: 'flex', flexDirection: 'column', flex: { xs: 1, md: '0 0 auto' } }}
             >
+              <Button
+                type="button"
+                onClick={handleBack}
+                startIcon={<ArrowBackIcon />}
+                sx={{
+                  display: { xs: 'none', md: 'inline-flex' },
+                  alignSelf: 'flex-start',
+                  mb: 2,
+                  px: 0,
+                  color: 'rgba(255,255,255,0.8)',
+                  fontWeight: 600,
+                }}
+              >
+                Trocar e-mail
+              </Button>
               <Typography
                 component="h1"
                 sx={{
@@ -437,7 +474,7 @@ export function LoginForm() {
                 sx={fieldSx}
               />
 
-              <Box sx={{ flex: 1 }} />
+              <Box sx={{ flex: 1, display: { md: 'none' } }} />
 
               <Button
                 type="submit"
@@ -466,6 +503,7 @@ export function LoginForm() {
               </Typography>
             </Box>
           )}
+        </Box>
         </Box>
       </Box>
 
