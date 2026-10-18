@@ -36,12 +36,21 @@ export function SuggestedPromptsSwiper({
 }: SuggestedPromptsSwiperProps) {
   return (
     <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%',
+        px: { xs: 1.25, sm: 2, md: 3 },
+      }}
+    >
+    <Box
       aria-label="Sugestões rápidas"
       sx={{
         display: 'flex',
         gap: 1,
         overflowX: 'auto',
-        px: { xs: 1.5, md: 3 },
+        width: 'max-content',
+        maxWidth: '100%',
         py: 1.25,
         scrollSnapType: 'x mandatory',
         WebkitOverflowScrolling: 'touch',
@@ -107,6 +116,7 @@ export function SuggestedPromptsSwiper({
           </Box>
         );
       })}
+    </Box>
     </Box>
   );
 }
