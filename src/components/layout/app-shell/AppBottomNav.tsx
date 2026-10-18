@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { mobileTabNavItems } from '@/components/layout/app-shell/appNavItems';
+import {
+  isImmersiveChatPath,
+  mobileTabNavItems,
+} from '@/components/layout/app-shell/appNavItems';
 import {
   APP_BOTTOM_NAV_FLOAT_GAP,
   APP_BOTTOM_NAV_HEIGHT,
@@ -17,7 +20,7 @@ export function AppBottomNav() {
   const { isDesktop } = useDevice();
   const { keyboardOpen } = useAppShell();
 
-  if (isDesktop || keyboardOpen) return null;
+  if (isDesktop || keyboardOpen || isImmersiveChatPath(pathname)) return null;
 
   return (
     <Box

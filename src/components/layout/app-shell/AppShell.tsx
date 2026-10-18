@@ -10,6 +10,7 @@ import {
 import { AppDrawer } from '@/components/layout/app-shell/AppDrawer';
 import { AppHeader } from '@/components/layout/app-shell/AppHeader';
 import { AppBottomNav } from '@/components/layout/app-shell/AppBottomNav';
+import { isImmersiveChatPath } from '@/components/layout/app-shell/appNavItems';
 import { RecentConversationsDrawer } from '@/features/chat/components/conversations/RecentConversationsDrawer';
 
 interface AppShellProps {
@@ -18,11 +19,20 @@ interface AppShellProps {
 
 function AppShellLayout({ children }: AppShellProps) {
   const pathname = usePathname() ?? '';
-  const { recentOpen, closeRecent, keyboardOpen, keyboardInset } = useAppShell();
+  const { isDesktop, recentOpen, closeRecent, keyboardOpen, keyboardInset } =
+    useAppShell();
+  const immersiveChat = !isDesktop && isImmersiveChatPath(pathname);
 
   useEffect(() => {
     document.documentElement.dataset.keyboard = keyboardOpen ? 'open' : 'closed';
   }, [keyboardOpen]);
+
+  useEffect(() => {
+    document.documentElement.dataset.immersive = immersiveChat ? 'true' : 'false';
+    return () => {
+      delete document.documentElement.dataset.immersive;
+    };
+  }, [immersiveChat]);
 
   return (
     <Box

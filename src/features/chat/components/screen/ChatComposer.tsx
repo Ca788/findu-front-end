@@ -178,8 +178,8 @@ export function ChatComposer({
     <Box
       sx={{
         px: { xs: 1.25, sm: 2, md: 3 },
-        pt: 1,
-        pb: 1.25,
+        pt: 0.75,
+        pb: 0.75,
         mx: 'auto',
         width: '100%',
         maxWidth: 880,

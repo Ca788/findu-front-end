@@ -1,6 +1,28 @@
 export type MessageRole = 'user' | 'assistant' | 'system';
 export type MessageKind = 'text' | 'audio';
 export type MessageStatus = 'pending' | 'processing' | 'completed' | 'failed';
+export type MessageActionKind = 'send_message' | 'navigate';
+export type MessageActionVariant = 'primary' | 'secondary';
+
+export interface MessageAction {
+  id: string;
+  label: string;
+  kind: MessageActionKind;
+  message?: string;
+  href?: string;
+  variant?: MessageActionVariant;
+}
+
+export interface MessageCardField {
+  label: string;
+  value: string;
+}
+
+export interface MessageCard {
+  kind: string;
+  title: string;
+  fields: MessageCardField[];
+}
 
 export interface MessageAttachment {
   id: number | string;
@@ -24,6 +46,8 @@ export interface ChatMessage {
   error?: Record<string, unknown> | null;
   audio_url?: string | null;
   attachments?: MessageAttachment[];
+  actions?: MessageAction[];
+  card?: MessageCard | null;
   created_at: string;
   updated_at: string;
 }

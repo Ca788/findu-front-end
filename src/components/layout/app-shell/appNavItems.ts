@@ -12,6 +12,7 @@ import ReplayIcon from '@mui/icons-material/ReplayOutlined';
 import CreditScoreIcon from '@mui/icons-material/CreditScoreOutlined';
 import PersonIcon from '@mui/icons-material/PersonOutlineOutlined';
 import AppsIcon from '@mui/icons-material/AppsOutlined';
+import ShowChartIcon from '@mui/icons-material/ShowChartOutlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
 export interface AppNavItem {
@@ -89,6 +90,12 @@ export const appNavItems: AppNavItem[] = [
     section: 'secondary',
   },
   {
+    label: 'Investimentos',
+    href: AppRoutePaths.INVESTMENTS,
+    icon: ShowChartIcon,
+    section: 'secondary',
+  },
+  {
     label: 'Conta',
     href: AppRoutePaths.PROFILE,
     icon: PersonIcon,
@@ -144,6 +151,8 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname.startsWith(`${AppRoutePaths.INSTALLMENTS}/`) ||
       pathname === AppRoutePaths.RECEIPTS ||
       pathname.startsWith(`${AppRoutePaths.RECEIPTS}/`) ||
+      pathname === AppRoutePaths.INVESTMENTS ||
+      pathname.startsWith(`${AppRoutePaths.INVESTMENTS}/`) ||
       pathname.startsWith(APP_CHAT_HISTORY_PATH),
   },
 ];
@@ -170,6 +179,11 @@ export const moreOrganizeItems: AppNavItem[] = [
     href: AppRoutePaths.INSTALLMENTS,
     icon: CreditScoreIcon,
   },
+  {
+    label: 'Investimentos',
+    href: AppRoutePaths.INVESTMENTS,
+    icon: ShowChartIcon,
+  },
 ];
 
 export const moreAccountItems: AppNavItem[] = [
@@ -184,6 +198,14 @@ export const moreAccountItems: AppNavItem[] = [
     icon: HistoryIcon,
   },
 ];
+
+export function isImmersiveChatPath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === AppRoutePaths.CHAT ||
+    pathname.startsWith(`${AppRoutePaths.CHAT}/c`)
+  );
+}
 
 export function sectionTitle(pathname: string): string {
   const active = findActiveNavItem(pathname);

@@ -4,20 +4,31 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { ThinkingStatus } from '@/features/chat/components/messages/ThinkingStatus';
+import { AssistantRichText } from '@/features/chat/components/messages/AssistantRichText';
+import { StructuredMessage } from '@/features/chat/components/messages/StructuredMessage';
 import { formatTimeBR } from '@/utils/date';
 import { AttachmentChip } from '@/features/chat/components/messages/AttachmentChip';
 import { AudioMessagePlayer } from '@/features/chat/components/messages/AudioMessagePlayer';
-import type { ChatMessage } from '@/features/chat/models/message.model';
+import type {
+  ChatMessage,
+  MessageAction,
+} from '@/features/chat/models/message.model';
 
 interface MessageBubbleProps {
   message: ChatMessage;
+  onAction?: (action: MessageAction) => void;
+  actionsDisabled?: boolean;
 }
 
 function isPending(status: ChatMessage['status']) {
   return status === 'pending' || status === 'processing';
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({
+  message,
+  onAction,
+  actionsDisabled = false,
+}: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const failed = message.status === 'failed';
   const pending = isPending(message.status);
@@ -27,6 +38,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const hasAttachments = !!message.attachments && message.attachments.length > 0;
   const hasContent = hasBody || hasAudio || hasAttachments;
   const isThinking = !isUser && pending && !hasContent;
+  const showStructure =
+    !isUser && !pending && ((message.actions?.length ?? 0) > 0 || !!message.card);
 
   if (isThinking) {
     return (
@@ -71,7 +84,6 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               ? 'text.primary'
               : 'primary.contrastText'
             : 'text.primary',
-          border: isUser ? 'none' : 'none',
           wordBreak: 'break-word',
         })}
       >
@@ -84,40 +96,23 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           </Box>
         )}
         {hasBody ? (
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              fontSize: 15,
-              lineHeight: 1.65,
-              letterSpacing: 0.01,
-            }}
-          >
-            {message.body}
-            {isStreaming && (
-              <Box
-                component="span"
-                aria-hidden
-                sx={{
-                  display: 'inline-block',
-                  width: 7,
-                  height: 7,
-                  ml: 0.75,
-                  mb: '1px',
-                  borderRadius: '50%',
-                  bgcolor: 'primary.main',
-                  verticalAlign: 'baseline',
-                  animation: 'fu-stream-dot 1.1s ease-in-out infinite',
-                  '@keyframes fu-stream-dot': {
-                    '0%, 100%': { opacity: 0.35, transform: 'scale(0.85)' },
-                    '50%': { opacity: 1, transform: 'scale(1)' },
-                  },
-                }}
-              />
-            )}
-          </Typography>
+          isUser ? (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontSize: 15,
+                lineHeight: 1.65,
+                letterSpacing: 0.01,
+              }}
+            >
+              {message.body}
+            </Typography>
+          ) : (
+            <AssistantRichText text={message.body ?? ''} streaming={isStreaming} />
+          )
         ) : null}
         {hasAttachments && (
           <Box sx={{ mt: hasBody || hasAudio ? 1 : 0, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -132,6 +127,15 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           </Typography>
         )}
       </Box>
+
+      {showStructure ? (
+        <StructuredMessage
+          card={message.card}
+          actions={message.actions}
+          disabled={actionsDisabled}
+          onAction={onAction}
+        />
+      ) : null}
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 0.5 }}>
         {failed && <ErrorOutlineIcon fontSize="small" color="error" />}

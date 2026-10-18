@@ -1,12 +1,15 @@
 'use client';
 
 import { ReactNode } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
+import DialogTitle from '@mui/material/DialogTitle';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import Typography from '@mui/material/Typography';
 import { useDevice } from '@/hooks/useDevice';
 
 interface ConfirmDialogProps {
@@ -32,7 +35,67 @@ export function ConfirmDialog({
   onClose,
   onConfirm,
 }: ConfirmDialogProps) {
-  const { isMobile } = useDevice();
+  const { isDesktop } = useDevice();
+  const sheet = !isDesktop;
+
+  if (sheet) {
+    return (
+      <SwipeableDrawer
+        anchor="bottom"
+        open={open}
+        onClose={onClose}
+        onOpen={() => undefined}
+        disableSwipeToOpen
+        slotProps={{
+          paper: {
+            sx: {
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              bgcolor: 'background.paper',
+              px: 2,
+              pt: 1,
+              pb: 'max(16px, env(safe-area-inset-bottom))',
+              maxWidth: 480,
+              mx: 'auto',
+              width: '100%',
+            },
+          },
+        }}
+      >
+        <Box
+          aria-hidden
+          sx={{
+            width: 40,
+            height: 4,
+            borderRadius: 999,
+            bgcolor: 'divider',
+            mx: 'auto',
+            mb: 2,
+          }}
+        />
+        <Typography sx={{ fontWeight: 700, fontSize: 18, mb: 1 }}>{title}</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }} component="div">
+          {description}
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Button
+            color={confirmColor}
+            variant="contained"
+            onClick={onConfirm}
+            disabled={isLoading}
+            size="large"
+            fullWidth
+            sx={{ borderRadius: 999, py: 1.35, fontWeight: 700 }}
+          >
+            {isLoading ? 'Processando...' : confirmLabel}
+          </Button>
+          <Button onClick={onClose} disabled={isLoading} size="large" fullWidth>
+            {cancelLabel}
+          </Button>
+        </Box>
+      </SwipeableDrawer>
+    );
+  }
 
   return (
     <Dialog
@@ -40,49 +103,16 @@ export function ConfirmDialog({
       onClose={onClose}
       fullWidth
       maxWidth="xs"
-      fullScreen={isMobile}
       slotProps={{
-        paper: {
-          sx: isMobile
-            ? {
-                m: 0,
-                borderRadius: 0,
-                maxHeight: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-              }
-            : { borderRadius: 3 },
-        },
+        paper: { sx: { borderRadius: 3 } },
       }}
     >
-      <DialogTitle
-        sx={{
-          fontWeight: 700,
-          pt: isMobile ? 'max(16px, env(safe-area-inset-top))' : 2,
-        }}
-      >
-        {title}
-      </DialogTitle>
-      <DialogContent sx={{ flex: isMobile ? '0 0 auto' : undefined }}>
+      <DialogTitle sx={{ fontWeight: 700 }}>{title}</DialogTitle>
+      <DialogContent>
         <DialogContentText component="div">{description}</DialogContentText>
       </DialogContent>
-      <DialogActions
-        sx={{
-          px: 2,
-          pb: isMobile ? 'max(12px, env(safe-area-inset-bottom))' : 2,
-          gap: 1,
-          flexDirection: isMobile ? 'column-reverse' : 'row',
-          '& > :not(style)': isMobile ? { width: '100%', m: 0 } : undefined,
-        }}
-      >
-        <Button
-          onClick={onClose}
-          disabled={isLoading}
-          size={isMobile ? 'large' : 'medium'}
-          fullWidth={isMobile}
-        >
+      <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+        <Button onClick={onClose} disabled={isLoading}>
           {cancelLabel}
         </Button>
         <Button
@@ -90,8 +120,6 @@ export function ConfirmDialog({
           variant="contained"
           onClick={onConfirm}
           disabled={isLoading}
-          size={isMobile ? 'large' : 'medium'}
-          fullWidth={isMobile}
         >
           {isLoading ? 'Processando...' : confirmLabel}
         </Button>
