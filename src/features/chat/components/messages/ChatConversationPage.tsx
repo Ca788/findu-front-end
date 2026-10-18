@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -14,6 +14,8 @@ import { ChatLayout } from '@/features/chat/components/screen/ChatLayout';
 import { SuggestedPromptsSwiper } from '@/features/chat/components/screen/SuggestedPromptsSwiper';
 import type { ChatSuggestedPrompt } from '@/features/chat/constants/chatSuggestedPrompts';
 import type { MessageAction, SendMessageInput } from '@/features/chat/models/message.model';
+
+const ACTION_IDLE_MS = 8000;
 
 interface ChatConversationPageProps {
   conversationId: string;
@@ -65,6 +67,20 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
   const awaitingReply =
     isSending ||
     (lastMessage?.role === 'user' && lastMessage.status !== 'failed');
+  const lastIsStreaming =
+    lastMessage?.role === 'assistant' &&
+    (lastMessage.status === 'pending' || lastMessage.status === 'processing');
+  const chatBusy = awaitingReply || lastIsStreaming;
+  const [revealExtras, setRevealExtras] = useState(true);
+
+  useEffect(() => {
+    if (chatBusy) {
+      setRevealExtras(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setRevealExtras(true), ACTION_IDLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [chatBusy, messages.length]);
 
   return (
     <ChatLayout
@@ -80,12 +96,24 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
             messages={messages}
             isLoading={isLoading}
             awaitingReply={awaitingReply}
+            revealActions={revealExtras}
             onAction={handleAction}
           />
         </>
       }
       suggestions={
-        <SuggestedPromptsSwiper onSelectPrompt={handleSelectPrompt} disabled={awaitingReply} />
+        <Box
+          sx={{
+            overflow: 'hidden',
+            maxHeight: revealExtras ? 220 : 0,
+            opacity: revealExtras ? 1 : 0,
+            pointerEvents: revealExtras ? 'auto' : 'none',
+            transition: 'max-height 280ms ease, opacity 220ms ease',
+            '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+          }}
+        >
+          <SuggestedPromptsSwiper onSelectPrompt={handleSelectPrompt} disabled={awaitingReply} />
+        </Box>
       }
       composer={
         <ChatComposer

@@ -18,6 +18,7 @@ interface MessageBubbleProps {
   message: ChatMessage;
   onAction?: (action: MessageAction) => void;
   actionsDisabled?: boolean;
+  revealActions?: boolean;
 }
 
 function isPending(status: ChatMessage['status']) {
@@ -28,6 +29,7 @@ export function MessageBubble({
   message,
   onAction,
   actionsDisabled = false,
+  revealActions = true,
 }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const failed = message.status === 'failed';
@@ -88,14 +90,15 @@ export function MessageBubble({
         })}
       >
         {hasAudio && (
-          <Box sx={{ mb: hasBody ? 1 : 0 }}>
+          <Box sx={{ mb: hasAudio && hasBody && !isUser ? 1 : 0 }}>
             <AudioMessagePlayer
               url={message.audio_url as string}
               tone={isUser ? 'user' : 'assistant'}
+              transcript={isUser ? message.body : null}
             />
           </Box>
         )}
-        {hasBody ? (
+        {hasBody && !hasAudio ? (
           isUser ? (
             <Typography
               variant="body2"
@@ -113,6 +116,9 @@ export function MessageBubble({
           ) : (
             <AssistantRichText text={message.body ?? ''} streaming={isStreaming} />
           )
+        ) : null}
+        {hasBody && hasAudio && !isUser ? (
+          <AssistantRichText text={message.body ?? ''} streaming={isStreaming} />
         ) : null}
         {hasAttachments && (
           <Box sx={{ mt: hasBody || hasAudio ? 1 : 0, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -133,6 +139,7 @@ export function MessageBubble({
           card={message.card}
           actions={message.actions}
           disabled={actionsDisabled}
+          visible={revealActions}
           onAction={onAction}
         />
       ) : null}
