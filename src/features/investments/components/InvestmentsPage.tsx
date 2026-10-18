@@ -179,7 +179,7 @@ function InvestmentCard({
             {positive ? '+' : ''}
             {ret.toFixed(2)}%
           </Typography>
-          <Typography variant="caption" color="text.secondary" display="block">
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
             {INVESTMENT_STATUS_LABELS[investment.status]} ·{' '}
             {formatDateBR(investment.invested_on)}
           </Typography>
