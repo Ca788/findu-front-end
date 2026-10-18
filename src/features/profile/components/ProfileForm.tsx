@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { PhoneField } from '@/components/common/PhoneField';
 import { maskBrPhone, phoneDigits } from '@/utils/maskedInput';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +32,13 @@ export function ProfileForm() {
   const { update, isLoading } = useUpdateProfile();
   const { showSuccess, showError } = useSnackbar();
   const [removeAvatar, setRemoveAvatar] = useState(false);
+  const profileStamp = user ? `${user.id}:${user.name}:${user.phone ?? ''}` : '';
+  const [syncedStamp, setSyncedStamp] = useState(profileStamp);
+
+  if (syncedStamp !== profileStamp) {
+    setSyncedStamp(profileStamp);
+    setRemoveAvatar(false);
+  }
 
   const {
     register,
@@ -39,7 +46,6 @@ export function ProfileForm() {
     reset,
     control,
     setValue,
-    watch,
     formState: { errors, isDirty },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -51,10 +57,9 @@ export function ProfileForm() {
   useEffect(() => {
     if (!user) return;
     reset(buildDefaultValues(user.name, user.phone));
-    setRemoveAvatar(false);
   }, [user, reset]);
 
-  const avatarFile = watch('avatar') ?? null;
+  const avatarFile = useWatch({ control, name: 'avatar' }) ?? null;
   const hasAvatarChange = !!avatarFile || removeAvatar;
   const canSubmit = (isDirty || hasAvatarChange) && !isLoading;
 

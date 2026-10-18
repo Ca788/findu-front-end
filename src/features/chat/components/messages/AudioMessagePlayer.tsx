@@ -19,28 +19,26 @@ export function AudioMessagePlayer({
   tone = 'assistant',
   transcript,
 }: AudioMessagePlayerProps) {
-  const [src, setSrc] = useState<string | null>(url.startsWith('blob:') ? url : null);
+  const [resolvedUrl, setResolvedUrl] = useState(url);
+  const [remoteSrc, setRemoteSrc] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
+
+  if (resolvedUrl !== url) {
+    setResolvedUrl(url);
+    setRemoteSrc(null);
+    setFailed(false);
+  }
+
+  const isBlob = url.startsWith('blob:');
+  const href = isBlob ? null : absoluteApiUrl(url);
+  const src = isBlob ? url : remoteSrc;
   const hasTranscript = !!transcript && transcript.trim().length > 0;
   const onDark = tone === 'user';
+  const unavailable = failed || (!isBlob && !href);
 
   useEffect(() => {
-    if (!url) {
-      setSrc(null);
-      return;
-    }
-    if (url.startsWith('blob:')) {
-      setSrc(url);
-      setFailed(false);
-      return;
-    }
-
-    const href = absoluteApiUrl(url);
-    if (!href) {
-      setFailed(true);
-      return;
-    }
+    if (!href) return;
 
     let objectUrl: string | null = null;
     let cancelled = false;
@@ -56,25 +54,25 @@ export function AudioMessagePlayer({
         if (cancelled) return;
         const type = response.headers.get('content-type') || '';
         if (!response.ok || type.includes('json') || type.includes('html')) {
-          setSrc(href);
+          setRemoteSrc(href);
           return;
         }
         const blob = await response.blob();
         objectUrl = URL.createObjectURL(blob);
-        setSrc(objectUrl);
+        setRemoteSrc(objectUrl);
         setFailed(false);
       })
       .catch(() => {
-        if (!cancelled) setSrc(href);
+        if (!cancelled) setRemoteSrc(href);
       });
 
     return () => {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [url]);
+  }, [href]);
 
-  if (!src && !failed) {
+  if (!src && !unavailable) {
     return (
       <Typography variant="caption" color={onDark ? 'inherit' : 'text.secondary'} sx={{ opacity: 0.8 }}>
         Carregando áudio…
@@ -84,7 +82,7 @@ export function AudioMessagePlayer({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 0.75, minWidth: 220 }}>
-      {src && !failed ? (
+      {src && !unavailable ? (
         <audio
           controls
           playsInline

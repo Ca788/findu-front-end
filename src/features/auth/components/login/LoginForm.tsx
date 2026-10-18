@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
@@ -81,20 +81,20 @@ export function LoginForm() {
 
   useEffect(() => {
     void (async () => {
+      try {
+        const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
+        if (saved) {
+          emailForm.setValue('email', saved);
+          setRemember(true);
+        }
+      } catch {
+        /* ignore */
+      }
+
       const available = await isBiometricAvailable();
       setBioAvailable(available);
       setBioEnabled(available && isBiometricEnabled());
     })();
-
-    try {
-      const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
-      if (saved) {
-        emailForm.setValue('email', saved);
-        setRemember(true);
-      }
-    } catch {
-      /* ignore */
-    }
   }, [emailForm]);
 
   const finishLogin = () => {
@@ -223,8 +223,8 @@ export function LoginForm() {
     router.push(AppRoutePaths.ROOT);
   };
 
-  const emailValue = emailForm.watch('email');
-  const passwordValue = passwordForm.watch('password');
+  const emailValue = useWatch({ control: emailForm.control, name: 'email' });
+  const passwordValue = useWatch({ control: passwordForm.control, name: 'password' });
   const canContinueEmail = requiredEmailSchema.safeParse(emailValue ?? '').success;
   const canContinuePassword = !!passwordValue?.trim();
 

@@ -80,13 +80,16 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
     lastMessage?.role === 'assistant' &&
     (lastMessage.status === 'pending' || lastMessage.status === 'processing');
   const chatBusy = awaitingReply || lastIsStreaming;
-  const [revealExtras, setRevealExtras] = useState(true);
+  const [busy, setBusy] = useState(chatBusy);
+  const [revealExtras, setRevealExtras] = useState(!chatBusy);
+
+  if (busy !== chatBusy) {
+    setBusy(chatBusy);
+    if (chatBusy) setRevealExtras(false);
+  }
 
   useEffect(() => {
-    if (chatBusy) {
-      setRevealExtras(false);
-      return;
-    }
+    if (chatBusy) return;
     const timer = window.setTimeout(() => setRevealExtras(true), ACTION_IDLE_MS);
     return () => window.clearTimeout(timer);
   }, [chatBusy, messages.length]);

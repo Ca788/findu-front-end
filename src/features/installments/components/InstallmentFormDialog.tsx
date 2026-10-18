@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import Stack from '@mui/material/Stack';
@@ -68,7 +68,6 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
     handleSubmit,
     reset,
     control,
-    watch,
     formState: { errors },
   } = useForm<InstallmentFormValues>({
     resolver: zodResolver(installmentFormSchema),
@@ -90,8 +89,8 @@ export function InstallmentFormDialog({ open, plan, onClose }: InstallmentFormDi
     });
   }, [open, plan, reset]);
 
-  const monthlyRaw = watch('monthly_amount');
-  const countRaw = watch('total_installments');
+  const monthlyRaw = useWatch({ control, name: 'monthly_amount' });
+  const countRaw = useWatch({ control, name: 'total_installments' });
   const preview =
     (parseAmountInput(monthlyRaw ?? '') ?? 0) * Number(countRaw || 0);
 
