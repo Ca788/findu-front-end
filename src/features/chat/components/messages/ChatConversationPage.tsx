@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
+import { useSnackbar } from '@/providers/SnackbarProvider';
 import { useConversation } from '@/features/chat/hooks/useConversation';
 import { useConversationMessages } from '@/features/chat/hooks/useConversationMessages';
-import { useSendMessage } from '@/features/chat/hooks/useSendMessage';
+import { takePendingSend, useSendMessage } from '@/features/chat/hooks/useSendMessage';
 import { MessagesList } from '@/features/chat/components/messages/MessagesList';
 import { ChatComposer } from '@/features/chat/components/screen/ChatComposer';
 import { ChatLayout } from '@/features/chat/components/screen/ChatLayout';
@@ -23,13 +24,23 @@ interface ChatConversationPageProps {
 
 export function ChatConversationPage({ conversationId }: ChatConversationPageProps) {
   const router = useRouter();
+  const { showError } = useSnackbar();
   useConversation(conversationId);
   const { messages, status, addOptimistic, markOptimisticFailed } =
     useConversationMessages(conversationId);
-  const { send, isSending } = useSendMessage(conversationId, {
+  const { send } = useSendMessage(conversationId, {
     onOptimistic: addOptimistic,
-    onOptimisticFailed: markOptimisticFailed,
+    onOptimisticFailed: (clientMessageId) => {
+      markOptimisticFailed(clientMessageId);
+      showError('Erro ao enviar mensagem');
+    },
   });
+
+  useEffect(() => {
+    const pending = takePendingSend(conversationId);
+    if (!pending) return;
+    void send(pending, { skipOptimistic: true });
+  }, [conversationId, send]);
 
   const handleSubmit = useCallback(
     (input: SendMessageInput) => send(input),
@@ -38,10 +49,9 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
 
   const handleSelectPrompt = useCallback(
     (prompt: ChatSuggestedPrompt) => {
-      if (isSending) return;
       void send({ body: prompt.message });
     },
-    [isSending, send],
+    [send],
   );
 
   const handleAction = useCallback(
@@ -62,11 +72,10 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
     [router, send],
   );
 
-  const isLoading = status === 'loading';
+  const isLoading = status === 'loading' && messages.length === 0;
   const lastMessage = messages[messages.length - 1];
   const awaitingReply =
-    isSending ||
-    (lastMessage?.role === 'user' && lastMessage.status !== 'failed');
+    lastMessage?.role === 'user' && lastMessage.status !== 'failed';
   const lastIsStreaming =
     lastMessage?.role === 'assistant' &&
     (lastMessage.status === 'pending' || lastMessage.status === 'processing');
@@ -118,7 +127,6 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
       composer={
         <ChatComposer
           onSubmit={handleSubmit}
-          isSending={isSending}
           placeholder="Pergunte ao Findu…"
         />
       }

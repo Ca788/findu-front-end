@@ -92,30 +92,26 @@ export function ChatComposer({
     if (galleryInputRef.current) galleryInputRef.current.value = '';
     if (cameraInputRef.current) cameraInputRef.current.value = '';
     if (filesInputRef.current) filesInputRef.current.value = '';
-    try {
-      await onSubmit(payload);
-    } catch (err) {
+    void onSubmit(payload).catch((err) => {
       const mapped = AppErrorResultMapper.fromAxiosError(
         err as AxiosError<ErrorResponse>,
       );
       showError(mapped.data.message ?? 'Erro ao enviar mensagem');
-    }
+    });
   };
 
   const submitAudioBlob = async (blob: Blob) => {
     if (isBusy) return;
     recorder.reset();
-    try {
-      await onSubmit({
-        audio: blob,
-        client_message_id: createClientId(),
-      });
-    } catch (err) {
+    void onSubmit({
+      audio: blob,
+      client_message_id: createClientId(),
+    }).catch((err) => {
       const mapped = AppErrorResultMapper.fromAxiosError(
         err as AxiosError<ErrorResponse>,
       );
       showError(mapped.data.message ?? 'Erro ao enviar áudio');
-    }
+    });
   };
 
   const submitAudio = async () => {

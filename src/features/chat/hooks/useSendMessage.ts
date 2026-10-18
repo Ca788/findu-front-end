@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { sendMessage } from '@/features/chat/gateway/messages.gateway';
 import type { ChatMessage, SendMessageInput } from '@/features/chat/models/message.model';
 
@@ -9,14 +9,27 @@ interface UseSendMessageOptions {
   onOptimisticFailed?: (clientMessageId: string) => void;
 }
 
-function createClientId(): string {
+interface PendingSend {
+  conversationId: string;
+  input: SendMessageInput;
+  optimistic: ChatMessage;
+}
+
+interface SendOptions {
+  skipOptimistic?: boolean;
+}
+
+const startedPending = new Set<string>();
+let pendingSend: PendingSend | null = null;
+
+export function createClientId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID();
   }
   return `tmp-${Date.now()}`;
 }
 
-function buildOptimisticMessage(
+export function buildOptimisticMessage(
   conversationId: string,
   input: SendMessageInput,
 ): ChatMessage {
@@ -47,11 +60,42 @@ function buildOptimisticMessage(
   };
 }
 
+export function stashPendingSend(
+  conversationId: string,
+  input: SendMessageInput,
+  optimistic: ChatMessage,
+): void {
+  pendingSend = {
+    conversationId,
+    input,
+    optimistic: { ...optimistic, conversation_id: conversationId },
+  };
+  startedPending.delete(conversationId);
+}
+
+export function peekPendingOptimistic(conversationId: string): ChatMessage | undefined {
+  if (pendingSend?.conversationId !== conversationId) return undefined;
+  return pendingSend.optimistic;
+}
+
+export function takePendingSend(conversationId: string): SendMessageInput | undefined {
+  if (pendingSend?.conversationId !== conversationId) return undefined;
+  if (startedPending.has(conversationId)) return undefined;
+  startedPending.add(conversationId);
+  return pendingSend.input;
+}
+
+export function clearPendingSend(conversationId: string): void {
+  if (pendingSend?.conversationId === conversationId) {
+    pendingSend = null;
+  }
+  startedPending.delete(conversationId);
+}
+
 export function useSendMessage(
   conversationId: string,
   options: UseSendMessageOptions = {},
 ) {
-  const [isSending, setIsSending] = useState(false);
   const optionsRef = useRef(options);
 
   useEffect(() => {
@@ -59,29 +103,36 @@ export function useSendMessage(
   }, [options]);
 
   const send = useCallback(
-    async (input: SendMessageInput): Promise<ChatMessage> => {
+    async (input: SendMessageInput, sendOptions: SendOptions = {}): Promise<ChatMessage> => {
       const payload: SendMessageInput = {
         ...input,
         client_message_id: input.client_message_id || createClientId(),
       };
 
-      const optimistic = buildOptimisticMessage(conversationId, payload);
-      optionsRef.current.onOptimistic?.(optimistic);
-      setIsSending(true);
+      const optimistic =
+        (sendOptions.skipOptimistic ? peekPendingOptimistic(conversationId) : undefined) ??
+        buildOptimisticMessage(conversationId, payload);
 
-      try {
-        return await sendMessage(conversationId, payload);
-      } catch (err) {
-        if (payload.client_message_id) {
-          optionsRef.current.onOptimisticFailed?.(payload.client_message_id);
-        }
-        throw err;
-      } finally {
-        setIsSending(false);
+      if (!sendOptions.skipOptimistic) {
+        optionsRef.current.onOptimistic?.(optimistic);
       }
+
+      void sendMessage(conversationId, payload)
+        .then((created) => {
+          optionsRef.current.onOptimistic?.(created);
+          clearPendingSend(conversationId);
+        })
+        .catch(() => {
+          if (payload.client_message_id) {
+            optionsRef.current.onOptimisticFailed?.(payload.client_message_id);
+          }
+          clearPendingSend(conversationId);
+        });
+
+      return optimistic;
     },
     [conversationId],
   );
 
-  return { send, isSending };
+  return { send };
 }
