@@ -34,10 +34,13 @@ function upsert(messages: ChatMessage[], incoming: ChatMessage): ChatMessage[] {
     ...incoming,
     client_message_id:
       incoming.client_message_id ?? previous.client_message_id ?? null,
+    audio_url: incoming.audio_url || previous.audio_url,
     attachments:
       incoming.attachments && incoming.attachments.length > 0
         ? incoming.attachments
         : previous.attachments,
+    actions: incoming.actions ?? previous.actions,
+    card: incoming.card ?? previous.card,
   };
   return next;
 }

@@ -5,12 +5,13 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { MessageBubble } from '@/features/chat/components/messages/MessageBubble';
 import { ThinkingStatus } from '@/features/chat/components/messages/ThinkingStatus';
-import type { ChatMessage } from '@/features/chat/models/message.model';
+import type { ChatMessage, MessageAction } from '@/features/chat/models/message.model';
 
 interface MessagesListProps {
   messages: ChatMessage[];
   isLoading: boolean;
   awaitingReply?: boolean;
+  onAction?: (action: MessageAction) => void;
 }
 
 function isLiveAssistant(message: ChatMessage | undefined): boolean {
@@ -22,6 +23,7 @@ export function MessagesList({
   messages,
   isLoading,
   awaitingReply = false,
+  onAction,
 }: MessagesListProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const last = messages[messages.length - 1];
@@ -70,7 +72,12 @@ export function MessagesList({
       }}
     >
       {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} />
+        <MessageBubble
+          key={message.id}
+          message={message}
+          onAction={onAction}
+          actionsDisabled={awaitingReply}
+        />
       ))}
       {showPlaceholderThinking && <ThinkingStatus urgent />}
       <div ref={bottomRef} />

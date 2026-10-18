@@ -3,16 +3,15 @@
 import { type ReactNode } from 'react';
 import Box from '@mui/material/Box';
 import { useAppShell } from '@/components/layout/app-shell/AppShellContext';
-import { useDevice } from '@/hooks/useDevice';
 
 interface ChatLayoutProps {
   topbar?: ReactNode;
   messages: ReactNode;
+  suggestions?: ReactNode;
   composer: ReactNode;
 }
 
-export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
-  const { isDesktop } = useDevice();
+export function ChatLayout({ topbar, messages, suggestions, composer }: ChatLayoutProps) {
   const { keyboardOpen } = useAppShell();
 
   return (
@@ -49,16 +48,16 @@ export function ChatLayout({ topbar, messages, composer }: ChatLayoutProps) {
       >
         {messages}
       </Box>
+      {suggestions && !keyboardOpen ? (
+        <Box sx={{ flexShrink: 0 }}>{suggestions}</Box>
+      ) : null}
       <Box
         sx={{
           flexShrink: 0,
           bgcolor: 'background.default',
           borderTop: '1px solid',
           borderColor: 'divider',
-          paddingBottom:
-            !isDesktop && !keyboardOpen
-              ? 'var(--app-bottom-nav-space)'
-              : 'var(--app-safe-bottom)',
+          pb: keyboardOpen ? 0 : 'var(--app-safe-bottom)',
         }}
       >
         {composer}

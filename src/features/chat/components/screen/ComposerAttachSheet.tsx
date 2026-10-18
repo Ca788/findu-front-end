@@ -1,7 +1,6 @@
 'use client';
 
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Typography from '@mui/material/Typography';
@@ -167,16 +166,20 @@ export function ComposerAttachSheet({
               }),
             })}
           >
-            <IconButton
-              size="small"
-              tabIndex={-1}
+            <Box
+              aria-hidden
               sx={{
+                width: 34,
+                height: 34,
+                borderRadius: '50%',
+                display: 'grid',
+                placeItems: 'center',
                 bgcolor: 'action.hover',
-                pointerEvents: 'none',
+                flexShrink: 0,
               }}
             >
               <Icon fontSize="small" />
-            </IconButton>
+            </Box>
             <Box>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {title}

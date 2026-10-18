@@ -1,23 +1,26 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useConversation } from '@/features/chat/hooks/useConversation';
 import { useConversationMessages } from '@/features/chat/hooks/useConversationMessages';
 import { useSendMessage } from '@/features/chat/hooks/useSendMessage';
-import { ChatConversationHeader } from '@/features/chat/components/messages/ChatConversationHeader';
 import { MessagesList } from '@/features/chat/components/messages/MessagesList';
 import { ChatComposer } from '@/features/chat/components/screen/ChatComposer';
 import { ChatLayout } from '@/features/chat/components/screen/ChatLayout';
-import type { SendMessageInput } from '@/features/chat/models/message.model';
+import { SuggestedPromptsSwiper } from '@/features/chat/components/screen/SuggestedPromptsSwiper';
+import type { ChatSuggestedPrompt } from '@/features/chat/constants/chatSuggestedPrompts';
+import type { MessageAction, SendMessageInput } from '@/features/chat/models/message.model';
 
 interface ChatConversationPageProps {
   conversationId: string;
 }
 
 export function ChatConversationPage({ conversationId }: ChatConversationPageProps) {
+  const router = useRouter();
   useConversation(conversationId);
   const { messages, status, addOptimistic, markOptimisticFailed } =
     useConversationMessages(conversationId);
@@ -31,6 +34,32 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
     [send],
   );
 
+  const handleSelectPrompt = useCallback(
+    (prompt: ChatSuggestedPrompt) => {
+      if (isSending) return;
+      void send({ body: prompt.message });
+    },
+    [isSending, send],
+  );
+
+  const handleAction = useCallback(
+    (action: MessageAction) => {
+      switch (action.kind) {
+        case 'send_message':
+          if (action.message) void send({ body: action.message });
+          break;
+        case 'navigate':
+          if (action.href) router.push(action.href);
+          break;
+        default: {
+          const exhaustive: never = action.kind;
+          return exhaustive;
+        }
+      }
+    },
+    [router, send],
+  );
+
   const isLoading = status === 'loading';
   const lastMessage = messages[messages.length - 1];
   const awaitingReply =
@@ -39,21 +68,6 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
 
   return (
     <ChatLayout
-      topbar={
-        <Box
-          sx={{
-            mx: 'auto',
-            width: '100%',
-            maxWidth: 880,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 0.5,
-            px: { xs: 0.5, md: 1 },
-          }}
-        >
-          <ChatConversationHeader />
-        </Box>
-      }
       messages={
         <>
           {status === 'error' && (
@@ -66,8 +80,12 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
             messages={messages}
             isLoading={isLoading}
             awaitingReply={awaitingReply}
+            onAction={handleAction}
           />
         </>
+      }
+      suggestions={
+        <SuggestedPromptsSwiper onSelectPrompt={handleSelectPrompt} disabled={awaitingReply} />
       }
       composer={
         <ChatComposer

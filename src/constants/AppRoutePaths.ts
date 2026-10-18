@@ -14,6 +14,7 @@ export class AppRoutePaths {
   static readonly RECURRENCES = '/recurrences';
   static readonly INSTALLMENTS = '/installments';
   static readonly BUDGETS = '/budgets';
+  static readonly INVESTMENTS = '/investments';
   static readonly CHAT = '/chat';
   static readonly CHAT_CONVERSATION = '/chat/c';
   static readonly PROFILE = '/profile';
