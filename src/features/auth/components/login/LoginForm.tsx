@@ -30,7 +30,9 @@ import { requiredEmailSchema } from '@/utils/maskedInput';
 import { useLogin } from '@/features/auth/hooks/useLogin';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
+import { AppStorageKeys } from '@/constants/AppStorageKeys';
 import type { AppErrorResult } from '@/infrastructure/AppResponse';
+import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import {
   disableBiometricLogin,
   enableBiometricLogin,
@@ -38,8 +40,6 @@ import {
   isBiometricEnabled,
   loginWithBiometric,
 } from '@/features/auth/services/biometric.service';
-
-const REMEMBER_EMAIL_KEY = 'findu.login.rememberEmail';
 
 const emailSchema = z.object({
   email: requiredEmailSchema,
@@ -81,14 +81,10 @@ export function LoginForm() {
 
   useEffect(() => {
     void (async () => {
-      try {
-        const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
-        if (saved) {
-          emailForm.setValue('email', saved);
-          setRemember(true);
-        }
-      } catch {
-        /* ignore */
+      const saved = appStorage.get<string>(AppStorageKeys.REMEMBER_EMAIL);
+      if (saved) {
+        emailForm.setValue('email', saved);
+        setRemember(true);
       }
 
       const available = await isBiometricAvailable();
@@ -106,17 +102,9 @@ export function LoginForm() {
   const handleEmailContinue = emailForm.handleSubmit((data) => {
     setEmail(data.email.trim());
     if (remember) {
-      try {
-        localStorage.setItem(REMEMBER_EMAIL_KEY, data.email.trim());
-      } catch {
-        /* ignore */
-      }
+      appStorage.set(AppStorageKeys.REMEMBER_EMAIL, data.email.trim());
     } else {
-      try {
-        localStorage.removeItem(REMEMBER_EMAIL_KEY);
-      } catch {
-        /* ignore */
-      }
+      appStorage.remove(AppStorageKeys.REMEMBER_EMAIL);
     }
     setStep('password');
   });
@@ -134,8 +122,11 @@ export function LoginForm() {
       if (bioAvailable) {
         try {
           await enableBiometricLogin(email, data.password);
-        } catch {
-          /* ignore */
+        } catch (err) {
+          const message =
+            (err as AppErrorResult)?.data?.message ??
+            'Login feito, mas não foi possível atualizar a digital';
+          showError(message);
         }
       }
 

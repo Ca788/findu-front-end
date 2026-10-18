@@ -39,7 +39,9 @@ export async function enableBiometricLogin(email: string, password: string): Pro
 export async function disableBiometricLogin(): Promise<void> {
   try {
     await NativeBiometric.deleteCredentials({ server: SERVER });
-  } catch {}
+  } catch (error) {
+    console.error('Failed to delete native biometric credentials', error);
+  }
   appStorage.remove(AppStorageKeys.BIOMETRIC_ENABLED);
 }
 
