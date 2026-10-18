@@ -11,6 +11,7 @@ interface MessagesListProps {
   messages: ChatMessage[];
   isLoading: boolean;
   awaitingReply?: boolean;
+  revealActions?: boolean;
   onAction?: (action: MessageAction) => void;
 }
 
@@ -23,6 +24,7 @@ export function MessagesList({
   messages,
   isLoading,
   awaitingReply = false,
+  revealActions = true,
   onAction,
 }: MessagesListProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -77,6 +79,7 @@ export function MessagesList({
           message={message}
           onAction={onAction}
           actionsDisabled={awaitingReply}
+          revealActions={revealActions}
         />
       ))}
       {showPlaceholderThinking && <ThinkingStatus urgent />}

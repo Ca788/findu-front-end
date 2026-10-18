@@ -1,31 +1,137 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { AppStorageKeys } from '@/constants/AppStorageKeys';
+import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import { absoluteApiUrl } from '@/utils/url';
 
 interface AudioMessagePlayerProps {
   url: string;
   tone?: 'user' | 'assistant';
+  transcript?: string | null;
 }
 
-export function AudioMessagePlayer({ url, tone = 'assistant' }: AudioMessagePlayerProps) {
-  const href = absoluteApiUrl(url);
+export function AudioMessagePlayer({
+  url,
+  tone = 'assistant',
+  transcript,
+}: AudioMessagePlayerProps) {
+  const [resolvedUrl, setResolvedUrl] = useState(url);
+  const [remoteSrc, setRemoteSrc] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
 
-  if (!href) {
+  if (resolvedUrl !== url) {
+    setResolvedUrl(url);
+    setRemoteSrc(null);
+    setFailed(false);
+  }
+
+  const isBlob = url.startsWith('blob:');
+  const href = isBlob ? null : absoluteApiUrl(url);
+  const src = isBlob ? url : remoteSrc;
+  const hasTranscript = !!transcript && transcript.trim().length > 0;
+  const onDark = tone === 'user';
+  const unavailable = failed || (!isBlob && !href);
+
+  useEffect(() => {
+    if (!href) return;
+
+    let objectUrl: string | null = null;
+    let cancelled = false;
+
+    const token = appStorage.get<string>(AppStorageKeys.TOKEN);
+    const headers: HeadersInit = { Accept: 'audio/*,*/*' };
+    if (token) {
+      headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    }
+
+    fetch(href, { headers })
+      .then(async (response) => {
+        if (cancelled) return;
+        const type = response.headers.get('content-type') || '';
+        if (!response.ok || type.includes('json') || type.includes('html')) {
+          setRemoteSrc(href);
+          return;
+        }
+        const blob = await response.blob();
+        objectUrl = URL.createObjectURL(blob);
+        setRemoteSrc(objectUrl);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (!cancelled) setRemoteSrc(href);
+      });
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [href]);
+
+  if (!src && !unavailable) {
     return (
-      <Typography variant="caption" color="text.secondary">
-        Áudio indisponível
+      <Typography variant="caption" color={onDark ? 'inherit' : 'text.secondary'} sx={{ opacity: 0.8 }}>
+        Carregando áudio…
       </Typography>
     );
   }
 
   return (
-    <audio
-      controls
-      preload="metadata"
-      src={href}
-      className={`w-full ${tone === 'user' ? 'filter-invert' : ''}`}
-      style={{ height: 36, minWidth: 220 }}
-    />
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 0.75, minWidth: 220 }}>
+      {src && !unavailable ? (
+        <audio
+          controls
+          playsInline
+          preload="metadata"
+          src={src}
+          onError={() => setFailed(true)}
+          style={{ height: 36, width: '100%' }}
+        />
+      ) : (
+        <Typography variant="caption" color={onDark ? 'inherit' : 'text.secondary'} sx={{ opacity: 0.85 }}>
+          Áudio indisponível neste aparelho. {hasTranscript ? 'Abra a transcrição.' : ''}
+        </Typography>
+      )}
+      {hasTranscript ? (
+        <>
+          <Button
+            type="button"
+            size="small"
+            onClick={() => setShowTranscript((open) => !open)}
+            sx={{
+              alignSelf: 'flex-start',
+              minWidth: 0,
+              px: 0,
+              py: 0,
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: 12.5,
+              color: onDark ? 'inherit' : 'text.secondary',
+              opacity: 0.9,
+            }}
+          >
+            {showTranscript ? 'Ver menos' : 'Ver transcrição'}
+          </Button>
+          {showTranscript ? (
+            <Typography
+              variant="body2"
+              sx={{
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontSize: 14,
+                lineHeight: 1.55,
+                opacity: 0.92,
+              }}
+            >
+              {transcript}
+            </Typography>
+          ) : null}
+        </>
+      ) : null}
+    </Box>
   );
 }

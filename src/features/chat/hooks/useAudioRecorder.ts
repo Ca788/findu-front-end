@@ -23,10 +23,11 @@ interface UseAudioRecorderOptions {
 }
 
 const PREFERRED_MIME_TYPES = [
+  'audio/mp4',
+  'audio/aac',
   'audio/webm;codecs=opus',
   'audio/webm',
   'audio/ogg;codecs=opus',
-  'audio/mp4',
 ];
 
 const LEVEL_BARS_DEFAULT = 28;

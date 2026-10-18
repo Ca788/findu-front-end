@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
@@ -30,7 +30,9 @@ import { requiredEmailSchema } from '@/utils/maskedInput';
 import { useLogin } from '@/features/auth/hooks/useLogin';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
+import { AppStorageKeys } from '@/constants/AppStorageKeys';
 import type { AppErrorResult } from '@/infrastructure/AppResponse';
+import { appStorage } from '@/infrastructure/storage/StorageBuilder';
 import {
   disableBiometricLogin,
   enableBiometricLogin,
@@ -38,8 +40,6 @@ import {
   isBiometricEnabled,
   loginWithBiometric,
 } from '@/features/auth/services/biometric.service';
-
-const REMEMBER_EMAIL_KEY = 'findu.login.rememberEmail';
 
 const emailSchema = z.object({
   email: requiredEmailSchema,
@@ -81,20 +81,16 @@ export function LoginForm() {
 
   useEffect(() => {
     void (async () => {
-      const available = await isBiometricAvailable();
-      setBioAvailable(available);
-      setBioEnabled(available && isBiometricEnabled());
-    })();
-
-    try {
-      const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
+      const saved = appStorage.get<string>(AppStorageKeys.REMEMBER_EMAIL);
       if (saved) {
         emailForm.setValue('email', saved);
         setRemember(true);
       }
-    } catch {
-      /* ignore */
-    }
+
+      const available = await isBiometricAvailable();
+      setBioAvailable(available);
+      setBioEnabled(available && isBiometricEnabled());
+    })();
   }, [emailForm]);
 
   const finishLogin = () => {
@@ -106,17 +102,9 @@ export function LoginForm() {
   const handleEmailContinue = emailForm.handleSubmit((data) => {
     setEmail(data.email.trim());
     if (remember) {
-      try {
-        localStorage.setItem(REMEMBER_EMAIL_KEY, data.email.trim());
-      } catch {
-        /* ignore */
-      }
+      appStorage.set(AppStorageKeys.REMEMBER_EMAIL, data.email.trim());
     } else {
-      try {
-        localStorage.removeItem(REMEMBER_EMAIL_KEY);
-      } catch {
-        /* ignore */
-      }
+      appStorage.remove(AppStorageKeys.REMEMBER_EMAIL);
     }
     setStep('password');
   });
@@ -134,8 +122,11 @@ export function LoginForm() {
       if (bioAvailable) {
         try {
           await enableBiometricLogin(email, data.password);
-        } catch {
-          /* ignore */
+        } catch (err) {
+          const message =
+            (err as AppErrorResult)?.data?.message ??
+            'Login feito, mas não foi possível atualizar a digital';
+          showError(message);
         }
       }
 
@@ -223,8 +214,8 @@ export function LoginForm() {
     router.push(AppRoutePaths.ROOT);
   };
 
-  const emailValue = emailForm.watch('email');
-  const passwordValue = passwordForm.watch('password');
+  const emailValue = useWatch({ control: emailForm.control, name: 'email' });
+  const passwordValue = useWatch({ control: passwordForm.control, name: 'password' });
   const canContinueEmail = requiredEmailSchema.safeParse(emailValue ?? '').success;
   const canContinuePassword = !!passwordValue?.trim();
 

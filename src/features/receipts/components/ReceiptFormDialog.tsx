@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import Stack from '@mui/material/Stack';
@@ -50,7 +50,6 @@ export function ReceiptFormDialog({
     handleSubmit,
     reset,
     control,
-    watch,
     formState: { errors },
   } = useForm<ReceiptFormValues>({
     resolver: zodResolver(receiptFormSchema),
@@ -64,7 +63,7 @@ export function ReceiptFormDialog({
     },
   });
 
-  const selectedId = watch('category_id');
+  const selectedId = useWatch({ control, name: 'category_id' });
   const selected = categories.find((category) => category.id === selectedId);
 
   useEffect(() => {

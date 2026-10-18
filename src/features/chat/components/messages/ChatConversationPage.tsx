@@ -1,13 +1,14 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
+import { useSnackbar } from '@/providers/SnackbarProvider';
 import { useConversation } from '@/features/chat/hooks/useConversation';
 import { useConversationMessages } from '@/features/chat/hooks/useConversationMessages';
-import { useSendMessage } from '@/features/chat/hooks/useSendMessage';
+import { takePendingSend, useSendMessage } from '@/features/chat/hooks/useSendMessage';
 import { MessagesList } from '@/features/chat/components/messages/MessagesList';
 import { ChatComposer } from '@/features/chat/components/screen/ChatComposer';
 import { ChatLayout } from '@/features/chat/components/screen/ChatLayout';
@@ -15,19 +16,31 @@ import { SuggestedPromptsSwiper } from '@/features/chat/components/screen/Sugges
 import type { ChatSuggestedPrompt } from '@/features/chat/constants/chatSuggestedPrompts';
 import type { MessageAction, SendMessageInput } from '@/features/chat/models/message.model';
 
+const ACTION_IDLE_MS = 8000;
+
 interface ChatConversationPageProps {
   conversationId: string;
 }
 
 export function ChatConversationPage({ conversationId }: ChatConversationPageProps) {
   const router = useRouter();
+  const { showError } = useSnackbar();
   useConversation(conversationId);
   const { messages, status, addOptimistic, markOptimisticFailed } =
     useConversationMessages(conversationId);
-  const { send, isSending } = useSendMessage(conversationId, {
+  const { send } = useSendMessage(conversationId, {
     onOptimistic: addOptimistic,
-    onOptimisticFailed: markOptimisticFailed,
+    onOptimisticFailed: (clientMessageId) => {
+      markOptimisticFailed(clientMessageId);
+      showError('Erro ao enviar mensagem');
+    },
   });
+
+  useEffect(() => {
+    const pending = takePendingSend(conversationId);
+    if (!pending) return;
+    void send(pending, { skipOptimistic: true });
+  }, [conversationId, send]);
 
   const handleSubmit = useCallback(
     (input: SendMessageInput) => send(input),
@@ -36,10 +49,9 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
 
   const handleSelectPrompt = useCallback(
     (prompt: ChatSuggestedPrompt) => {
-      if (isSending) return;
       void send({ body: prompt.message });
     },
-    [isSending, send],
+    [send],
   );
 
   const handleAction = useCallback(
@@ -60,11 +72,27 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
     [router, send],
   );
 
-  const isLoading = status === 'loading';
+  const isLoading = status === 'loading' && messages.length === 0;
   const lastMessage = messages[messages.length - 1];
   const awaitingReply =
-    isSending ||
-    (lastMessage?.role === 'user' && lastMessage.status !== 'failed');
+    lastMessage?.role === 'user' && lastMessage.status !== 'failed';
+  const lastIsStreaming =
+    lastMessage?.role === 'assistant' &&
+    (lastMessage.status === 'pending' || lastMessage.status === 'processing');
+  const chatBusy = awaitingReply || lastIsStreaming;
+  const [busy, setBusy] = useState(chatBusy);
+  const [revealExtras, setRevealExtras] = useState(!chatBusy);
+
+  if (busy !== chatBusy) {
+    setBusy(chatBusy);
+    if (chatBusy) setRevealExtras(false);
+  }
+
+  useEffect(() => {
+    if (chatBusy) return;
+    const timer = window.setTimeout(() => setRevealExtras(true), ACTION_IDLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [chatBusy, messages.length]);
 
   return (
     <ChatLayout
@@ -80,17 +108,28 @@ export function ChatConversationPage({ conversationId }: ChatConversationPagePro
             messages={messages}
             isLoading={isLoading}
             awaitingReply={awaitingReply}
+            revealActions={revealExtras}
             onAction={handleAction}
           />
         </>
       }
       suggestions={
-        <SuggestedPromptsSwiper onSelectPrompt={handleSelectPrompt} disabled={awaitingReply} />
+        <Box
+          sx={{
+            overflow: 'hidden',
+            maxHeight: revealExtras ? 220 : 0,
+            opacity: revealExtras ? 1 : 0,
+            pointerEvents: revealExtras ? 'auto' : 'none',
+            transition: 'max-height 280ms ease, opacity 220ms ease',
+            '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+          }}
+        >
+          <SuggestedPromptsSwiper onSelectPrompt={handleSelectPrompt} disabled={awaitingReply} />
+        </Box>
       }
       composer={
         <ChatComposer
           onSubmit={handleSubmit}
-          isSending={isSending}
           placeholder="Pergunte ao Findu…"
         />
       }

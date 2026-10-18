@@ -71,16 +71,16 @@ export function SuggestedPromptsSwiper({
             onClick={() => onSelectPrompt?.(prompt)}
             sx={(theme) => ({
               flex: '0 0 auto',
-              width: 168,
+              width: { xs: 132, sm: 168 },
               scrollSnapAlign: 'start',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              gap: 0.5,
+              gap: { xs: 0.35, sm: 0.5 },
               textAlign: 'left',
-              px: 1.5,
-              py: 1.25,
-              borderRadius: 2.5,
+              px: { xs: 1.15, sm: 1.5 },
+              py: { xs: 1, sm: 1.25 },
+              borderRadius: { xs: 2, sm: 2.5 },
               border: '1px solid',
               borderColor: 'divider',
               bgcolor:
@@ -100,16 +100,21 @@ export function SuggestedPromptsSwiper({
               },
             })}
           >
-            <Icon sx={{ fontSize: 18, color: 'primary.main' }} />
+            <Icon sx={{ fontSize: { xs: 16, sm: 18 }, color: 'primary.main' }} />
             <Typography
               component="span"
-              sx={{ fontSize: 13, fontWeight: 600, lineHeight: 1.25 }}
+              sx={{ fontSize: { xs: 12.5, sm: 13 }, fontWeight: 600, lineHeight: 1.25 }}
             >
               {prompt.label}
             </Typography>
             <Typography
               component="span"
-              sx={{ fontSize: 11.5, color: 'text.secondary', lineHeight: 1.3 }}
+              sx={{
+                display: { xs: 'none', sm: 'block' },
+                fontSize: 11.5,
+                color: 'text.secondary',
+                lineHeight: 1.3,
+              }}
             >
               {prompt.hint}
             </Typography>

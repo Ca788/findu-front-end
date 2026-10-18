@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getCableConsumer } from '@/infrastructure/cable.client';
 import { listMessages } from '@/features/chat/gateway/messages.gateway';
-import type { ChatMessage } from '@/features/chat/models/message.model';
+import { peekPendingOptimistic } from '@/features/chat/hooks/useSendMessage';
+import type { ChatMessage, MessageAttachment } from '@/features/chat/models/message.model';
 
 export type MessagesStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -23,6 +24,27 @@ function sameMessage(a: ChatMessage, b: ChatMessage): boolean {
   return false;
 }
 
+function isBlobUrl(url: string | null | undefined): boolean {
+  return !!url && url.startsWith('blob:');
+}
+
+function mergeAttachments(
+  previous: MessageAttachment[] | undefined,
+  incoming: MessageAttachment[] | undefined,
+): MessageAttachment[] | undefined {
+  if (!incoming || incoming.length === 0) return previous ?? incoming;
+  if (!previous || previous.length === 0) return incoming;
+
+  const previousByName = new Map(previous.map((item) => [item.filename, item]));
+  return incoming.map((attachment, index) => {
+    const local = previousByName.get(attachment.filename) ?? previous[index];
+    if (local && isBlobUrl(local.url)) {
+      return { ...attachment, url: local.url };
+    }
+    return attachment;
+  });
+}
+
 function upsert(messages: ChatMessage[], incoming: ChatMessage): ChatMessage[] {
   const index = messages.findIndex((message) => sameMessage(message, incoming));
   if (index === -1) return [...messages, incoming];
@@ -34,11 +56,10 @@ function upsert(messages: ChatMessage[], incoming: ChatMessage): ChatMessage[] {
     ...incoming,
     client_message_id:
       incoming.client_message_id ?? previous.client_message_id ?? null,
-    audio_url: incoming.audio_url || previous.audio_url,
-    attachments:
-      incoming.attachments && incoming.attachments.length > 0
-        ? incoming.attachments
-        : previous.attachments,
+    audio_url: isBlobUrl(previous.audio_url)
+      ? previous.audio_url
+      : incoming.audio_url || previous.audio_url,
+    attachments: mergeAttachments(previous.attachments, incoming.attachments),
     actions: incoming.actions ?? previous.actions,
     card: incoming.card ?? previous.card,
   };
@@ -66,8 +87,9 @@ export function useConversationMessages(conversationId: string | undefined) {
 
   if (conversationId !== loadedId) {
     setLoadedId(conversationId);
-    setMessages([]);
-    setStatus(conversationId ? 'loading' : 'idle');
+    const seed = conversationId ? peekPendingOptimistic(conversationId) : undefined;
+    setMessages(seed ? [seed] : []);
+    setStatus(seed ? 'ready' : conversationId ? 'loading' : 'idle');
   }
 
   useEffect(() => {
