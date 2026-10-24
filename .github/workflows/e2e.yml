@@ -57,7 +57,7 @@ jobs:
         with:
           repository: Ca788/findu
           ref: ${{ vars.E2E_BACKEND_REF || 'main' }}
-          token: ${{ secrets.E2E_BACKEND_TOKEN }}
+          token: ${{ secrets.E2E_BACKEND_TOKEN || github.token }}
           path: backend
 
       - name: Setup Ruby
