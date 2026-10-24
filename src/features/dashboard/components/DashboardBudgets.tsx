@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -12,6 +11,9 @@ import { useCurrentBudgets } from '@/features/budgets/hooks/useCurrentBudgets';
 import { BUDGET_PERIOD_LABELS } from '@/features/budgets/models/budget.model';
 import type { Budget } from '@/features/budgets/models/budget.model';
 import { formatBRL } from '@/utils/currency';
+import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
+import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
+import { riseDelay } from '@/features/dashboard/components/CycleTransition';
 
 interface DashboardBudgetsProps {
   referenceDate: string;
@@ -23,13 +25,13 @@ function progressColor(usage: number): 'success' | 'warning' | 'error' {
   return 'success';
 }
 
-function BudgetRow({ budget }: { budget: Budget }) {
+function BudgetRow({ budget, index }: { budget: Budget; index: number }) {
   const usage = Math.min(200, Number(budget.usage_percent ?? 0));
   const color = progressColor(usage);
   const periodLabel = BUDGET_PERIOD_LABELS[budget.period_type];
 
   return (
-    <Stack spacing={1} className="min-w-0">
+    <Stack spacing={1} className="min-w-0 findu-anim-rise" style={riseDelay(index)}>
       <Box className="flex items-center justify-between gap-2">
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
           {periodLabel}
@@ -49,7 +51,11 @@ function BudgetRow({ budget }: { budget: Budget }) {
         variant="determinate"
         color={color}
         value={Math.min(100, usage)}
-        sx={{ height: 8, borderRadius: 999 }}
+        sx={{
+          height: 8,
+          borderRadius: 999,
+          '& .MuiLinearProgress-bar': { transition: 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)' },
+        }}
       />
       <Typography
         variant="caption"
@@ -67,11 +73,10 @@ export function DashboardBudgets({ referenceDate }: DashboardBudgetsProps) {
   const budgets = data ?? [];
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-3.5 rounded-xl px-4 py-4">
-      <div className="flex items-center justify-between gap-2">
-        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-          Metas
-        </Typography>
+    <DashboardCard
+      className="findu-anim-rise"
+      title="Metas"
+      action={
         <Button
           component={Link}
           href={AppRoutePaths.BUDGETS}
@@ -80,8 +85,8 @@ export function DashboardBudgets({ referenceDate }: DashboardBudgetsProps) {
         >
           Ver todas
         </Button>
-      </div>
-
+      }
+    >
       {isError && (
         <Typography variant="body2" color="error.main">
           Erro ao carregar orçamentos.
@@ -93,18 +98,22 @@ export function DashboardBudgets({ referenceDate }: DashboardBudgetsProps) {
       )}
 
       {!isLoading && !isError && budgets.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          Nenhuma meta ativa agora.
-        </Typography>
+        <DashboardEmptyState
+          illustration="shield"
+          title="Nenhuma meta ativa"
+          description="Defina um limite por período e acompanhe o consumo aqui."
+          actionLabel="Criar meta"
+          actionHref={AppRoutePaths.BUDGETS}
+        />
       )}
 
       {budgets.length > 0 && (
         <Stack spacing={2.5}>
-          {budgets.slice(0, 3).map((budget) => (
-            <BudgetRow key={budget.id} budget={budget} />
+          {budgets.slice(0, 3).map((budget, index) => (
+            <BudgetRow key={budget.id} budget={budget} index={index} />
           ))}
         </Stack>
       )}
-    </Paper>
+    </DashboardCard>
   );
 }

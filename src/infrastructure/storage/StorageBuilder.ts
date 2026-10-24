@@ -63,5 +63,5 @@ class StorageBuilder {
 export const appStorage: AppStorage = new StorageBuilder()
   .useMemoryStorage()
   .useLocalStorage()
-  // .useCookieStorage()
+  .useCookieStorage()
   .build();

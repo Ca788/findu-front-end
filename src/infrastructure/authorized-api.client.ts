@@ -1,9 +1,19 @@
-import axios, { InternalAxiosRequestConfig } from 'axios';
-import { appStorage } from '@/infrastructure/storage/StorageBuilder';
-import { AppStorageKeys } from '@/constants/AppStorageKeys';
-import { AppRoutePaths } from '@/constants/AppRoutePaths';
-import { disconnectCable } from '@/infrastructure/cable.client';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_BASE_URL } from '@/constants/apiBaseUrl';
+import {
+  CLIENT_PLATFORM_HEADER,
+  getAccessToken,
+  getClientPlatform,
+  notifyUnauthorized,
+  refreshSession,
+} from '@/infrastructure/session';
+
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    skipAuthHandler?: boolean;
+    _retriedAfterRefresh?: boolean;
+  }
+}
 
 const authorizedApiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -15,10 +25,11 @@ const authorizedApiClient = axios.create({
 
 authorizedApiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = appStorage.get<string>(AppStorageKeys.TOKEN);
+    const token = getAccessToken();
     if (token) {
-      config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers[CLIENT_PLATFORM_HEADER] = getClientPlatform();
     return config;
   },
   (error) => Promise.reject(error),
@@ -26,14 +37,24 @@ authorizedApiClient.interceptors.request.use(
 
 authorizedApiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      appStorage.remove(AppStorageKeys.TOKEN);
-      disconnectCable();
-      if (typeof window !== 'undefined') {
-        window.location.replace(AppRoutePaths.LOGIN);
+  async (error: AxiosError) => {
+    const config = error.config;
+    const status = error.response?.status;
+
+    if (status !== 401 || !config || config.skipAuthHandler) {
+      return Promise.reject(error);
+    }
+
+    if (!config._retriedAfterRefresh) {
+      const newToken = await refreshSession();
+      if (newToken) {
+        config._retriedAfterRefresh = true;
+        config.headers.Authorization = `Bearer ${newToken}`;
+        return authorizedApiClient.request(config);
       }
     }
+
+    notifyUnauthorized();
     return Promise.reject(error);
   },
 );

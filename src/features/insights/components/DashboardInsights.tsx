@@ -1,10 +1,11 @@
 'use client';
 
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
+import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
+import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
 import { useInsights } from '@/features/insights/hooks/useInsights';
 import {
   INSIGHT_SEVERITY_LABELS,
@@ -45,11 +46,7 @@ export function DashboardInsights({ period, limit = 3 }: DashboardInsightsProps)
   const insights = data?.data ?? [];
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-3.5 rounded-xl px-4 py-4">
-      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-        Insights
-      </Typography>
-
+    <DashboardCard className="findu-anim-rise" title="Insights">
       {isError && (
         <Typography variant="body2" color="error.main">
           Erro ao carregar insights.
@@ -61,9 +58,12 @@ export function DashboardInsights({ period, limit = 3 }: DashboardInsightsProps)
       )}
 
       {!isLoading && !isError && insights.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          Nenhum insight gerado para este mês ainda.
-        </Typography>
+        <DashboardEmptyState
+          illustration="graduation"
+          title="Nenhum insight neste ciclo"
+          description="Conforme você lança movimentações, o Findu gera observações aqui."
+          compact
+        />
       )}
 
       {insights.length > 0 && (
@@ -84,6 +84,6 @@ export function DashboardInsights({ period, limit = 3 }: DashboardInsightsProps)
           ))}
         </Stack>
       )}
-    </Paper>
+    </DashboardCard>
   );
 }

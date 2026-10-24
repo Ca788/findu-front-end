@@ -15,6 +15,8 @@ export interface RegisterCredentials {
 
 export interface AuthResponseData {
   user: User;
+  /** Presente em login, registro e refresh. */
+  refresh_token?: string;
 }
 
 export interface ForgotPasswordCredentials {

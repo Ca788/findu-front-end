@@ -7,7 +7,6 @@ import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import LinearProgress from '@mui/material/LinearProgress';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
@@ -15,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { ListSkeleton } from '@/components/common/ListSkeleton';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import {
   AppErrorResultMapper,
@@ -34,7 +34,7 @@ export function ChatPage() {
   const [archiveTarget, setArchiveTarget] = useState<Conversation | undefined>();
   const { showSuccess, showError } = useSnackbar();
 
-  const { data, isLoading, isFetching, isError } = useConversations({ perPage: 40 });
+  const { data, isLoading, isError } = useConversations({ perPage: 40 });
   const archiveMutation = useArchiveConversation();
 
   const conversations = data?.data ?? [];
@@ -91,7 +91,7 @@ export function ChatPage() {
       </Box>
 
       {isError && <Alert severity="error">Erro ao carregar conversas.</Alert>}
-      {isFetching && <LinearProgress />}
+      {isLoading && <ListSkeleton rows={5} height={64} />}
 
       {!isLoading && conversations.length === 0 && (
         <Typography variant="body2" color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>

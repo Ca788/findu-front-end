@@ -2,8 +2,8 @@
 
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
+import { ListSkeleton } from '@/components/common/ListSkeleton';
 import { useStatementsList } from '@/features/statements/hooks/useStatementsList';
 import { StatementCard } from '@/features/statements/components/StatementCard';
 import { currentMonthParam } from '@/features/statements/utils/month';
@@ -44,7 +44,7 @@ export function StatementsListPage() {
       </Stack>
 
       {query.isError && <Alert severity="error">Erro ao carregar extratos.</Alert>}
-      {query.isFetching && <LinearProgress sx={{ height: 3, borderRadius: 999 }} />}
+      {query.isLoading && <ListSkeleton rows={3} height={96} />}
 
       {current.length > 0 && (
         <Section title="Este mês">
@@ -70,7 +70,7 @@ export function StatementsListPage() {
         </Section>
       )}
 
-      {!query.isFetching && rows.length === 0 && (
+      {!query.isLoading && rows.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           Nenhum extrato disponível ainda.
         </Typography>

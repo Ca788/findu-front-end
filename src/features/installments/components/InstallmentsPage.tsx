@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { AxiosError } from 'axios';
+import { ListSkeleton } from '@/components/common/ListSkeleton';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -126,9 +127,9 @@ export function InstallmentsPage() {
       </Tabs>
 
       {query.isError && <Alert severity="error">Erro ao carregar parcelamentos.</Alert>}
-      {query.isFetching && <LinearProgress />}
+      {query.isLoading && <ListSkeleton rows={4} height={140} columns={2} />}
 
-      {!query.isFetching && plans.length === 0 && (
+      {!query.isLoading && plans.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           Você ainda não cadastrou nenhum parcelamento. Cadastre uma vez (valor,
           quantidade, mês da 1ª parcela) e o sistema criará automaticamente todas
@@ -136,7 +137,7 @@ export function InstallmentsPage() {
         </Typography>
       )}
 
-      {!query.isFetching && plans.length > 0 && visiblePlans.length === 0 && (
+      {!query.isLoading && plans.length > 0 && visiblePlans.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           {tab === 'active'
             ? 'Nenhum parcelamento ativo no momento.'

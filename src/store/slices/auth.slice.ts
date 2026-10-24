@@ -104,7 +104,15 @@ export const updateProfile = createAsyncThunk<User, UpdateProfileInput, ThunkCon
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    sessionExpired(state) {
+      state.user = undefined;
+      state.status = 'unauthorized';
+      state.isLoggedIn = false;
+      state.loading = false;
+      state.error = AppErrorResultMapper.fromGeneric('Sessão expirada. Entre novamente.', 401);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
@@ -195,6 +203,7 @@ const authSlice = createSlice({
   },
 });
 
+export const { sessionExpired } = authSlice.actions;
 export const authReducer = authSlice.reducer;
 
 export const selectAuthState = (state: RootState) => state.auth;

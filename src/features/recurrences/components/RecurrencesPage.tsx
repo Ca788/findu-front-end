@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { AxiosError } from 'axios';
+import { ListSkeleton } from '@/components/common/ListSkeleton';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -76,9 +76,9 @@ export function RecurrencesPage() {
       />
 
       {query.isError && <Alert severity="error">Erro ao carregar recorrências.</Alert>}
-      {query.isFetching && <LinearProgress />}
+      {query.isLoading && <ListSkeleton rows={4} height={140} columns={2} />}
 
-      {!query.isFetching && rules.length === 0 && (
+      {!query.isLoading && rules.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           Você ainda não cadastrou nenhuma recorrência. Cadastre coisas como aluguel,
           internet, academia ou salário. O sistema criará automaticamente os

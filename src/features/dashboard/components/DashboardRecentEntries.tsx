@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -12,6 +11,9 @@ import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { formatBRL } from '@/utils/currency';
 import type { Statement } from '@/features/statements/models/statement.model';
 import type { Transaction } from '@/features/transactions/models/transaction.model';
+import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
+import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
+import { riseDelay } from '@/features/dashboard/components/CycleTransition';
 
 interface DashboardRecentEntriesProps {
   statement?: Statement;
@@ -19,14 +21,14 @@ interface DashboardRecentEntriesProps {
   limit?: number;
 }
 
-function EntryLine({ entry }: { entry: Transaction }) {
+function EntryLine({ entry, index }: { entry: Transaction; index: number }) {
   const isIncome = entry.transaction_type === 'income';
   const paid = entry.status === 'paid';
   const tone = isIncome ? 'success.main' : 'error.main';
   const Icon = isIncome ? ArrowUpwardIcon : ArrowDownwardIcon;
 
   return (
-    <div className="flex min-w-0 items-center gap-3">
+    <div className="findu-anim-rise flex min-w-0 items-center gap-3" style={riseDelay(index, 45)}>
       <Box
         sx={{
           width: 40,
@@ -86,11 +88,10 @@ export function DashboardRecentEntries({
   const visible = entries.slice(0, limit);
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-3.5 rounded-xl px-4 py-4">
-      <div className="flex items-center justify-between gap-2">
-        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-          Movimentações
-        </Typography>
+    <DashboardCard
+      className="findu-anim-rise"
+      title="Movimentações"
+      action={
         <Button
           component={Link}
           href={AppRoutePaths.statementDetail(monthParam)}
@@ -99,21 +100,24 @@ export function DashboardRecentEntries({
         >
           Ver tudo
         </Button>
-      </div>
-
+      }
+    >
       {visible.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          Nenhuma movimentação neste mês.
-        </Typography>
+        <DashboardEmptyState
+          illustration="coins"
+          title="Nenhuma movimentação neste ciclo"
+          description="Lance uma despesa ou receita e ela aparece aqui."
+          size={72}
+        />
       )}
 
       {visible.length > 0 && (
         <Stack spacing={2.25}>
-          {visible.map((entry) => (
-            <EntryLine key={entry.id} entry={entry} />
+          {visible.map((entry, index) => (
+            <EntryLine key={entry.id} entry={entry} index={index} />
           ))}
         </Stack>
       )}
-    </Paper>
+    </DashboardCard>
   );
 }

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
 import Typography from '@mui/material/Typography';
@@ -146,7 +145,6 @@ export function StatementDetailPage({ month }: StatementDetailPageProps) {
       </Stack>
 
       {query.isError && <Alert severity="error">Erro ao carregar o extrato.</Alert>}
-      {query.isFetching && <LinearProgress sx={{ height: 3, borderRadius: 999 }} />}
 
       <StatementKpis statement={statement} />
 

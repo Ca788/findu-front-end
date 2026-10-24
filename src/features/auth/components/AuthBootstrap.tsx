@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   getUserFromToken,
   selectAuthState,
+  sessionExpired,
 } from '@/store/slices/auth.slice';
+import { setUnauthorizedHandler } from '@/infrastructure/session';
 import type { AppDispatch } from '@/store';
 
 export function AuthBootstrap() {
@@ -17,6 +19,11 @@ export function AuthBootstrap() {
       dispatch(getUserFromToken());
     }
   }, [dispatch, status]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => dispatch(sessionExpired()));
+    return () => setUnauthorizedHandler(null);
+  }, [dispatch]);
 
   return null;
 }
