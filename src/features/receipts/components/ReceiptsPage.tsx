@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { AxiosError } from 'axios';
+import { ListSkeleton } from '@/components/common/ListSkeleton';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -173,9 +173,9 @@ export function ReceiptsPage() {
       />
 
       {query.isError && <Alert severity="error">Erro ao carregar comprovantes.</Alert>}
-      {query.isFetching && <LinearProgress />}
+      {query.isLoading && <ListSkeleton rows={4} height={120} columns={2} />}
 
-      {!query.isFetching && receipts.length === 0 && (
+      {!query.isLoading && receipts.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           Cadastre o WhatsApp na categoria e envie o total pago do período.
         </Typography>

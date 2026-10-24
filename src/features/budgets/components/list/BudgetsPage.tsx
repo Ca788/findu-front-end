@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import { useBudgets } from '@/features/budgets/hooks/useBudgets';
 import { useBudgetDialogs } from '@/features/budgets/hooks/useBudgetDialogs';
 import { DataPagination } from '@/components/common/DataPagination';
@@ -18,7 +17,7 @@ export function BudgetsPage() {
   const [perPage, setPerPage] = useState(10);
   const dialogs = useBudgetDialogs();
 
-  const { data, isLoading, isFetching, isError } = useBudgets({ page, perPage });
+  const { data, isLoading, isError } = useBudgets({ page, perPage });
 
   const budgets = data?.data ?? [];
   const totalCount = data?.pagination.totalCount ?? 0;
@@ -33,7 +32,6 @@ export function BudgetsPage() {
       <BudgetsHeader onCreate={dialogs.openCreate} />
 
       {isError && <Alert severity="error">Erro ao carregar orçamentos.</Alert>}
-      {isFetching && <LinearProgress />}
 
       <div className="hidden md:block">
         <BudgetsTable

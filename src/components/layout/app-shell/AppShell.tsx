@@ -10,7 +10,9 @@ import {
 import { AppDrawer } from '@/components/layout/app-shell/AppDrawer';
 import { AppHeader } from '@/components/layout/app-shell/AppHeader';
 import { AppBottomNav } from '@/components/layout/app-shell/AppBottomNav';
+import { GlobalProgress } from '@/components/layout/app-shell/GlobalProgress';
 import { isImmersiveChatPath } from '@/components/layout/app-shell/appNavItems';
+import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { RecentConversationsDrawer } from '@/features/chat/components/conversations/RecentConversationsDrawer';
 
 interface AppShellProps {
@@ -21,7 +23,9 @@ function AppShellLayout({ children }: AppShellProps) {
   const pathname = usePathname() ?? '';
   const { isDesktop, recentOpen, closeRecent, keyboardOpen, keyboardInset } =
     useAppShell();
-  const immersiveChat = !isDesktop && isImmersiveChatPath(pathname);
+  const chatPath = isImmersiveChatPath(pathname);
+  const immersiveChat = !isDesktop && chatPath;
+  const screenKey = chatPath ? AppRoutePaths.CHAT : pathname;
 
   useEffect(() => {
     document.documentElement.dataset.keyboard = keyboardOpen ? 'open' : 'closed';
@@ -56,6 +60,7 @@ function AppShellLayout({ children }: AppShellProps) {
           overflow: 'hidden',
         }}
       >
+        <GlobalProgress />
         <AppHeader />
         <Box
           component="main"
@@ -69,7 +74,7 @@ function AppShellLayout({ children }: AppShellProps) {
           }}
         >
           <Box
-            key={pathname}
+            key={screenKey}
             className="findu-anim-tab-enter"
             sx={{
               flex: 1,

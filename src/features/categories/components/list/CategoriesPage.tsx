@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import { useCategories } from '@/features/categories/hooks/useCategories';
 import { useCategoryDialogs } from '@/features/categories/hooks/useCategoryDialogs';
 import { CategoriesHeader } from '@/features/categories/components/list/CategoriesHeader';
@@ -19,7 +18,7 @@ export function CategoriesPage() {
   const [perPage, setPerPage] = useState(10);
   const dialogs = useCategoryDialogs();
 
-  const { data, isLoading, isFetching, isError } = useCategories({ page, perPage });
+  const { data, isLoading, isError } = useCategories({ page, perPage });
 
   const categories = data?.data ?? [];
   const totalCount = data?.pagination.totalCount ?? 0;
@@ -34,7 +33,6 @@ export function CategoriesPage() {
       <CategoriesHeader onCreate={dialogs.openCreate} />
 
       {isError && <Alert severity="error">Erro ao carregar categorias.</Alert>}
-      {isFetching && <LinearProgress />}
 
       <div className="hidden md:block">
         <CategoriesTable

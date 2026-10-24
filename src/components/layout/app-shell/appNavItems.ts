@@ -13,6 +13,7 @@ import CreditScoreIcon from '@mui/icons-material/CreditScoreOutlined';
 import PersonIcon from '@mui/icons-material/PersonOutlineOutlined';
 import AppsIcon from '@mui/icons-material/AppsOutlined';
 import ShowChartIcon from '@mui/icons-material/ShowChartOutlined';
+import Inventory2Icon from '@mui/icons-material/Inventory2Outlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 
 export interface AppNavItem {
@@ -96,6 +97,12 @@ export const appNavItems: AppNavItem[] = [
     section: 'secondary',
   },
   {
+    label: 'Caixinhas',
+    href: AppRoutePaths.BOXES,
+    icon: Inventory2Icon,
+    section: 'secondary',
+  },
+  {
     label: 'Conta',
     href: AppRoutePaths.PROFILE,
     icon: PersonIcon,
@@ -153,6 +160,8 @@ export const mobileTabNavItems: MobileTabNavItem[] = [
       pathname.startsWith(`${AppRoutePaths.RECEIPTS}/`) ||
       pathname === AppRoutePaths.INVESTMENTS ||
       pathname.startsWith(`${AppRoutePaths.INVESTMENTS}/`) ||
+      pathname === AppRoutePaths.BOXES ||
+      pathname.startsWith(`${AppRoutePaths.BOXES}/`) ||
       pathname.startsWith(APP_CHAT_HISTORY_PATH),
   },
 ];
@@ -183,6 +192,11 @@ export const moreOrganizeItems: AppNavItem[] = [
     label: 'Investimentos',
     href: AppRoutePaths.INVESTMENTS,
     icon: ShowChartIcon,
+  },
+  {
+    label: 'Caixinhas',
+    href: AppRoutePaths.BOXES,
+    icon: Inventory2Icon,
   },
 ];
 

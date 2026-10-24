@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
+import Skeleton from '@mui/material/Skeleton';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -12,14 +13,17 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  ReferenceLine,
 } from 'recharts';
 import { useStatementsList } from '@/features/statements/hooks/useStatementsList';
 import {
   addMonths,
   currentMonthParam,
+  formatMonthShort,
   parseMonth,
 } from '@/features/statements/utils/month';
 import { formatBRL } from '@/utils/currency';
+import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
 
 function toNumber(value: string | number | undefined): number {
   const n = Number(value ?? 0);
@@ -45,30 +49,38 @@ function monthAxisLabel(month: string): string {
     .toLowerCase();
 }
 
-export function DashboardCashflowChart({ height = 220 }: { height?: number }) {
+interface DashboardCashflowChartProps {
+  height?: number;
+  monthParam?: string;
+}
+
+export function DashboardCashflowChart({ height = 220, monthParam }: DashboardCashflowChartProps) {
   const theme = useTheme();
-  const to = currentMonthParam();
+  const to = monthParam ?? currentMonthParam();
   const from = addMonths(to, -5);
   const query = useStatementsList({ from, to });
 
   const rows = useMemo(() => {
-    return (query.data ?? [])
-      .filter((row) => row.month >= from && row.month <= to)
-      .slice()
-      .sort((a, b) => a.month.localeCompare(b.month))
-      .map((row) => ({
-        month: monthAxisLabel(row.month),
-        income: toNumber(row.income_paid),
-        expense: toNumber(row.expense_paid),
-      }));
-  }, [query.data, from, to]);
+    const byMonth = new Map((query.data ?? []).map((row) => [row.month, row]));
+    return Array.from({ length: 6 }, (_, index) => addMonths(from, index)).map((month) => {
+      const row = byMonth.get(month);
+      return {
+        key: month,
+        month: monthAxisLabel(month),
+        income: toNumber(row?.income_paid),
+        expense: toNumber(row?.expense_paid),
+      };
+    });
+  }, [query.data, from]);
+
+  const hasData = rows.some((row) => row.income > 0 || row.expense > 0);
+  const selectedLabel = monthAxisLabel(to);
 
   if (query.isError) return null;
-  if (!query.isFetching && rows.length === 0) return null;
 
   return (
     <Box
-      className="findu-anim-fade-in"
+      className="findu-anim-rise"
       sx={{
         borderRadius: '14px',
         border: '1px solid',
@@ -77,6 +89,10 @@ export function DashboardCashflowChart({ height = 220 }: { height?: number }) {
         px: 2,
         pt: 2,
         pb: 1.5,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        minWidth: 0,
       }}
     >
       <Typography sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.35 }}>
@@ -93,17 +109,28 @@ export function DashboardCashflowChart({ height = 220 }: { height?: number }) {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          Entradas e saídas pagas · últimos 6 meses
+          Entradas e saídas pagas · 6 meses até {formatMonthShort(to)}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, flexShrink: 0 }}>
           <ChartKey color={theme.palette.primary.main} label="Entradas" />
           <ChartKey color="#E85D4C" label="Saídas" />
         </Box>
       </Box>
-      <Box sx={{ width: '100%', height }}>
-        {rows.length > 0 ? (
+      <Box sx={{ width: '100%', height, flex: 1, minHeight: height }}>
+        {query.isFetching && !query.data ? (
+          <Skeleton variant="rounded" width="100%" height="100%" sx={{ borderRadius: '10px' }} />
+        ) : !hasData ? (
+          <Box sx={{ height: '100%', display: 'grid', placeItems: 'center' }}>
+            <DashboardEmptyState
+              illustration="rocket"
+              title="Sem fluxo neste período"
+              description="Registre receitas e despesas para ver a curva dos seus ciclos."
+              size={72}
+            />
+          </Box>
+        ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={rows} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
+            <AreaChart key={to} data={rows} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="finduIncome" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.32} />
@@ -137,6 +164,19 @@ export function DashboardCashflowChart({ height = 220 }: { height?: number }) {
                   }).format(Number(v))
                 }
               />
+              <ReferenceLine
+                x={selectedLabel}
+                stroke={theme.palette.primary.main}
+                strokeDasharray="4 4"
+                strokeOpacity={0.7}
+                label={{
+                  value: 'ciclo',
+                  position: 'insideTopRight',
+                  fill: theme.palette.primary.main,
+                  fontSize: 11,
+                  fontWeight: 700,
+                }}
+              />
               <Tooltip
                 formatter={(value) => formatBRL(Number(value ?? 0))}
                 contentStyle={{
@@ -167,7 +207,7 @@ export function DashboardCashflowChart({ height = 220 }: { height?: number }) {
               />
             </AreaChart>
           </ResponsiveContainer>
-        ) : null}
+        )}
       </Box>
     </Box>
   );

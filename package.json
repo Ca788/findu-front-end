@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:update": "playwright test e2e/visual.spec.ts --update-snapshots",
     "build:mobile": "next build && npx cap sync android",
     "android:open": "npx cap open android",
     "android:apk": "cd android && ./gradlew assembleDebug"
@@ -30,6 +33,7 @@
     "@reduxjs/toolkit": "^2.12.0",
     "@tanstack/react-query": "^5.101.0",
     "axios": "^1.17.0",
+    "lottie-react": "^3.1.2",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -39,6 +43,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/rails__actioncable": "^8",

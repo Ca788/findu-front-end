@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import LinearProgress from '@mui/material/LinearProgress';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { AxiosError } from 'axios';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { ListSkeleton } from '@/components/common/ListSkeleton';
 import { DataPagination } from '@/components/common/DataPagination';
 import { PageHeader } from '@/components/common/PageHeader';
 import { RowActions } from '@/components/common/RowActions';
@@ -38,7 +38,7 @@ export function InvestmentsPage() {
   const dialogs = useInvestmentDialogs();
   const { showSuccess, showError } = useSnackbar();
   const { mutateAsync: remove, isPending: isDeleting } = useDeleteInvestment();
-  const { data, isLoading, isFetching, isError } = useInvestments({ page, perPage });
+  const { data, isLoading, isError } = useInvestments({ page, perPage });
 
   const investments = data?.data ?? [];
   const totalCount = data?.pagination.totalCount ?? 0;
@@ -75,9 +75,9 @@ export function InvestmentsPage() {
       />
 
       {isError && <Alert severity="error">Erro ao carregar investimentos.</Alert>}
-      {isFetching && <LinearProgress />}
-
-      {!isLoading && investments.length === 0 ? (
+      {isLoading ? (
+        <ListSkeleton rows={4} height={88} />
+      ) : investments.length === 0 ? (
         <Paper className="rounded-2xl px-4 py-10 text-center">
           <Typography variant="body2" color="text.secondary">
             Nenhum investimento cadastrado.

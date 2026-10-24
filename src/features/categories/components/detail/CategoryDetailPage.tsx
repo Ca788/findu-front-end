@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBackOutlined';
 import SendIcon from '@mui/icons-material/SendOutlined';
 import { PageHeader } from '@/components/common/PageHeader';
+import { ListSkeleton } from '@/components/common/ListSkeleton';
 import { DataPagination } from '@/components/common/DataPagination';
 import { StatementMonthSwitcher } from '@/features/statements/components/StatementMonthSwitcher';
 import { useCategory } from '@/features/categories/hooks/useCategory';
@@ -139,9 +139,9 @@ export function CategoryDetailPage({ categoryId, month: initialMonth }: Category
       {transactionsQuery.isError && (
         <Alert severity="error">Erro ao carregar lançamentos da categoria.</Alert>
       )}
-      {(categoryQuery.isFetching || transactionsQuery.isFetching) && <LinearProgress />}
+      {transactionsQuery.isLoading && <ListSkeleton rows={4} height={72} />}
 
-      {!transactionsQuery.isFetching && entries.length === 0 && (
+      {!transactionsQuery.isLoading && entries.length === 0 && (
         <Typography variant="body2" color="text.secondary">
           Nenhum lançamento nesta categoria no mês selecionado.
         </Typography>

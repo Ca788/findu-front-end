@@ -32,6 +32,16 @@ export async function listMessages(
   return response.data;
 }
 
+export async function getMessage(
+  conversationId: string,
+  messageId: string,
+): Promise<ChatMessage> {
+  const response = await authorizedApiClient.get<SuccessResponse<ChatMessage>>(
+    `${messagesPath(conversationId)}/${messageId}`,
+  );
+  return response.data.data;
+}
+
 function defaultAudioFilename(blob: Blob): string {
   const mime = blob.type || 'audio/webm';
   const ext = mime.includes('mp4')

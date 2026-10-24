@@ -7,7 +7,6 @@ import SendIcon from '@mui/icons-material/SendOutlined';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -128,7 +127,7 @@ export function CategoryTotalsSection() {
   const [perPage, setPerPage] = useState(10);
   const [sending, setSending] = useState<CategoryTotal | null>(null);
 
-  const { data, isLoading, isFetching, isError } = useCategoryTotals({
+  const { data, isLoading, isError } = useCategoryTotals({
     page,
     perPage,
     from: month,
@@ -159,7 +158,6 @@ export function CategoryTotalsSection() {
       </div>
 
       {isError && <Alert severity="error">Erro ao carregar totais por categoria.</Alert>}
-      {isFetching && <LinearProgress />}
 
       <div className="hidden md:block">
         <TableContainer component={Paper} className="rounded-2xl">

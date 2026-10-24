@@ -58,8 +58,32 @@ export interface AppErrorResult {
   data: ErrorResponse;
 }
 
+export const NETWORK_ERROR_CODE = 0;
+export const NETWORK_ERROR_MESSAGE =
+  'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.';
+
 export class AppErrorResultMapper {
+  static isNetworkError(error: AxiosError): boolean {
+    return (
+      !error.response &&
+      (error.code === AxiosError.ERR_NETWORK ||
+        error.code === AxiosError.ECONNABORTED ||
+        error.code === AxiosError.ETIMEDOUT)
+    );
+  }
+
   static fromAxiosError(error: AxiosError<ErrorResponse>): AppErrorResult {
+    if (AppErrorResultMapper.isNetworkError(error)) {
+      return {
+        httpStatusCode: NETWORK_ERROR_CODE,
+        data: {
+          success: false,
+          errorCode: NETWORK_ERROR_CODE,
+          message: NETWORK_ERROR_MESSAGE,
+        },
+      };
+    }
+
     const httpStatusCode = error.response?.status ?? 500;
     const responseData = error.response?.data;
 

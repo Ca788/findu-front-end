@@ -1,10 +1,13 @@
-import { AxiosHeaders, type AxiosResponse } from 'axios';
 import publicApiClient from '@/infrastructure/public-api.client';
 import authorizedApiClient from '@/infrastructure/authorized-api.client';
 import type { SuccessResponse } from '@/infrastructure/AppResponse';
-import { appStorage } from '@/infrastructure/storage/StorageBuilder';
-import { AppStorageKeys } from '@/constants/AppStorageKeys';
-import { disconnectCable } from '@/infrastructure/cable.client';
+import {
+  CLIENT_PLATFORM_HEADER,
+  clearSession,
+  getClientPlatform,
+  getRefreshToken,
+  persistSessionFromResponse,
+} from '@/infrastructure/session';
 import type {
   AuthResponseData,
   ForgotPasswordCredentials,
@@ -15,37 +18,15 @@ import type {
 } from '@/features/auth/models/auth.model';
 import type { User } from '@/models/user.model';
 
-function readAuthorizationHeader(response: AxiosResponse): string | undefined {
-  const headers = response.headers;
-
-  if (headers instanceof AxiosHeaders) {
-    const value = headers.get('authorization');
-    return typeof value === 'string' ? value : undefined;
-  }
-
-  const plain = headers as Record<string, unknown>;
-  const value = plain['authorization'] ?? plain['Authorization'];
-  return typeof value === 'string' ? value : undefined;
-}
-
-function extractAndPersistToken(response: AxiosResponse): void {
-  const headerValue = readAuthorizationHeader(response);
-
-  if (!headerValue) return;
-
-  const token = headerValue.startsWith('Bearer ')
-    ? headerValue.slice('Bearer '.length)
-    : headerValue;
-
-  appStorage.set(AppStorageKeys.TOKEN, token);
-}
+const platformHeaders = () => ({ [CLIENT_PLATFORM_HEADER]: getClientPlatform() });
 
 export async function login(credentials: LoginCredentials): Promise<User> {
   const response = await publicApiClient.post<SuccessResponse<AuthResponseData>>(
     '/login',
     { user: credentials },
+    { headers: platformHeaders() },
   );
-  extractAndPersistToken(response);
+  persistSessionFromResponse(response);
   return response.data.data.user;
 }
 
@@ -54,17 +35,21 @@ export async function register(credentials: RegisterCredentials): Promise<User> 
   const response = await publicApiClient.post<SuccessResponse<AuthResponseData>>(
     '/user',
     { user: { ...rest, password_confirmation: passwordConfirmation } },
+    { headers: platformHeaders() },
   );
-  extractAndPersistToken(response);
+  persistSessionFromResponse(response);
   return response.data.data.user;
 }
 
 export async function logout(): Promise<void> {
+  const refreshToken = getRefreshToken();
   try {
-    await authorizedApiClient.delete('/logout');
+    await authorizedApiClient.delete('/logout', {
+      data: refreshToken ? { refresh_token: refreshToken } : undefined,
+      skipAuthHandler: true,
+    });
   } finally {
-    appStorage.remove(AppStorageKeys.TOKEN);
-    disconnectCable();
+    clearSession();
   }
 }
 
