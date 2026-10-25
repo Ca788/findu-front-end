@@ -32,6 +32,9 @@ export async function startPush(handlers: PushHandlers): Promise<() => void> {
     await PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
       handlers.onOpen((action.notification.data ?? {}) as Record<string, string>);
     }),
+    await PushNotifications.addListener('registrationError', (error) => {
+      console.warn('[push] registration failed', error);
+    }),
   ];
 
   let permission = await PushNotifications.checkPermissions();
@@ -44,7 +47,7 @@ export async function startPush(handlers: PushHandlers): Promise<() => void> {
       await PushNotifications.createChannel({
         id: CHANNEL_ID,
         name: 'Notificações',
-        description: 'Contas a vencer, orçamentos e insights',
+        description: 'Contas a vencer, orçamentos, insights e lembretes do dia',
         importance: 4,
         visibility: 1,
         vibration: true,
@@ -60,10 +63,10 @@ export async function startPush(handlers: PushHandlers): Promise<() => void> {
 
 export async function stopPush(): Promise<void> {
   const token = appStorage.get<string>(AppStorageKeys.PUSH_TOKEN);
-  appStorage.remove(AppStorageKeys.PUSH_TOKEN);
   if (!token) return;
   try {
     await unregisterDevice(token);
+    appStorage.remove(AppStorageKeys.PUSH_TOKEN);
   } catch {
     return;
   }

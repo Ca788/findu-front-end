@@ -18,7 +18,8 @@ export type NotificationKind =
   | 'budget_exceeded'
   | 'insights_ready'
   | 'installment_completed'
-  | 'idle_reminder';
+  | 'idle_reminder'
+  | 'daily_register';
 
 export interface NotificationData {
   route?: string;
@@ -67,7 +68,7 @@ export const NOTIFICATION_GROUP_LABELS: Record<
   },
   reminders: {
     label: 'Lembretes',
-    description: 'Um toque semanal se você ficar sem registrar gastos.',
+    description: 'Todo dia às 8h e ao meio-dia para registrar o dia, e um toque semanal se você ficar sem lançar.',
   },
 };
 
