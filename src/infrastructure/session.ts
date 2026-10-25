@@ -13,7 +13,7 @@ export interface SessionTokens {
   refreshToken?: string;
 }
 
-type UnauthorizedHandler = () => void;
+type UnauthorizedHandler = () => void | Promise<void>;
 
 let unauthorizedHandler: UnauthorizedHandler | null = null;
 let refreshInFlight: Promise<string | null> | null = null;
@@ -48,8 +48,10 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
 }
 
 export function notifyUnauthorized(): void {
-  clearSession();
-  unauthorizedHandler?.();
+  const handler = unauthorizedHandler;
+  void Promise.resolve(handler?.()).finally(() => {
+    clearSession();
+  });
 }
 
 export function readAuthorizationHeader(response: AxiosResponse): string | undefined {

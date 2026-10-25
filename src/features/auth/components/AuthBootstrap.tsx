@@ -8,6 +8,7 @@ import {
   sessionExpired,
 } from '@/store/slices/auth.slice';
 import { setUnauthorizedHandler } from '@/infrastructure/session';
+import { stopPush } from '@/features/notifications/services/push.service';
 import type { AppDispatch } from '@/store';
 
 export function AuthBootstrap() {
@@ -21,7 +22,10 @@ export function AuthBootstrap() {
   }, [dispatch, status]);
 
   useEffect(() => {
-    setUnauthorizedHandler(() => dispatch(sessionExpired()));
+    setUnauthorizedHandler(async () => {
+      await stopPush();
+      dispatch(sessionExpired());
+    });
     return () => setUnauthorizedHandler(null);
   }, [dispatch]);
 

@@ -23,7 +23,6 @@ export function NotificationBell() {
   );
   useNotificationsChannel(onCreated);
   usePushRegistration();
-  usePushRegistration();
 
   return (
     <>
