@@ -2,73 +2,7 @@
 
 Assistente financeiro para o dia a dia. O Findu junta extrato, metas e um chat que lê a sua vida financeira: você pergunta em texto, manda um áudio ou envia a foto de um boleto.
 
-O app roda na web e no Android. No celular a navegação é de app de banco. No desktop a mesma conta abre com sidebar e painéis lado a lado.
-
-## Prints
-
-Telas do app publicado.
-
-### Início
-
-Saldo do mês, entradas, saídas e os atalhos de despesa, receita, comprovante e extrato.
-
-![Início no celular](docs/prints/01-inicio-mobile.png)
-
-![Início no desktop](docs/prints/02-inicio-desktop.png)
-
-### Assistente
-
-Perguntas prontas sobre o mês, onde cortar gasto, parcelas e reserva. Dá para escolher o modelo e o agente.
-
-![Chat](docs/prints/03-chat.png)
-
-### OCR
-
-Foto da câmera, imagem da galeria ou PDF. O assistente lê o documento e segue a conversa em cima dele. Também aceita áudio.
-
-![Enviar foto ou PDF](docs/prints/04-ocr-anexo.png)
-
-![Resposta a partir do documento](docs/prints/05-ocr-resultado.png)
-
-### Extrato
-
-Meses anteriores e o detalhe do mês, com lançamentos pagos e pendentes.
-
-![Lista de extratos](docs/prints/06-extratos.png)
-
-![Lançamentos do mês](docs/prints/07-extrato-detalhe.png)
-
-### Metas
-
-Limite do período e quanto já foi usado.
-
-![Metas](docs/prints/08-metas.png)
-
-### Parcelas e recorrências
-
-Parcelamentos perto do fim e contas que se repetem todo mês.
-
-![Parcelas](docs/prints/09-parcelas.png)
-
-![Recorrências](docs/prints/10-recorrencias.png)
-
-### Categorias e comprovantes
-
-Gasto por categoria e comprovante em PDF, com envio pelo WhatsApp da categoria.
-
-![Categorias](docs/prints/11-categorias.png)
-
-![Comprovantes](docs/prints/12-comprovantes.png)
-
-### Conta e acesso
-
-Cadastro, login e, no Android, entrada com a digital do aparelho.
-
-![Login no desktop](docs/prints/13-login-desktop.png)
-
-![Login no celular](docs/prints/14-login-mobile.png)
-
-A entrada com digital só aparece no Android, com o app instalado. No navegador essa tela não existe.
+O app roda na web e no Android. No celular a navegação é de app. No desktop a mesma conta abre com sidebar e painéis lado a lado.
 
 ## O que o app entrega
 
