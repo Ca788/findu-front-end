@@ -1,9 +1,8 @@
 'use client';
 
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import type { Budget } from '@/features/budgets/models/budget.model';
 import { BudgetCardItem } from '@/features/budgets/components/list/BudgetCardItem';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface BudgetsCardListProps {
   budgets: Budget[];
@@ -15,11 +14,12 @@ interface BudgetsCardListProps {
 export function BudgetsCardList({ budgets, isLoading, onEdit, onDelete }: BudgetsCardListProps) {
   if (!isLoading && budgets.length === 0) {
     return (
-      <Paper className="rounded-2xl px-4 py-10 text-center">
-        <Typography variant="body2" color="text.secondary">
-          Nenhum orçamento cadastrado.
-        </Typography>
-      </Paper>
+      <EmptyState
+        variant="card"
+        illustration="shield"
+        title="Nenhum orçamento ainda"
+        description="Defina um limite por período e acompanhe o consumo em tempo real."
+      />
     );
   }
 

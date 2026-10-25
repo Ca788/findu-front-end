@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react';
 import { AxiosError } from 'axios';
 import { ListSkeleton } from '@/components/common/ListSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
+import { SummaryHero } from '@/components/common/SummaryHero';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -73,6 +75,14 @@ export function InstallmentsPage() {
   const [canceling, setCanceling] = useState<InstallmentPlan | null>(null);
 
   const plans = useMemo(() => query.data?.data ?? [], [query.data?.data]);
+  const openTotals = useMemo(() => {
+    const active = plans.filter((plan) => plan.status === 'active');
+    return {
+      count: active.length,
+      remaining: active.reduce((sum, plan) => sum + Number(plan.remaining_amount), 0),
+      monthly: active.reduce((sum, plan) => sum + Number(plan.monthly_amount), 0),
+    };
+  }, [plans]);
   const visiblePlans = useMemo(
     () =>
       plans.filter((plan) =>
@@ -116,6 +126,15 @@ export function InstallmentsPage() {
         }
       />
 
+      {plans.length > 0 && (
+        <SummaryHero
+          illustration="car"
+          label="Falta pagar em parcelamentos"
+          value={formatBRL(openTotals.remaining)}
+          caption={`${openTotals.count} ${openTotals.count === 1 ? 'parcelamento ativo' : 'parcelamentos ativos'} · ${formatBRL(openTotals.monthly)} por mês`}
+        />
+      )}
+
       <Tabs
         value={tab}
         onChange={(_, value: InstallmentTab) => setTab(value)}
@@ -130,19 +149,22 @@ export function InstallmentsPage() {
       {query.isLoading && <ListSkeleton rows={4} height={140} columns={2} />}
 
       {!query.isLoading && plans.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          Você ainda não cadastrou nenhum parcelamento. Cadastre uma vez (valor,
-          quantidade, mês da 1ª parcela) e o sistema criará automaticamente todas
-          as parcelas nos meses seguintes.
-        </Typography>
+        <EmptyState
+          variant="card"
+          illustration="car"
+          title="Nenhum parcelamento ainda"
+          description="Cadastre valor, quantidade e mês da primeira parcela; o Findu cria todas as parcelas nos meses seguintes."
+          actionLabel="Criar primeiro parcelamento"
+          onAction={openCreate}
+        />
       )}
 
       {!query.isLoading && plans.length > 0 && visiblePlans.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          {tab === 'active'
-            ? 'Nenhum parcelamento ativo no momento.'
-            : 'Nenhum parcelamento concluído ou cancelado ainda.'}
-        </Typography>
+        <EmptyState
+          illustration="car"
+          title={tab === 'active' ? 'Nenhum parcelamento ativo' : 'Nenhum parcelamento concluído ou cancelado'}
+          description={tab === 'active' ? 'Tudo quitado por aqui.' : 'Quando um parcelamento terminar, ele aparece aqui.'}
+        />
       )}
 
       <div className="grid gap-3 sm:grid-cols-2">

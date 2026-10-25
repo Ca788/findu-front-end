@@ -15,7 +15,7 @@ import { BoxProgressBar, boxAccent, boxProgress } from '@/features/boxes/compone
 import type { Box as BoxModel } from '@/features/boxes/models/box.model';
 import { AnimatedMoney } from '@/features/dashboard/components/AnimatedMoney';
 import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
-import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
+import { EmptyState } from '@/components/common/EmptyState';
 import { riseDelay } from '@/features/dashboard/components/CycleTransition';
 
 interface DashboardBoxesProps {
@@ -122,13 +122,13 @@ export function DashboardBoxes({ limit = 3 }: DashboardBoxesProps) {
       )}
 
       {!isLoading && !isError && boxes.length === 0 && (
-        <DashboardEmptyState
+        <EmptyState
           illustration="piggy"
           title="Comece a guardar"
           description="Crie caixinhas para a reserva, uma viagem ou qualquer objetivo."
           actionLabel="Criar caixinha"
           actionHref={AppRoutePaths.BOXES}
-          compact
+          variant="compact"
         />
       )}
 

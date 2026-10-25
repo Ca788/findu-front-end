@@ -7,9 +7,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import type { Budget } from '@/features/budgets/models/budget.model';
 import { BudgetRow } from '@/features/budgets/components/list/BudgetRow';
+import { EmptyState } from '@/components/common/EmptyState';
 
 interface BudgetsTableProps {
   budgets: Budget[];
@@ -35,10 +35,13 @@ export function BudgetsTable({ budgets, isLoading, onEdit, onDelete }: BudgetsTa
         <TableBody>
           {isEmpty && (
             <TableRow>
-              <TableCell colSpan={4} align="center" className="py-10">
-                <Typography variant="body2" color="text.secondary">
-                  Nenhum orçamento cadastrado.
-                </Typography>
+              <TableCell colSpan={4} className="py-8">
+                <EmptyState
+                  illustration="shield"
+                  size={110}
+                  title="Nenhum orçamento ainda"
+                  description="Defina um limite por período e acompanhe o consumo em tempo real."
+                />
               </TableCell>
             </TableRow>
           )}

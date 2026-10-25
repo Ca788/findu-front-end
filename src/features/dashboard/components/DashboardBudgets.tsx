@@ -12,7 +12,7 @@ import { BUDGET_PERIOD_LABELS } from '@/features/budgets/models/budget.model';
 import type { Budget } from '@/features/budgets/models/budget.model';
 import { formatBRL } from '@/utils/currency';
 import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
-import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
+import { EmptyState } from '@/components/common/EmptyState';
 import { riseDelay } from '@/features/dashboard/components/CycleTransition';
 
 interface DashboardBudgetsProps {
@@ -98,7 +98,7 @@ export function DashboardBudgets({ referenceDate }: DashboardBudgetsProps) {
       )}
 
       {!isLoading && !isError && budgets.length === 0 && (
-        <DashboardEmptyState
+        <EmptyState
           illustration="shield"
           title="Nenhuma meta ativa"
           description="Defina um limite por período e acompanhe o consumo aqui."

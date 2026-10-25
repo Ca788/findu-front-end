@@ -10,6 +10,8 @@ import AddIcon from '@mui/icons-material/AddOutlined';
 import { AxiosError } from 'axios';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { ListSkeleton } from '@/components/common/ListSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
+import { SummaryHero } from '@/components/common/SummaryHero';
 import { DataPagination } from '@/components/common/DataPagination';
 import { PageHeader } from '@/components/common/PageHeader';
 import { RowActions } from '@/components/common/RowActions';
@@ -42,6 +44,10 @@ export function InvestmentsPage() {
 
   const investments = data?.data ?? [];
   const totalCount = data?.pagination.totalCount ?? 0;
+  const active = investments.filter((item) => item.status === 'active');
+  const invested = active.reduce((sum, item) => sum + Number(item.invested_amount), 0);
+  const current = active.reduce((sum, item) => sum + Number(item.current_amount), 0);
+  const gain = current - invested;
 
   const handleDelete = async () => {
     if (!dialogs.selected) return;
@@ -74,15 +80,28 @@ export function InvestmentsPage() {
         }
       />
 
+      {investments.length > 0 && (
+        <SummaryHero
+          illustration="rocket"
+          label="Patrimônio investido"
+          value={formatBRL(current)}
+          caption={`${active.length} ${active.length === 1 ? 'ativo' : 'ativos'} · ${gain >= 0 ? '+' : ''}${formatBRL(gain)} de rendimento nesta página`}
+          color={gain >= 0 ? '#10B981' : undefined}
+        />
+      )}
+
       {isError && <Alert severity="error">Erro ao carregar investimentos.</Alert>}
       {isLoading ? (
         <ListSkeleton rows={4} height={88} />
       ) : investments.length === 0 ? (
-        <Paper className="rounded-2xl px-4 py-10 text-center">
-          <Typography variant="body2" color="text.secondary">
-            Nenhum investimento cadastrado.
-          </Typography>
-        </Paper>
+        <EmptyState
+          variant="card"
+          illustration="rocket"
+          title="Nenhum investimento ainda"
+          description="Registre CDB, Tesouro, fundos ou ações para acompanhar quanto o seu dinheiro rende."
+          actionLabel="Adicionar investimento"
+          onAction={dialogs.openCreate}
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {investments.map((item) => (

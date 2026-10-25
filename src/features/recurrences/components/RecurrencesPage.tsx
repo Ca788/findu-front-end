@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { ListSkeleton } from '@/components/common/ListSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
+import { SummaryHero } from '@/components/common/SummaryHero';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import Paper from '@mui/material/Paper';
@@ -41,6 +43,13 @@ export function RecurrencesPage() {
   const [canceling, setCanceling] = useState<RecurrenceRule | null>(null);
 
   const rules = query.data?.data ?? [];
+  const activeRules = rules.filter((rule) => rule.active);
+  const monthlyExpenses = activeRules
+    .filter((rule) => rule.transaction_type === 'expense')
+    .reduce((sum, rule) => sum + Number(rule.amount), 0);
+  const monthlyIncome = activeRules
+    .filter((rule) => rule.transaction_type === 'income')
+    .reduce((sum, rule) => sum + Number(rule.amount), 0);
 
   const openCreate = () => {
     setSelected(null);
@@ -75,15 +84,27 @@ export function RecurrencesPage() {
         }
       />
 
+      {rules.length > 0 && (
+        <SummaryHero
+          illustration="house"
+          label="Compromissos fixos por mês"
+          value={formatBRL(monthlyExpenses)}
+          caption={`${activeRules.length} ${activeRules.length === 1 ? 'recorrência ativa' : 'recorrências ativas'}${monthlyIncome > 0 ? ` · ${formatBRL(monthlyIncome)} de entradas fixas` : ''}`}
+        />
+      )}
+
       {query.isError && <Alert severity="error">Erro ao carregar recorrências.</Alert>}
       {query.isLoading && <ListSkeleton rows={4} height={140} columns={2} />}
 
       {!query.isLoading && rules.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          Você ainda não cadastrou nenhuma recorrência. Cadastre coisas como aluguel,
-          internet, academia ou salário. O sistema criará automaticamente os
-          lançamentos dos próximos meses.
-        </Typography>
+        <EmptyState
+          variant="card"
+          illustration="house"
+          title="Nenhuma recorrência ainda"
+          description="Cadastre aluguel, internet, academia ou salário uma vez e o Findu lança automaticamente os próximos meses."
+          actionLabel="Criar primeira recorrência"
+          onAction={openCreate}
+        />
       )}
 
       <div className="grid gap-3 sm:grid-cols-2">

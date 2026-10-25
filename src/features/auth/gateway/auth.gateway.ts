@@ -17,6 +17,7 @@ import type {
   UpdateProfileInput,
 } from '@/features/auth/models/auth.model';
 import type { User } from '@/models/user.model';
+import { stopPush } from '@/features/notifications/services/push.service';
 
 const platformHeaders = () => ({ [CLIENT_PLATFORM_HEADER]: getClientPlatform() });
 
@@ -44,6 +45,7 @@ export async function register(credentials: RegisterCredentials): Promise<User> 
 export async function logout(): Promise<void> {
   const refreshToken = getRefreshToken();
   try {
+    await stopPush();
     await authorizedApiClient.delete('/logout', {
       data: refreshToken ? { refresh_token: refreshToken } : undefined,
       skipAuthHandler: true,

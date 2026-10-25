@@ -5,7 +5,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
 import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
-import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
+import { EmptyState } from '@/components/common/EmptyState';
 import { useInsights } from '@/features/insights/hooks/useInsights';
 import {
   INSIGHT_SEVERITY_LABELS,
@@ -58,11 +58,11 @@ export function DashboardInsights({ period, limit = 3 }: DashboardInsightsProps)
       )}
 
       {!isLoading && !isError && insights.length === 0 && (
-        <DashboardEmptyState
+        <EmptyState
           illustration="graduation"
           title="Nenhum insight neste ciclo"
           description="Conforme você lança movimentações, o Findu gera observações aqui."
-          compact
+          variant="compact"
         />
       )}
 

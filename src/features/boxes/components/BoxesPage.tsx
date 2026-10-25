@@ -5,12 +5,11 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import { alpha } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { AxiosError } from 'axios';
+import { EmptyState } from '@/components/common/EmptyState';
+import { SummaryHero } from '@/components/common/SummaryHero';
 import { ListSkeleton } from '@/components/common/ListSkeleton';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { DataPagination } from '@/components/common/DataPagination';
@@ -22,7 +21,6 @@ import { useArchiveBox, useBoxDialogs, useBoxes } from '@/features/boxes/hooks/u
 import { BoxCard } from '@/features/boxes/components/BoxCard';
 import { BoxDetailDialog } from '@/features/boxes/components/BoxDetailDialog';
 import { BoxFormDialog } from '@/features/boxes/components/BoxFormDialog';
-import { BoxIllustrationView } from '@/features/boxes/components/BoxIllustrationView';
 import { BoxMoveDialog } from '@/features/boxes/components/BoxMoveDialog';
 import {
   BOX_KIND_LABELS,
@@ -104,30 +102,17 @@ export function BoxesPage() {
         }
       />
 
-      <Paper
-        variant="outlined"
-        sx={(theme) => ({
-          p: 2.5,
-          borderRadius: 4,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.16)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
-        })}
-      >
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'center' } }}>
-          <BoxIllustrationView illustrationKey="coins" size={88} />
-          <Stack spacing={0.25} sx={{ flex: 1 }}>
-            <Typography variant="overline" color="text.secondary">
-              {archived ? 'Arquivadas nesta página' : 'Guardado nesta página'}
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800 }}>
-              {formatBRL(totals.balance)}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {boxes.length} {boxes.length === 1 ? 'caixinha' : 'caixinhas'}
-              {totals.withTarget > 0 && ` · ${totals.completed}/${totals.withTarget} metas atingidas`}
-            </Typography>
-          </Stack>
-        </Stack>
-      </Paper>
+      <SummaryHero
+        illustration="coins"
+        label={archived ? 'Arquivadas nesta página' : 'Guardado nesta página'}
+        value={formatBRL(totals.balance)}
+        caption={
+          <>
+            {boxes.length} {boxes.length === 1 ? 'caixinha' : 'caixinhas'}
+            {totals.withTarget > 0 && ` · ${totals.completed}/${totals.withTarget} metas atingidas`}
+          </>
+        }
+      />
 
       <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
         <Chip
@@ -157,24 +142,18 @@ export function BoxesPage() {
       {isLoading ? (
         <ListSkeleton rows={6} height={180} columns={2} />
       ) : boxes.length === 0 ? (
-        <Paper variant="outlined" sx={{ p: 4, borderRadius: 4, textAlign: 'center' }}>
-          <Stack spacing={1.5} sx={{ alignItems: 'center' }}>
-            <BoxIllustrationView illustrationKey="piggy" size={140} />
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {archived ? 'Nenhuma caixinha arquivada' : 'Comece a guardar'}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 360 }}>
-              {archived
-                ? 'Caixinhas arquivadas aparecem aqui.'
-                : 'Crie uma caixinha para a reserva de emergência, uma viagem ou qualquer objetivo.'}
-            </Typography>
-            {!archived && (
-              <Button variant="contained" startIcon={<AddIcon />} onClick={dialogs.openCreate}>
-                Criar primeira caixinha
-              </Button>
-            )}
-          </Stack>
-        </Paper>
+        <EmptyState
+          variant="card"
+          illustration="piggy"
+          title={archived ? 'Nenhuma caixinha arquivada' : 'Comece a guardar'}
+          description={
+            archived
+              ? 'Caixinhas arquivadas aparecem aqui.'
+              : 'Crie uma caixinha para a reserva de emergência, uma viagem ou qualquer objetivo.'
+          }
+          actionLabel={archived ? undefined : 'Criar primeira caixinha'}
+          onAction={dialogs.openCreate}
+        />
       ) : (
         <Box
           sx={{

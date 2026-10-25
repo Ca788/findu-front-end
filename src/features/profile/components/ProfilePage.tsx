@@ -4,6 +4,7 @@ import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { ProfileForm } from '@/features/profile/components/ProfileForm';
+import { NotificationPreferences } from '@/features/notifications/components/NotificationPreferences';
 import { useDevice } from '@/hooks/useDevice';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 
@@ -44,6 +45,20 @@ export function ProfilePage() {
 
       <Paper className="rounded-xl px-4 py-5 md:px-8 md:py-7">
         <ProfileForm />
+      </Paper>
+
+      <Paper id="notificacoes" className="rounded-xl px-4 py-5 md:px-8 md:py-7">
+        <Stack spacing={2}>
+          <Stack spacing={0.25}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              Notificações
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Escolha o que você quer receber no app e como push no celular.
+            </Typography>
+          </Stack>
+          <NotificationPreferences />
+        </Stack>
       </Paper>
     </Stack>
   );

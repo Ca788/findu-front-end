@@ -23,7 +23,7 @@ import {
   parseMonth,
 } from '@/features/statements/utils/month';
 import { formatBRL } from '@/utils/currency';
-import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
+import { EmptyState } from '@/components/common/EmptyState';
 
 function toNumber(value: string | number | undefined): number {
   const n = Number(value ?? 0);
@@ -121,7 +121,7 @@ export function DashboardCashflowChart({ height = 220, monthParam }: DashboardCa
           <Skeleton variant="rounded" width="100%" height="100%" sx={{ borderRadius: '10px' }} />
         ) : !hasData ? (
           <Box sx={{ height: '100%', display: 'grid', placeItems: 'center' }}>
-            <DashboardEmptyState
+            <EmptyState
               illustration="rocket"
               title="Sem fluxo neste período"
               description="Registre receitas e despesas para ver a curva dos seus ciclos."

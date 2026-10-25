@@ -193,6 +193,36 @@ body {
   }
 }
 
+@keyframes findu-bell-ring {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(14deg);
+  }
+  30% {
+    transform: rotate(-12deg);
+  }
+  45% {
+    transform: rotate(8deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+}
+
+.findu-bell-alert svg {
+  transform-origin: 50% 0;
+  animation: findu-bell-ring 900ms ease-in-out 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .findu-bell-alert svg {
+    animation: none;
+  }
+}
+
 .findu-aurora-glow {
   position: relative;
   isolation: isolate;

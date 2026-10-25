@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { ListSkeleton } from '@/components/common/ListSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import Paper from '@mui/material/Paper';
@@ -176,9 +177,12 @@ export function ReceiptsPage() {
       {query.isLoading && <ListSkeleton rows={4} height={120} columns={2} />}
 
       {!query.isLoading && receipts.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          Cadastre o WhatsApp na categoria e envie o total pago do período.
-        </Typography>
+        <EmptyState
+          variant="card"
+          illustration="gift"
+          title="Nenhum comprovante ainda"
+          description="Cadastre o WhatsApp na categoria e envie o total pago do período para gerar o comprovante."
+        />
       )}
 
       <div className="grid gap-3 sm:grid-cols-2">

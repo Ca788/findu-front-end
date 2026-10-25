@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import { EmptyState } from '@/components/common/EmptyState';
 import type { Category } from '@/features/categories/models/category.model';
 import { CategoryRow } from '@/features/categories/components/list/CategoryRow';
 
@@ -39,10 +39,13 @@ export function CategoriesTable({
         <TableBody>
           {isEmpty && (
             <TableRow>
-                  <TableCell colSpan={3} align="center" className="py-10">
-                <Typography variant="body2" color="text.secondary">
-                  Nenhuma categoria cadastrada.
-                </Typography>
+              <TableCell colSpan={3} className="py-8">
+                <EmptyState
+                  illustration="briefcase"
+                  size={110}
+                  title="Nenhuma categoria ainda"
+                  description="Crie categorias como Mercado, Transporte ou Lazer para organizar os lançamentos."
+                />
               </TableCell>
             </TableRow>
           )}

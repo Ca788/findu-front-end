@@ -19,6 +19,7 @@
     "@capacitor/app": "^8.1.1",
     "@capacitor/cli": "^8.4.2",
     "@capacitor/core": "^8.4.2",
+    "@capacitor/push-notifications": "^8",
     "@capgo/capacitor-native-biometric": "^8.6.2",
     "@datadog/browser-logs": "^7.6.0",
     "@datadog/browser-rum": "^7.6.0",

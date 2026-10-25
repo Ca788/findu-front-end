@@ -4,6 +4,7 @@ import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 import { ListSkeleton } from '@/components/common/ListSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
 import { useStatementsList } from '@/features/statements/hooks/useStatementsList';
 import { StatementCard } from '@/features/statements/components/StatementCard';
 import { currentMonthParam } from '@/features/statements/utils/month';
@@ -71,9 +72,14 @@ export function StatementsListPage() {
       )}
 
       {!query.isLoading && rows.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
-          Nenhum extrato disponível ainda.
-        </Typography>
+        <EmptyState
+          variant="card"
+          illustration="coins"
+          title="Nenhum extrato ainda"
+          description="Registre o primeiro lançamento e o extrato do mês aparece aqui."
+          actionLabel="Ir para o chat"
+          actionHref="/chat"
+        />
       )}
     </Stack>
   );

@@ -12,7 +12,7 @@ import { formatBRL } from '@/utils/currency';
 import type { Statement } from '@/features/statements/models/statement.model';
 import type { Transaction } from '@/features/transactions/models/transaction.model';
 import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
-import { DashboardEmptyState } from '@/features/dashboard/components/DashboardEmptyState';
+import { EmptyState } from '@/components/common/EmptyState';
 import { riseDelay } from '@/features/dashboard/components/CycleTransition';
 
 interface DashboardRecentEntriesProps {
@@ -103,7 +103,7 @@ export function DashboardRecentEntries({
       }
     >
       {visible.length === 0 && (
-        <DashboardEmptyState
+        <EmptyState
           illustration="coins"
           title="Nenhuma movimentação neste ciclo"
           description="Lance uma despesa ou receita e ela aparece aqui."

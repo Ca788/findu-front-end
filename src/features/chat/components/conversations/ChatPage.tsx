@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { EmptyState } from '@/components/common/EmptyState';
 import { ListSkeleton } from '@/components/common/ListSkeleton';
 import { useSnackbar } from '@/providers/SnackbarProvider';
 import {
@@ -94,9 +95,13 @@ export function ChatPage() {
       {isLoading && <ListSkeleton rows={5} height={64} />}
 
       {!isLoading && conversations.length === 0 && (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
-          Nenhuma conversa ainda.
-        </Typography>
+        <Box sx={{ py: 4 }}>
+          <EmptyState
+            illustration="heart"
+            title="Nenhuma conversa ainda"
+            description="Comece uma conversa e o histórico aparece aqui."
+          />
+        </Box>
       )}
 
       <List disablePadding sx={{ mx: -1 }}>

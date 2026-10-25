@@ -76,7 +76,7 @@ export function getTheme(mode: ThemeMode): Theme {
       },
     },
     shape: {
-      borderRadius: 12,
+      borderRadius: 16,
     },
     typography: {
       fontFamily: [
@@ -124,7 +124,7 @@ export function getTheme(mode: ThemeMode): Theme {
             backgroundImage: 'none',
             backgroundColor: p.bgPaper,
             border: `1px solid ${p.border}`,
-            borderRadius: 12,
+            borderRadius: 16,
           },
         },
       },
@@ -220,12 +220,47 @@ export function getTheme(mode: ThemeMode): Theme {
             backgroundColor: 'transparent',
             border: `1px solid ${p.border}`,
             borderRadius: 999,
+            fontWeight: 500,
+          },
+          filled: {
+            border: '1px solid transparent',
+          },
+          colorPrimary: {
+            '&.MuiChip-filled': {
+              backgroundColor: p.actionSelected,
+              color: p.primaryLight,
+            },
+          },
+          clickable: {
+            transition: 'background-color 160ms ease, border-color 160ms ease',
+            '&:hover': { borderColor: p.borderHi },
           },
         },
       },
       MuiTableCell: {
         styleOverrides: {
           root: { borderBottomColor: p.border },
+          head: {
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            color: p.textMid,
+            backgroundColor: 'transparent',
+          },
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            '&:last-child td': { borderBottom: 0 },
+            '&.MuiTableRow-hover:hover': { backgroundColor: p.actionHover },
+          },
+        },
+      },
+      MuiSkeleton: {
+        styleOverrides: {
+          root: { backgroundColor: p.actionHover },
         },
       },
       MuiListItemButton: {

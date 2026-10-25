@@ -13,6 +13,7 @@ import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import { UserMenu } from '@/features/auth/components/userMenu/UserMenu';
 import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import {
   isImmersiveChatPath,
   sectionTitle,
@@ -136,6 +137,7 @@ export function AppHeader() {
 
       {!immersive && (
         <>
+          <NotificationBell />
           <ThemeToggleButton />
           <UserMenu />
         </>
