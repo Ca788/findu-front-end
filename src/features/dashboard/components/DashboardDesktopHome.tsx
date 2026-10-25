@@ -50,6 +50,7 @@ export function DashboardDesktopHome() {
           '& > *': { minWidth: 0, minHeight: 0 },
         }}
       >
+        <DashboardBoxes />
         <CycleTransition cycle={cycle} fill>
           <AccountBalanceHero
             statement={statementQuery.data}
@@ -58,7 +59,6 @@ export function DashboardDesktopHome() {
             onToggleHidden={toggleHidden}
           />
         </CycleTransition>
-        <DashboardBoxes />
 
         <CycleTransition cycle={cycle} fill>
           <AccountBalanceMetrics statement={statementQuery.data} loading={loading} hidden={hidden} />
@@ -87,7 +87,7 @@ export function DashboardDesktopHome() {
             '& > div > .MuiPaper-root': { height: '100%', borderRadius: '14px', minWidth: 0 },
           }}
         >
-          <StatementSideLists statement={statementQuery.data} />
+          <StatementSideLists statement={statementQuery.data} compact />
         </Box>
       </CycleTransition>
     </Stack>

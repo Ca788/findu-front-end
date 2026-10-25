@@ -5,113 +5,157 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { useCurrentBudgets } from '@/features/budgets/hooks/useCurrentBudgets';
+import { useBudgets } from '@/features/budgets/hooks/useBudgets';
 import { BUDGET_PERIOD_LABELS } from '@/features/budgets/models/budget.model';
 import type { Budget } from '@/features/budgets/models/budget.model';
+import { useGoals } from '@/features/goals/hooks/useGoals';
+import type { Goal } from '@/features/goals/models/goal.model';
 import { formatBRL } from '@/utils/currency';
 import { DashboardCard } from '@/features/dashboard/components/DashboardCard';
 import { EmptyState } from '@/components/common/EmptyState';
+import { ProgressItemRow, type ProgressTone } from '@/components/common/ProgressItemRow';
 import { riseDelay } from '@/features/dashboard/components/CycleTransition';
 
 interface DashboardBudgetsProps {
   referenceDate: string;
 }
 
-function progressColor(usage: number): 'success' | 'warning' | 'error' {
-  if (usage >= 100) return 'error';
-  if (usage >= 80) return 'warning';
-  return 'success';
+function budgetTone(usage: number): ProgressTone {
+  if (usage >= 100) return 'bad';
+  if (usage >= 80) return 'warn';
+  return 'good';
+}
+
+function budgetBadge(usage: number): string | undefined {
+  if (usage >= 100) return 'Estourou';
+  if (usage >= 80) return 'Atenção';
+  if (usage <= 40) return 'Sobra folga';
+  return 'No ritmo';
+}
+
+function goalTone(progress: number, status: Goal['status']): ProgressTone {
+  if (status === 'achieved' || progress >= 100) return 'good';
+  if (progress >= 70) return 'neutral';
+  return 'warn';
+}
+
+function goalBadge(goal: Goal): string | undefined {
+  if (goal.status === 'achieved' || goal.progress_percent >= 100) return 'Concluída';
+  if (goal.progress_percent >= 70) return 'Quase lá';
+  return undefined;
+}
+
+function goalSubtitle(goal: Goal): string {
+  if (goal.status === 'achieved' || goal.progress_percent >= 100) {
+    return 'Meta atingida';
+  }
+  return `Falta ${formatBRL(goal.remaining_amount)}`;
+}
+
+function GoalRow({ goal, index }: { goal: Goal; index: number }) {
+  return (
+    <div className="findu-anim-rise min-w-0" style={riseDelay(index)}>
+      <ProgressItemRow
+        title={goal.name}
+        subtitle={goalSubtitle(goal)}
+        value={formatBRL(goal.current_amount)}
+        progress={goal.progress_percent}
+        tone={goalTone(goal.progress_percent, goal.status)}
+        badge={goalBadge(goal)}
+      />
+    </div>
+  );
 }
 
 function BudgetRow({ budget, index }: { budget: Budget; index: number }) {
-  const usage = Math.min(200, Number(budget.usage_percent ?? 0));
-  const color = progressColor(usage);
-  const periodLabel = BUDGET_PERIOD_LABELS[budget.period_type];
+  const usage = Number(budget.usage_percent ?? 0);
 
   return (
-    <Stack spacing={1} className="min-w-0 findu-anim-rise" style={riseDelay(index)}>
-      <Box className="flex items-center justify-between gap-2">
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          {periodLabel}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            fontVariantNumeric: 'tabular-nums',
-            fontWeight: 700,
-            color: color === 'success' ? 'text.secondary' : `${color}.main`,
-          }}
-        >
-          {usage.toFixed(0)}%
-        </Typography>
-      </Box>
-      <LinearProgress
-        variant="determinate"
-        color={color}
-        value={Math.min(100, usage)}
-        sx={{
-          height: 8,
-          borderRadius: 999,
-          '& .MuiLinearProgress-bar': { transition: 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)' },
-        }}
+    <div className="findu-anim-rise min-w-0" style={riseDelay(index)}>
+      <ProgressItemRow
+        title={BUDGET_PERIOD_LABELS[budget.period_type]}
+        subtitle={`${formatBRL(budget.spent_amount ?? 0)} de ${formatBRL(budget.limit_amount)}`}
+        value={`${Math.min(999, Math.round(usage))}%`}
+        progress={Math.min(100, usage)}
+        tone={budgetTone(usage)}
+        badge={budgetBadge(usage)}
+        href={AppRoutePaths.BUDGETS}
       />
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ fontVariantNumeric: 'tabular-nums' }}
-      >
-        {formatBRL(budget.spent_amount ?? 0)} de {formatBRL(budget.limit_amount)}
-      </Typography>
-    </Stack>
+    </div>
   );
 }
 
 export function DashboardBudgets({ referenceDate }: DashboardBudgetsProps) {
-  const { data, isLoading, isError } = useCurrentBudgets(referenceDate);
-  const budgets = data ?? [];
+  const goalsQuery = useGoals({ page: 1, perPage: 6, status: 'active' });
+  const currentQuery = useCurrentBudgets(referenceDate);
+  const listQuery = useBudgets({ page: 1, perPage: 6 });
+
+  const goals = goalsQuery.data?.data ?? [];
+  const current = currentQuery.data ?? [];
+  const listed = listQuery.data?.data ?? [];
+  const budgets = current.length > 0 ? current : listed;
+  const showGoals = goals.length > 0;
+  const items = showGoals ? goals : budgets;
+  const loading =
+    goalsQuery.isLoading ||
+    (goals.length === 0 && currentQuery.isLoading) ||
+    (goals.length === 0 && current.length === 0 && listQuery.isLoading);
+  const failed = goalsQuery.isError && currentQuery.isError && listQuery.isError;
 
   return (
     <DashboardCard
       className="findu-anim-rise"
       title="Metas"
+      subtitle={
+        items.length > 0
+          ? showGoals
+            ? `${goals.length} ${goals.length === 1 ? 'objetivo' : 'objetivos'} em andamento`
+            : `${budgets.length} ${budgets.length === 1 ? 'orçamento' : 'orçamentos'} no período`
+          : undefined
+      }
       action={
         <Button
           component={Link}
-          href={AppRoutePaths.BUDGETS}
+          href={showGoals ? AppRoutePaths.CHAT : AppRoutePaths.BUDGETS}
           size="small"
           variant="text"
         >
-          Ver todas
+          {showGoals ? 'No chat' : 'Ver todas'}
         </Button>
       }
     >
-      {isError && (
+      {failed && (
         <Typography variant="body2" color="error.main">
-          Erro ao carregar orçamentos.
+          Erro ao carregar metas.
         </Typography>
       )}
 
-      {isLoading && (
+      {loading && (
         <LinearProgress variant="indeterminate" sx={{ borderRadius: 999, height: 3 }} />
       )}
 
-      {!isLoading && !isError && budgets.length === 0 && (
+      {!loading && !failed && items.length === 0 && (
         <EmptyState
-          illustration="shield"
+          variant="compact"
+          illustration="rocket"
           title="Nenhuma meta ativa"
-          description="Defina um limite por período e acompanhe o consumo aqui."
+          description="Peça no chat ou defina um limite de gastos."
           actionLabel="Criar meta"
-          actionHref={AppRoutePaths.BUDGETS}
+          actionHref={AppRoutePaths.CHAT}
         />
       )}
 
-      {budgets.length > 0 && (
-        <Stack spacing={2.5}>
-          {budgets.slice(0, 3).map((budget, index) => (
-            <BudgetRow key={budget.id} budget={budget} index={index} />
-          ))}
+      {items.length > 0 && (
+        <Stack spacing={1.75}>
+          {showGoals
+            ? goals.slice(0, 3).map((goal, index) => (
+                <GoalRow key={goal.id} goal={goal} index={index} />
+              ))
+            : budgets.slice(0, 3).map((budget, index) => (
+                <BudgetRow key={budget.id} budget={budget} index={index} />
+              ))}
         </Stack>
       )}
     </DashboardCard>

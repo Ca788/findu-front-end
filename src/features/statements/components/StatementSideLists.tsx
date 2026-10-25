@@ -1,12 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import LinearProgress from '@mui/material/LinearProgress';
 import { formatBRL } from '@/utils/currency';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
+import {
+  ProgressItemRow,
+  ProgressListCard,
+  type ProgressTone,
+} from '@/components/common/ProgressItemRow';
 import type {
   Statement,
   StatementByCategory,
@@ -17,6 +18,51 @@ import type { RecurrenceRule } from '@/features/recurrences/models/recurrence.mo
 interface StatementSideListsProps {
   statement?: Statement;
   compact?: boolean;
+}
+
+function installmentProgress(plan: InstallmentPlan): number {
+  if (plan.total_installments <= 0) return 0;
+  return Math.round((plan.paid_count / plan.total_installments) * 100);
+}
+
+function installmentTone(plan: InstallmentPlan): ProgressTone {
+  if (plan.remaining_count <= 0) return 'good';
+  if (plan.remaining_count <= 2) return 'warn';
+  return 'neutral';
+}
+
+function installmentBadge(plan: InstallmentPlan): string | undefined {
+  if (plan.remaining_count <= 0) return 'Quitado';
+  if (plan.remaining_count === 1) return 'Última';
+  if (plan.remaining_count === 2) return 'Quase lá';
+  return undefined;
+}
+
+function installmentSubtitle(plan: InstallmentPlan): string {
+  if (plan.remaining_count <= 0) return `${plan.total_installments} parcelas pagas`;
+  if (plan.remaining_count === 1) return 'Falta 1 parcela';
+  return `${plan.paid_count}/${plan.total_installments} · faltam ${plan.remaining_count}`;
+}
+
+function categoryProgress(row: StatementByCategory): number {
+  const forecast = Number(row.forecast) || 0;
+  const paid = Number(row.paid) || 0;
+  if (forecast <= 0) return paid > 0 ? 100 : 0;
+  return Math.min(100, Math.round((paid / forecast) * 100));
+}
+
+function categoryTone(progress: number, forecast: number): ProgressTone {
+  if (forecast <= 0) return 'neutral';
+  if (progress >= 100) return 'bad';
+  if (progress >= 80) return 'warn';
+  return 'good';
+}
+
+function categoryBadge(progress: number, forecast: number): string | undefined {
+  if (forecast <= 0) return undefined;
+  if (progress >= 100) return 'Estourou';
+  if (progress >= 80) return 'Atenção';
+  return 'No controle';
 }
 
 function CategoryBreakdown({
@@ -32,55 +78,31 @@ function CategoryBreakdown({
   const visible = compact ? rows.slice(0, 4) : rows;
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-3 rounded-xl px-4 py-4">
-      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-        Por categoria
-      </Typography>
+    <ProgressListCard title="Por categoria" href={AppRoutePaths.CATEGORIES}>
       {visible.map((row) => {
         const forecast = Number(row.forecast) || 0;
         const paid = Number(row.paid) || 0;
-        const pct = forecast > 0 ? Math.min(100, Math.round((paid / forecast) * 100)) : 0;
+        const progress = categoryProgress(row);
 
         return (
-          <Box key={row.category_id ?? 'uncategorized'} className="min-w-0">
-            <div className="mb-1 flex items-baseline justify-between gap-2">
-              {row.category_id ? (
-                <Typography
-                  component={Link}
-                  href={AppRoutePaths.categoryDetail(row.category_id, month)}
-                  variant="body2"
-                  sx={{ fontWeight: 600, color: 'inherit' }}
-                  className="min-w-0 truncate no-underline"
-                >
-                  {row.category_name || 'Sem categoria'}
-                </Typography>
-              ) : (
-                <Typography variant="body2" sx={{ fontWeight: 600 }} className="min-w-0 truncate">
-                  {row.category_name || 'Sem categoria'}
-                </Typography>
-              )}
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}
-              >
-                {formatBRL(paid)}
-              </Typography>
-            </div>
-            <LinearProgress
-              variant="determinate"
-              value={pct}
-              sx={{ height: 6, borderRadius: 999 }}
-            />
-          </Box>
+          <ProgressItemRow
+            key={row.category_id ?? 'uncategorized'}
+            title={row.category_name || 'Sem categoria'}
+            subtitle={forecast > 0 ? `de ${formatBRL(forecast)} previstos` : 'sem previsão'}
+            value={formatBRL(paid)}
+            progress={progress}
+            tone={categoryTone(progress, forecast)}
+            badge={categoryBadge(progress, forecast)}
+            href={row.category_id ? AppRoutePaths.categoryDetail(row.category_id, month) : undefined}
+          />
         );
       })}
-      {compact && rows.length > visible.length && (
+      {compact && rows.length > visible.length ? (
         <Typography variant="caption" color="text.secondary">
           +{rows.length - visible.length} categorias
         </Typography>
-      )}
-    </Paper>
+      ) : null}
+    </ProgressListCard>
   );
 }
 
@@ -92,32 +114,23 @@ function InstallmentsList({
   compact?: boolean;
 }) {
   if (plans.length === 0) return null;
-  const visible = compact ? plans.slice(0, 2) : plans;
+  const visible = compact ? plans.slice(0, 3) : plans;
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-2.5 rounded-xl px-4 py-4">
-      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-        Parcelas
-      </Typography>
+    <ProgressListCard title="Parcelas" href={AppRoutePaths.INSTALLMENTS}>
       {visible.map((plan) => (
-        <div key={plan.id} className="flex min-w-0 items-center justify-between gap-3">
-          <div className="min-w-0">
-            <Typography variant="body2" className="truncate" sx={{ fontWeight: 600 }}>
-              {plan.description || 'Parcelamento'}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {plan.paid_count}/{plan.total_installments} pagas
-            </Typography>
-          </div>
-          <Typography
-            variant="body2"
-            sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700, flexShrink: 0 }}
-          >
-            {formatBRL(plan.monthly_amount)}
-          </Typography>
-        </div>
+        <ProgressItemRow
+          key={plan.id}
+          title={plan.description || 'Parcelamento'}
+          subtitle={installmentSubtitle(plan)}
+          value={formatBRL(plan.monthly_amount)}
+          progress={installmentProgress(plan)}
+          tone={installmentTone(plan)}
+          badge={installmentBadge(plan)}
+          href={AppRoutePaths.INSTALLMENTS}
+        />
       ))}
-    </Paper>
+    </ProgressListCard>
   );
 }
 
@@ -132,30 +145,24 @@ function RecurrencesList({
   const visible = compact ? rules.slice(0, 3) : rules;
 
   return (
-    <Paper className="flex min-w-0 flex-col gap-2.5 rounded-xl px-4 py-4">
-      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-        Recorrentes
-      </Typography>
-      {visible.map((rule) => (
-        <div key={rule.id} className="flex min-w-0 items-center justify-between gap-3">
-          <div className="min-w-0">
-            <Typography variant="body2" className="truncate" sx={{ fontWeight: 600 }}>
-              {rule.description || 'Recorrência'}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {rule.transaction_type === 'income' ? 'Receita' : 'Despesa'}
-              {rule.day_of_month ? ` · dia ${rule.day_of_month}` : ''}
-            </Typography>
-          </div>
-          <Typography
-            variant="body2"
-            sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700, flexShrink: 0 }}
-          >
-            {formatBRL(rule.amount)}
-          </Typography>
-        </div>
-      ))}
-    </Paper>
+    <ProgressListCard title="Recorrentes" href={AppRoutePaths.RECURRENCES}>
+      {visible.map((rule) => {
+        const income = rule.transaction_type === 'income';
+        return (
+          <ProgressItemRow
+            key={rule.id}
+            title={rule.description || 'Recorrência'}
+            subtitle={income ? 'Receita todo mês' : 'Despesa todo mês'}
+            value={formatBRL(rule.amount)}
+            progress={rule.day_of_month ? Math.round((rule.day_of_month / 31) * 100) : 100}
+            tone={income ? 'income' : 'neutral'}
+            leading={rule.day_of_month ? 'day' : 'ring'}
+            day={rule.day_of_month ?? undefined}
+            href={AppRoutePaths.RECURRENCES}
+          />
+        );
+      })}
+    </ProgressListCard>
   );
 }
 
