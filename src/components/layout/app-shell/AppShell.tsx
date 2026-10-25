@@ -14,12 +14,14 @@ import { GlobalProgress } from '@/components/layout/app-shell/GlobalProgress';
 import { isImmersiveChatPath } from '@/components/layout/app-shell/appNavItems';
 import { AppRoutePaths } from '@/constants/AppRoutePaths';
 import { RecentConversationsDrawer } from '@/features/chat/components/conversations/RecentConversationsDrawer';
+import { useChatInboxChannel } from '@/features/chat/hooks/useChatInboxChannel';
 
 interface AppShellProps {
   children: ReactNode;
 }
 
 function AppShellLayout({ children }: AppShellProps) {
+  useChatInboxChannel();
   const pathname = usePathname() ?? '';
   const { isDesktop, recentOpen, closeRecent, keyboardOpen, keyboardInset } =
     useAppShell();
