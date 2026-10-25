@@ -9,7 +9,6 @@ import { DashboardQuickActions } from '@/features/dashboard/components/Dashboard
 import { DashboardBudgets } from '@/features/dashboard/components/DashboardBudgets';
 import { DashboardBoxes } from '@/features/dashboard/components/DashboardBoxes';
 import { DashboardCashflowChart } from '@/features/dashboard/components/DashboardCashflowChart';
-import { DashboardEndingInstallments } from '@/features/dashboard/components/DashboardEndingInstallments';
 import { CycleTransition } from '@/features/dashboard/components/CycleTransition';
 import { useStatement } from '@/features/statements/hooks/useStatement';
 import {
@@ -40,8 +39,6 @@ export function DashboardDesktopHome() {
           Erro ao carregar extrato do mês.
         </Alert>
       )}
-
-      <DashboardEndingInstallments />
 
       <Box
         sx={{

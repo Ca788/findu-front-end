@@ -66,9 +66,10 @@ export function NotificationItem({ notification, onOpen }: NotificationItemProps
             color="text.secondary"
             sx={{
               display: '-webkit-box',
-              WebkitLineClamp: 2,
+              WebkitLineClamp: 5,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
+              whiteSpace: 'pre-line',
             }}
           >
             {notification.body}
