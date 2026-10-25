@@ -18,6 +18,7 @@ export type NotificationKind =
   | 'budget_exceeded'
   | 'insights_ready'
   | 'installment_completed'
+  | 'installment_ending'
   | 'idle_reminder'
   | 'daily_register';
 
@@ -64,7 +65,7 @@ export const NOTIFICATION_GROUP_LABELS: Record<
   },
   installments: {
     label: 'Parcelamentos',
-    description: 'Quando um parcelamento for quitado.',
+    description: 'Quando restam poucas parcelas e quando um parcelamento é quitado.',
   },
   reminders: {
     label: 'Lembretes',
